@@ -2,7 +2,9 @@ import { useMemo, useRef, useState } from "react";
 import Header from "../components/Header";
 import InputPanel from "../components/InputPanel";
 import ReportPanel from "../components/ReportPanel";
+import ErrorBanner from "../components/ErrorBanner";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { analizarTexto } from "../services/analysisService";
 
 const featureList = [
   {
@@ -48,9 +50,6 @@ const Home = () => {
       setError(null);
       setReport(null);
 
-      // Simulación de tiempo de respuesta de la IA
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
       const normalized = content.trim().toLowerCase();
 
       if (!normalized) {
@@ -58,15 +57,7 @@ const Home = () => {
         return;
       }
 
-      // Simulación de IA
-      const verdict =
-        normalized.includes("falso") || normalized.includes("mentira")
-          ? "falso"
-          : normalized.includes("posible") ||
-            normalized.includes("dudoso") ||
-            normalized.includes("tal vez")
-          ? "dudoso"
-          : "veraz";
+      const resultado = await analizarTexto(content);
 
       const keyTerms = [
         "veracidad",
@@ -76,23 +67,16 @@ const Home = () => {
         "engañoso",
       ].filter((term) => normalized.includes(term));
 
-      const explanation =
-        verdict === "veraz"
-          ? "El texto presenta elementos consistentes, fuentes creíbles y no muestra señales de manipulación evidente."
-          : verdict === "dudoso"
-          ? "Se detectaron frases ambiguas o afirmaciones sin respaldo claro; conviene revisar los datos que se citan."
-          : "El contenido contiene palabras o patrones que suelen asociarse con información incorrecta o engañosa.";
-
       const indicators =
-        verdict === "veraz"
+        resultado.veredicto === "veraz"
           ? ["Estructura coherente", "Lenguaje directo y claro"]
-          : verdict === "dudoso"
-          ? ["Uso de palabras imprecisas", "Falta de fuentes concretas"]
-          : ["Afirmaciones sin respaldo", "Lenguaje sensacionalista"];
+          : resultado.veredicto === "dudoso"
+            ? ["Uso de palabras imprecisas", "Falta de fuentes concretas"]
+            : ["Afirmaciones sin respaldo", "Lenguaje sensacionalista"];
 
       setReport({
-        verdict,
-        explanation,
+        verdict: resultado.veredicto,
+        explanation: resultado.explicacion,
         keyTerms,
         indicators,
       });
@@ -102,8 +86,10 @@ const Home = () => {
       setStatus("error");
 
       setError({
-        codigo: "ERROR_ANALISIS",
-        mensaje: "No fue posible realizar el análisis.",
+        codigo: err?.codigo || "ERROR_ANALISIS",
+        mensaje:
+          err?.mensaje ||
+          "No fue posible realizar el análisis. Por favor intenta de nuevo.",
       });
     }
   };
@@ -158,10 +144,11 @@ const Home = () => {
 
         {/* Estado error */}
         {status === "error" && (
-          <div className="mt-8 rounded-2xl border border-red-300 bg-red-100 p-4 text-red-700">
-            <h3 className="font-semibold">Error</h3>
-            <p>{error?.mensaje}</p>
-          </div>
+          <ErrorBanner
+            message={error?.mensaje}
+            code={error?.codigo}
+            onRetry={analyzeContent}
+          />
         )}
 
         {/* Estado resultado */}
