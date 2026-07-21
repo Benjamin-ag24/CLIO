@@ -42,9 +42,7 @@ const InputPanel = forwardRef(
       <div className="rounded-3xl bg-white p-6 shadow-[0_8px_30px_-12px_rgba(91,55,35,0.15)]">
         <div className="space-y-4">
           <div>
-            <h2 className="text-xl font-semibold text-[#5b3f2d]">
-              Analiza tu contenido
-            </h2>
+
             <p className="mt-1 text-sm text-[#7b5f49]">
               Pega o escribe el texto que deseas verificar
             </p>
