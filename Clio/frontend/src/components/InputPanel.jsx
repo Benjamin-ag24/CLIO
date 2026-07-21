@@ -42,6 +42,15 @@ const InputPanel = forwardRef(
       <div className="rounded-3xl bg-white p-6 shadow-[0_8px_30px_-12px_rgba(91,55,35,0.15)]">
         <div className="space-y-4">
           <div>
+            <h2 className="text-xl font-semibold text-[#5b3f2d]">
+              Analiza tu contenido
+            </h2>
+            <p className="mt-1 text-sm text-[#7b5f49]">
+              Pega o escribe el texto que deseas verificar
+            </p>
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-[#5b3f2d] mb-1">
               Texto a analizar
             </label>
@@ -66,9 +75,7 @@ const InputPanel = forwardRef(
               {error && (
                 <span
                   className={`text-sm ${
-                    error.includes("corto")
-                      ? "text-yellow-600"
-                      : "text-red-600"
+                    error.includes("corto") ? "text-yellow-600" : "text-red-600"
                   }`}
                 >
                   {error}
@@ -105,7 +112,6 @@ const InputPanel = forwardRef(
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-
                   Analizando...
                 </span>
               ) : (
@@ -123,7 +129,7 @@ const InputPanel = forwardRef(
         </div>
       </div>
     );
-  }
+  },
 );
 
 InputPanel.displayName = "InputPanel";

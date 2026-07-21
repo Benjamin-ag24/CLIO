@@ -1,106 +1,146 @@
+﻿import { useState } from "react";
+import Semaphore, { renderHighlightedText } from "./Semaphore";
+
+const buildReportText = ({ verdict, explanation, keyTerms, indicators }) => {
+  const text = [
+    "Reporte final de resultados",
+    `Veredicto: ${verdict}`,
+    "",
+    "Explicación:",
+    explanation,
+  ];
+
+  if (keyTerms?.length) {
+    text.push("", "Términos clave:", keyTerms.join(", "));
+  }
+
+  if (indicators?.length) {
+    text.push("", "Indicadores:", ...indicators.map((item) => `- ${item}`));
+  }
+
+  return text.join("\n");
+};
+
 const ReportPanel = ({ report, onReset }) => {
+  const [copyState, setCopyState] = useState("idle");
+
   if (!report) return null;
 
   const { verdict, explanation, keyTerms, indicators } = report;
 
-  const verdictConfig = {
-    veraz: {
-      color: "green",
-      bg: "bg-green-100",
-      text: "text-green-800",
-      icon: "🟢",
-      label: "Veraz",
-    },
-    dudoso: {
-      color: "yellow",
-      bg: "bg-yellow-100",
-      text: "text-yellow-800",
-      icon: "🟡",
-      label: "Dudoso",
-    },
-    falso: {
-      color: "red",
-      bg: "bg-red-100",
-      text: "text-red-800",
-      icon: "🔴",
-      label: "Falso",
-    },
+  const handleCopy = async () => {
+    const text = buildReportText(report);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "absolute";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
+      setCopyState("copied");
+    } catch {
+      setCopyState("error");
+    }
+
+    window.setTimeout(() => {
+      setCopyState("idle");
+    }, 1800);
   };
 
-  const config = verdictConfig[verdict] || verdictConfig.dudoso;
-
   return (
-    <div className="mt-8 rounded-3xl bg-white p-6 shadow-[0_8px_30px_-12px_rgba(91,55,35,0.15)] animate-fadeIn">
-      <div className="flex items-start gap-6">
-        <div className="flex-shrink-0">
-          <div
-            className={`w-20 h-20 rounded-full ${config.bg} flex items-center justify-center text-4xl`}
-          >
-            {config.icon}
+    <div className="mt-8 rounded-3xl bg-white p-6 shadow-[0_8px_30px_-12px_rgba(91,55,35,0.15)]">
+      <div className="grid gap-6 xl:grid-cols-[1.1fr_1fr]">
+        <section className="rounded-3xl border border-[#e8ddd0] bg-[#fcfaf7] p-5">
+          <div className="mb-4">
+            <span className="text-xs font-semibold uppercase tracking-[0.24em] text-[#a78a6f]">
+              Semáforo
+            </span>
+            <h2 className="mt-2 text-lg font-semibold text-[#5b3f2d]">
+              Evaluación inmediata
+            </h2>
           </div>
-        </div>
-        <div className="flex-1">
-          <h2 className="text-xl font-bold text-[#5b3f2d]">
-            Resultado del análisis
-          </h2>
-          <p className={`text-2xl font-bold ${config.text} mt-1`}>
-            {config.label}
-          </p>
-          <p className="text-[#7b5f49] mt-2 text-sm leading-relaxed">
-            {explanation}
-          </p>
-        </div>
+          <Semaphore verdict={verdict} />
+        </section>
+
+        <section className="rounded-3xl border border-[#e8ddd0] bg-[#fcfaf7] p-5">
+          <div className="mb-4">
+            <span className="text-xs font-semibold uppercase tracking-[0.24em] text-[#a78a6f]">
+              Explicación
+            </span>
+            <h2 className="mt-2 text-lg font-semibold text-[#5b3f2d]">
+              Qué se detectó en el contenido
+            </h2>
+          </div>
+          <div className="space-y-4 text-sm leading-7 text-[#6e5544]">
+            <p>{renderHighlightedText(explanation, keyTerms)}</p>
+
+            {indicators?.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-[#a78a6f]">
+                  Indicadores
+                </h3>
+                <ul className="mt-3 space-y-2">
+                  {indicators.map((indicator) => (
+                    <li
+                      key={indicator}
+                      className="flex items-start gap-3 rounded-2xl bg-[#fff8f3] p-3 text-sm text-[#705944]"
+                    >
+                      <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#e8d7c1] text-xs font-semibold text-[#7b5d42]">
+                        ✓
+                      </span>
+                      <span>{indicator}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {keyTerms?.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-[#a78a6f]">
+                  Términos clave
+                </h3>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {keyTerms.map((term) => (
+                    <span
+                      key={term}
+                      className="rounded-full bg-[#f2ede6] px-3 py-1 text-sm font-medium text-[#5b3f2d]"
+                    >
+                      {term}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
 
-      {keyTerms && keyTerms.length > 0 && (
-        <div className="mt-4 border-t border-[#e8ddd0] pt-4">
-          <h3 className="text-sm font-semibold text-[#5b3f2d] uppercase tracking-wide">
-            Términos clave detectados
-          </h3>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {keyTerms.map((term) => (
-              <span
-                key={term}
-                className="rounded-full bg-[#f7f2ec] px-3 py-1 text-sm text-[#5b3f2d]"
-              >
-                {term}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {indicators && indicators.length > 0 && (
-        <div className="mt-4 border-t border-[#e8ddd0] pt-4">
-          <h3 className="text-sm font-semibold text-[#5b3f2d] uppercase tracking-wide">
-            Indicadores
-          </h3>
-          <ul className="mt-2 space-y-1">
-            {indicators.map((indicator) => (
-              <li
-                key={indicator}
-                className="flex items-start gap-2 text-sm text-[#7b5f49]"
-              >
-                <span className="text-[#7fb3d1]">•</span>
-                {indicator}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <div className="mt-6 flex gap-3">
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
         <button
-          onClick={() => {
-            /* Copiar reporte */
-          }}
-          className="rounded-full border border-[#e8ddd0] px-6 py-2.5 text-sm font-medium text-[#7b5f49] hover:bg-[#f7f2ec] transition-colors"
+          onClick={handleCopy}
+          type="button"
+          className="inline-flex items-center justify-center rounded-full border border-[#e8ddd0] bg-white px-6 py-3 text-sm font-medium text-[#7b5f49] transition-colors hover:bg-[#f7f2ec]"
         >
-          Copiar reporte
+          <span className="mr-2 text-base">
+            {copyState === "copied" ? "✅" : "📋"}
+          </span>
+          {copyState === "copied" ? "Reporte copiado" : "Copiar reporte"}
         </button>
+
         <button
           onClick={onReset}
-          className="rounded-full bg-[#7fb3d1] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#6a9eb8] transition-colors"
+          type="button"
+          className="inline-flex items-center justify-center rounded-full bg-[#7fb3d1] px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-[#7fb3d1]/20 transition-colors hover:bg-[#6a9eb8]"
         >
           Nuevo análisis
         </button>
