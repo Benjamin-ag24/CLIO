@@ -1,40 +1,106 @@
-const InputPanel = () => {
+import { useState } from "react";
+
+const InputPanel = ({
+  content,
+  onChange,
+  onClear,
+  onAnalyze,
+  characterCount,
+}) => {
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const maxLength = 5000;
+
+  const handleAnalyze = async () => {
+    if (!content.trim()) {
+      setError("El campo no puede estar vacío");
+      return;
+    }
+
+    if (content.trim().length < 10) {
+      setError("El texto es muy corto, el análisis puede ser impreciso");
+      return;
+    }
+
+    setError("");
+    setIsLoading(true);
+    await onAnalyze();
+    setIsLoading(false);
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-3xl">
-
-      <h2 className="text-2xl font-semibold mb-2">
-        Analiza tu contenido
-      </h2>
-
-      <p className="text-gray-500 mb-6">
-        Pega una URL o escribe el texto que deseas verificar
-      </p>
-
-      <textarea
-        className="w-full border rounded-lg p-4 min-h-60 resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Escribe aquí tu texto o pega una URL..."
-      ></textarea>
-
-      <div className="flex justify-between mt-3">
-
-        <span className="text-sm text-gray-500">
-          0 / 5000 caracteres
-        </span>
-
-        <div className="space-x-3">
-
-          <button className="px-5 py-2 border rounded-lg">
-            Limpiar
-          </button>
-
-          <button className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            Analizar
-          </button>
-
+    <div className="rounded-3xl bg-white p-6 shadow-[0_8px_30px_-12px_rgba(91,55,35,0.15)]">
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-[#5b3f2d] mb-1">
+            Texto a analizar
+          </label>
+          <textarea
+            value={content}
+            onChange={(e) => {
+              onChange(e.target.value);
+              if (error) setError("");
+            }}
+            placeholder="Escribe aquí tu texto histórico o fragmento a verificar..."
+            className="w-full rounded-2xl border border-[#e8ddd0] p-4 text-[#5b3f2d] placeholder-[#b8a392] focus:border-[#7fb3d1] focus:outline-none focus:ring-2 focus:ring-[#7fb3d1]/30 transition-all min-h-[120px] resize-y"
+            maxLength={maxLength}
+          />
+          <div className="flex justify-between items-center mt-2">
+            <span className="text-sm text-[#b8a392]">
+              {characterCount} / {maxLength}
+            </span>
+            {error && (
+              <span
+                className={`text-sm ${error.includes("corto") ? "text-yellow-600" : "text-red-600"}`}
+              >
+                {error}
+              </span>
+            )}
+          </div>
         </div>
 
+        <div className="flex gap-3">
+          <button
+            onClick={handleAnalyze}
+            disabled={isLoading || !content.trim()}
+            className="flex-1 rounded-full bg-[#7fb3d1] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#6a9eb8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg
+                  className="animate-spin h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Analizando...
+              </span>
+            ) : (
+              "Validar hecho"
+            )}
+          </button>
+          <button
+            onClick={onClear}
+            className="rounded-full border border-[#e8ddd0] px-6 py-3 text-sm font-medium text-[#7b5f49] hover:bg-[#f7f2ec] transition-colors"
+          >
+            Limpiar
+          </button>
+        </div>
       </div>
-
     </div>
   );
 };
