@@ -116,12 +116,11 @@ const Home = () => {
           </h1>
 
           <p className="mt-3 text-[#7b5f49] text-sm md:text-base max-w-2xl mx-auto">
-            Escribe un enunciado o afirmación sobre un hecho histórico y te
-            ayudaremos a verificarlo.
+            Pega o escribe el texto sobre un hecho histórico que deseas verificar
           </p>
 
           <p className="mt-1 text-[#a6886a] text-sm italic">
-            Ejemplo: La independencia de Ecuador ocurrió el 24 de mayo de 1822.
+            Ejemplo: Antes de la década de 1440, la inmensa mayoría de los textos se copiaban a mano, un proceso sumamente lento y costoso realizado principalmente por monjes en monasterios. Esta barrera significaba que el saber estaba restringido a las élites y que los índices de alfabetización eran extremadamente bajos. En Europa, el monopolio de la información residía casi en su totalidad en la Iglesia
           </p>
         </div>
 

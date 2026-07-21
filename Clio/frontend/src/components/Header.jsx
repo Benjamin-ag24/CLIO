@@ -6,9 +6,8 @@ const Header = () => {
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f3e7dc] shadow-sm border border-[#e8ddd0] overflow-hidden">
             {/* Reemplaza aquí con tu imagen de logo */}
-            <img
-              src="logo.png"
-              alt="Logo Clio"
+            <img src="logo/logo.png"
+
               className="h-full w-full object-contain"
             />
           </div>
