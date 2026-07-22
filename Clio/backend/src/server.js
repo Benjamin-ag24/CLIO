@@ -2,7 +2,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
 
@@ -14,7 +14,22 @@ app.use(cors());
 app.use(express.json());
 
 // Configurar Gemini
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+const RESPONSE_SCHEMA = {
+  type: "object",
+  properties: {
+    veredicto: {
+      type: "string",
+      enum: ["veraz", "dudoso", "falso"],
+    },
+    explicacion: {
+      type: "string",
+    },
+  },
+  required: ["veredicto", "explicacion"],
+  additionalProperties: false,
+};
 
 // System Prompt (las reglas de Clio)
 const SYSTEM_PROMPT = `
@@ -33,6 +48,28 @@ Reglas que debes seguir de manera estricta:
 4. **Explica tu razonamiento:** Siempre debes proporcionar una explicación clara.
 `;
 
+// Función auxiliar: reintenta la llamada a Gemini si hay error 503 (saturación)
+async function generarConReintentos(params, maxIntentos = 3) {
+  for (let intento = 1; intento <= maxIntentos; intento++) {
+    try {
+      return await genAI.models.generateContent(params);
+    } catch (error) {
+      const esSaturacion = error.status === 503;
+      const esUltimoIntento = intento === maxIntentos;
+
+      if (!esSaturacion || esUltimoIntento) {
+        throw error; // no reintentar otros errores, o si ya se acabaron los intentos
+      }
+
+      const espera = 1000 * intento; // 1s, 2s, 3s
+      console.log(
+        `Gemini saturado, reintentando en ${espera}ms (intento ${intento}/${maxIntentos})`
+      );
+      await new Promise((resolve) => setTimeout(resolve, espera));
+    }
+  }
+}
+
 // Endpoint para analizar texto
 app.post("/api/analisar", async (req, res) => {
   try {
@@ -45,18 +82,17 @@ app.post("/api/analisar", async (req, res) => {
       });
     }
 
-    // Configurar el modelo de Gemini
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash-exp", // o 'gemini-1.5-pro'
+    // Llamar a Gemini (con reintentos automáticos si está saturado)
+    const result = await generarConReintentos({
+      model: "gemini-3.5-flash",
+      contents: texto.trim(),
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
+        responseMimeType: "application/json",
+        responseJsonSchema: RESPONSE_SCHEMA,
+      },
     });
-
-    // Construir el prompt combinando System + User
-    const prompt = `${SYSTEM_PROMPT}\n\nTexto del usuario: ${texto}`;
-
-    // Llamar a Gemini
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const text = result.text;
 
     // Intentar parsear JSON
     let parsedResponse;
