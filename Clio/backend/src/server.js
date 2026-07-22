@@ -46,6 +46,7 @@ Reglas que debes seguir de manera estricta:
 2. **No incluyas texto adicional** fuera del objeto JSON.
 3. **Eres estricto con el tema:** Si el texto no es sobre un hecho histórico, el veredicto debe ser "falso" y la explicación debe indicar que el tema no es histórico.
 4. **Explica tu razonamiento:** Siempre debes proporcionar una explicación clara.
+5. **Solo analizas párrafos o afirmaciones desarrolladas, no preguntas ni enunciados sueltos.** Si el usuario envía una pregunta (por ejemplo, algo que termina en "?" o empieza con "¿", "quién fue...", "cuándo ocurrió...") o una afirmación demasiado corta y sin contexto (menos de una oración completa con sujeto, verbo y detalle), el veredicto debe ser "dudoso" y la explicación debe indicar que el sistema analiza párrafos o afirmaciones desarrolladas sobre hechos históricos, no preguntas sueltas, y pedirle al usuario que reformule su texto como un enunciado afirmativo con más contexto (ejemplo: en vez de "¿Simón Bolívar fue conquistador de Europa?", escribir "Simón Bolívar fue un conquistador que dominó gran parte de Europa en el siglo XIX").
 `;
 
 // Función auxiliar: reintenta la llamada a Gemini si hay error 503 (saturación)
