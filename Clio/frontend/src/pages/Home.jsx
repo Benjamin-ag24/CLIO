@@ -4,7 +4,9 @@ import InputPanel from "../components/InputPanel";
 import ReportPanel from "../components/ReportPanel";
 import ErrorBanner from "../components/ErrorBanner";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Login from "../components/Login"; // NUEVO
 import { analizarTexto } from "../services/analysisService";
+import { getToken, logout } from "../services/authService"; // NUEVO
 
 const featureList = [
   {
@@ -31,6 +33,9 @@ const featureList = [
 ];
 
 const Home = () => {
+  // NUEVO: estado de autenticación
+  const [isAuthenticated, setIsAuthenticated] = useState(!!getToken());
+
   const [content, setContent] = useState("");
   const [report, setReport] = useState(null);
 
@@ -104,11 +109,29 @@ const Home = () => {
     inputRef.current?.focus();
   };
 
+  // NUEVO: si no hay sesión, solo se muestra el login
+  if (!isAuthenticated) {
+    return <Login onLoginSuccess={() => setIsAuthenticated(true)} />;
+  }
+
   return (
     <main className="min-h-screen bg-[#f7f2ec]">
       <Header />
 
       <div className="mx-auto max-w-6xl px-6 py-8">
+        {/* NUEVO: botón de cerrar sesión */}
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={() => {
+              logout();
+              setIsAuthenticated(false);
+            }}
+            className="text-sm text-[#93816F] hover:text-[#5b3f2d] transition"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+
         {/* Título */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-[#5b3f2d] tracking-tight">

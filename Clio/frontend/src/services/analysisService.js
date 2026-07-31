@@ -1,3 +1,5 @@
+import { getToken } from "./authService"; // NUEVO
+
 const API_URL = "http://localhost:3000/api/analisar";
 
 
@@ -22,7 +24,8 @@ export const analizarTexto = async (texto) => {
             method: "POST",
 
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${getToken()}` // NUEVO
             },
 
             body: JSON.stringify({
