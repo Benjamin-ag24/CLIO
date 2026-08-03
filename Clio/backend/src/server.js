@@ -3,10 +3,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
-import jwt from "jsonwebtoken"; // NUEVO
-import bcrypt from "bcryptjs"; // NUEVO
-import { findUserByUsername } from "./users.js"; // NUEVO
-import { verifyToken } from "./authMiddleware.js"; // NUEVO
+import { verifyToken } from "./authMiddleware.js";
+import authRoutes from "./routes/authRoutes.js"; // NUEVO
 
 dotenv.config();
 
@@ -16,6 +14,9 @@ const PORT = 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Rutas de autenticación (/api/auth/register, /api/auth/login)
+app.use("/api/auth", authRoutes); // NUEVO
 
 // Configurar Gemini
 const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -75,40 +76,7 @@ async function generarConReintentos(params, maxIntentos = 3) {
   }
 }
 
-// NUEVO: Endpoint de login
-app.post("/api/login", async (req, res) => {
-  try {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-      return res.status(400).json({ error: "Usuario y contraseña son obligatorios" });
-    }
-
-    const user = findUserByUsername(username);
-    if (!user) {
-      return res.status(400).json({ error: "Usuario no encontrado" });
-    }
-
-    const validPassword = await bcrypt.compare(password, user.passwordHash);
-    if (!validPassword) {
-      return res.status(400).json({ error: "Contraseña incorrecta" });
-    }
-
-    const token = jwt.sign(
-      { id: user.id, username: user.username },
-      process.env.JWT_SECRET,
-      { expiresIn: "2h" }
-    );
-
-    res.json({ token });
-  } catch (error) {
-    console.error("Error en login:", error);
-    res.status(500).json({ error: "Error al iniciar sesión" });
-  }
-});
-
 // Endpoint para analizar texto
-// NUEVO: se agregó "verifyToken" como segundo argumento para proteger esta ruta
 app.post("/api/analisar", verifyToken, async (req, res) => {
   try {
     const { texto } = req.body;

@@ -4,9 +4,10 @@ import InputPanel from "../components/InputPanel";
 import ReportPanel from "../components/ReportPanel";
 import ErrorBanner from "../components/ErrorBanner";
 import LoadingSpinner from "../components/LoadingSpinner";
-import Login from "../components/Login"; // NUEVO
+import LoginPage from "./Auth/LoginPage"; // ACTUALIZADO
+import RegisterPage from "./Auth/RegisterPage"; // ACTUALIZADO
 import { analizarTexto } from "../services/analysisService";
-import { getToken, logout } from "../services/authService"; // NUEVO
+import { getAuthToken, getAuthUser, clearAuthSession } from "../services/authStorage"; // ACTUALIZADO
 
 const featureList = [
   {
@@ -33,8 +34,9 @@ const featureList = [
 ];
 
 const Home = () => {
-  // NUEVO: estado de autenticación
-  const [isAuthenticated, setIsAuthenticated] = useState(!!getToken());
+  // ACTUALIZADO: estado de autenticación + vista (login/registro)
+  const [isAuthenticated, setIsAuthenticated] = useState(!!getAuthToken());
+  const [vista, setVista] = useState("login");
 
   const [content, setContent] = useState("");
   const [report, setReport] = useState(null);
@@ -109,9 +111,17 @@ const Home = () => {
     inputRef.current?.focus();
   };
 
-  // NUEVO: si no hay sesión, solo se muestra el login
+  // ACTUALIZADO: si no hay sesión, muestra login o registro según la vista
   if (!isAuthenticated) {
-    return <Login onLoginSuccess={() => setIsAuthenticated(true)} />;
+    if (vista === "registro") {
+      return <RegisterPage onGoToLogin={() => setVista("login")} />;
+    }
+    return (
+      <LoginPage
+        onLoginSuccess={() => setIsAuthenticated(true)}
+        onGoToRegister={() => setVista("registro")}
+      />
+    );
   }
 
   return (
@@ -119,16 +129,16 @@ const Home = () => {
       <Header />
 
       <div className="mx-auto max-w-6xl px-6 py-8">
-        {/* NUEVO: botón de cerrar sesión */}
+        {/* ACTUALIZADO: botón de cerrar sesión con nombre del usuario */}
         <div className="flex justify-end mb-4">
           <button
             onClick={() => {
-              logout();
+              clearAuthSession();
               setIsAuthenticated(false);
             }}
             className="text-sm text-[#93816F] hover:text-[#5b3f2d] transition"
           >
-            Cerrar sesión
+            Cerrar sesión ({getAuthUser()?.nombre})
           </button>
         </div>
 
