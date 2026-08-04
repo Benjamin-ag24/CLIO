@@ -1,4 +1,4 @@
-import { getToken } from "./authService"; // NUEVO
+import { getAuthToken } from "./authStorage"; // ACTUALIZADO
 
 const API_URL = "http://localhost:3000/api/analisar";
 
@@ -25,7 +25,7 @@ export const analizarTexto = async (texto) => {
 
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${getToken()}` // NUEVO
+                "Authorization": `Bearer ${getAuthToken()}` // ACTUALIZADO
             },
 
             body: JSON.stringify({

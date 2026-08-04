@@ -1,22 +1,48 @@
-// frontend/src/components/Login.jsx
 import { useState } from "react";
-import { login } from "../services/authService";
+import { saveAuthSession } from "../../services/authStorage";
 
-export default function Login({ onLoginSuccess }) {
-  const [username, setUsername] = useState("");
+export default function LoginPage({ onLoginSuccess, onGoToRegister }) {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(false);
 
+  const validar = () => {
+    if (!email.includes("@")) {
+      setError("Ingresa un correo electrónico válido.");
+      return false;
+    }
+    if (password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres.");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (!validar()) return;
+
     setCargando(true);
     try {
-      await login(username, password);
+      const respuesta = await fetch("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const datos = await respuesta.json();
+
+      if (!respuesta.ok) {
+        throw new Error(datos.error || "Credenciales inválidas");
+      }
+
+      saveAuthSession(datos.token, datos.usuario);
       onLoginSuccess();
     } catch (err) {
-      setError(err.mensaje);
+      setError(err.message);
     } finally {
       setCargando(false);
     }
@@ -26,7 +52,6 @@ export default function Login({ onLoginSuccess }) {
     <div className="min-h-screen w-full bg-[#F7F2EC] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
 
-        {/* Logo + nombre, igual que el header de la app */}
         <div className="flex items-center justify-center gap-3 mb-8">
           <div className="w-14 h-14 rounded-2xl bg-[#F1DFC0] flex items-center justify-center">
             <svg width="26" height="26" viewBox="0 0 38 38" fill="none">
@@ -40,7 +65,6 @@ export default function Login({ onLoginSuccess }) {
           </span>
         </div>
 
-        {/* Card */}
         <div className="bg-white rounded-3xl border border-[#E9E1D3] shadow-sm p-8">
           <h2 className="text-2xl font-bold text-[#4A3226] mb-1">Iniciar sesión</h2>
           <p className="text-sm text-[#93816F] mb-6">
@@ -50,13 +74,13 @@ export default function Login({ onLoginSuccess }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-[#4A3226] mb-1">
-                Usuario
+                Correo electrónico
               </label>
               <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Ingresa tu usuario"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tucorreo@ejemplo.com"
                 className="w-full rounded-xl border border-[#E9E1D3] bg-[#FBFAF6] px-4 py-3
                            text-[#4A3226] placeholder-[#B3A392]
                            focus:outline-none focus:border-[#6FA8C9] focus:ring-2 focus:ring-[#DCEBF3]
@@ -96,6 +120,16 @@ export default function Login({ onLoginSuccess }) {
               {cargando ? "Ingresando..." : "Ingresar"}
             </button>
           </form>
+
+          <p className="text-center text-sm text-[#93816F] mt-6">
+            ¿No tienes cuenta?{" "}
+            <button
+              onClick={onGoToRegister}
+              className="text-[#6FA8C9] font-semibold hover:underline"
+            >
+              Regístrate
+            </button>
+          </p>
         </div>
 
         <p className="text-center text-xs text-[#B3A392] mt-6 tracking-wide">
