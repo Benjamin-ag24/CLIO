@@ -26,7 +26,9 @@ export function verifyToken(req, res, next) {
 // NUEVO: verifica que el usuario tenga el rol requerido
 export function checkRole(requiredRole) {
   return (req, res, next) => {
-    if (!req.user || req.user.rol !== requiredRole) {
+    const userRole = req.user?.role ?? req.user?.rol;
+
+    if (!req.user || userRole !== requiredRole) {
       return res.status(403).json({
         error: "No tienes permisos para acceder a este recurso.",
       });
