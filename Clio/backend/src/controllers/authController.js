@@ -6,11 +6,7 @@ import { pool } from "../db.js";
 // POST /api/auth/register
 export const register = async (req, res) => {
   try {
-    const { nombre, apellido, first_name, last_name, email, password } =
-      req.body;
-
-    const firstName = first_name ?? nombre;
-    const lastName = last_name ?? apellido;
+    const { firstName, lastName, email, password } = req.body;
 
     if (!firstName || !lastName || !email || !password) {
       return res
@@ -25,8 +21,8 @@ export const register = async (req, res) => {
     }
 
     const existente = await pool.query(
-      "SELECT id FROM users WHERE email = $1",
-      [email],
+      "SELECT id FROM usuarios WHERE email = $1",
+      [email]
     );
     if (existente.rows.length > 0) {
       return res.status(400).json({ error: "Ese correo ya está registrado" });
@@ -35,10 +31,10 @@ export const register = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
 
     const resultado = await pool.query(
-      `INSERT INTO users (first_name, last_name, email, password, role)
+      `INSERT INTO usuarios (nombre, apellido, email, password, rol)
        VALUES ($1, $2, $3, $4, 'user')
-       RETURNING id, first_name, last_name, email, role`,
-      [firstName, lastName, email, passwordHash],
+       RETURNING id, nombre, apellido, email, rol`,
+      [firstName, lastName, email, passwordHash]
     );
 
     res.status(201).json({ usuario: resultado.rows[0] });
@@ -59,9 +55,10 @@ export const login = async (req, res) => {
         .json({ error: "Correo y contraseña son obligatorios" });
     }
 
-    const resultado = await pool.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
+    const resultado = await pool.query(
+      "SELECT * FROM usuarios WHERE email = $1",
+      [email]
+    );
     const usuario = resultado.rows[0];
 
     if (!usuario) {
@@ -77,22 +74,21 @@ export const login = async (req, res) => {
       {
         sub: usuario.id,
         email: usuario.email,
-        first_name: usuario.first_name,
-        last_name: usuario.last_name,
-        role: usuario.role,
+        nombre: usuario.nombre,
+        rol: usuario.rol,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" },
+      { expiresIn: "2h" }
     );
 
     res.json({
       token,
       usuario: {
         id: usuario.id,
-        nombre: usuario.first_name,
-        apellido: usuario.last_name,
+        nombre: usuario.nombre,
+        apellido: usuario.apellido,
         email: usuario.email,
-        rol: usuario.role,
+        rol: usuario.rol,
       },
     });
   } catch (error) {
