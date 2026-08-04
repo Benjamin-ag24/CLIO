@@ -15,14 +15,12 @@ export const analyzeText = async (text) => {
     // Enviar texto al backend
     const response = await fetch(API_URL, {
       method: "POST",
-
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${getAuthToken()}`,
       },
-
       body: JSON.stringify({
-        text,
+        original_text: text,
       }),
     });
 
@@ -40,15 +38,13 @@ export const analyzeText = async (text) => {
 
     // Devolver objeto estructurado
     return {
-      verdict: data.veredicto,
-
-      explanation: data.explicacion,
+      verdict: data.verdict,
+      explanation: data.explanation,
     };
   } catch (error) {
     // Error de red o error controlado
     throw {
       code: error.code || "NETWORK_ERROR",
-
       message:
         error.message ||
         "No fue posible conectarse con la inteligencia artificial.",
