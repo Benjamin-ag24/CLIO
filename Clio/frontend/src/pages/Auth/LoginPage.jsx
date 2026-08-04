@@ -5,9 +5,9 @@ export default function LoginPage({ onLoginSuccess, onGoToRegister }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [cargando, setCargando] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const validar = () => {
+  const validateForm = () => {
     if (!email.includes("@")) {
       setError("Ingresa un correo electrónico válido.");
       return false;
@@ -23,50 +23,60 @@ export default function LoginPage({ onLoginSuccess, onGoToRegister }) {
     e.preventDefault();
     setError("");
 
-    if (!validar()) return;
+    if (!validateForm()) return;
 
-    setCargando(true);
+    setIsLoading(true);
     try {
-      const respuesta = await fetch("http://localhost:3000/api/auth/login", {
+      const response = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      const datos = await respuesta.json();
+      const data = await response.json();
 
-      if (!respuesta.ok) {
-        throw new Error(datos.error || "Credenciales inválidas");
+      if (!response.ok) {
+        throw new Error(data.error || "Credenciales inválidas");
       }
 
-      saveAuthSession(datos.token, datos.usuario);
+      saveAuthSession(data.token, data.usuario);
       onLoginSuccess();
     } catch (err) {
       setError(err.message);
     } finally {
-      setCargando(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen w-full bg-[#F7F2EC] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-
         <div className="flex items-center justify-center gap-3 mb-8">
           <div className="w-14 h-14 rounded-2xl bg-[#F1DFC0] flex items-center justify-center">
             <svg width="26" height="26" viewBox="0 0 38 38" fill="none">
-              <path d="M4 8C9 6 14 6 19 9V30C14 27 9 27 4 29V8Z" fill="#B08355" />
-              <path d="M34 8C29 6 24 6 19 9V30C24 27 29 27 34 29V8Z" fill="#8C6239" />
+              <path
+                d="M4 8C9 6 14 6 19 9V30C14 27 9 27 4 29V8Z"
+                fill="#B08355"
+              />
+              <path
+                d="M34 8C29 6 24 6 19 9V30C24 27 29 27 34 29V8Z"
+                fill="#8C6239"
+              />
               <path d="M19 9V30" stroke="#5C4234" strokeWidth="1.4" />
             </svg>
           </div>
-          <span className="text-3xl font-bold text-[#4A3226]" style={{ fontFamily: "serif" }}>
+          <span
+            className="text-3xl font-bold text-[#4A3226]"
+            style={{ fontFamily: "serif" }}
+          >
             Clio
           </span>
         </div>
 
         <div className="bg-white rounded-3xl border border-[#E9E1D3] shadow-sm p-8">
-          <h2 className="text-2xl font-bold text-[#4A3226] mb-1">Iniciar sesión</h2>
+          <h2 className="text-2xl font-bold text-[#4A3226] mb-1">
+            Iniciar sesión
+          </h2>
           <p className="text-sm text-[#93816F] mb-6">
             Ingresa tus credenciales para verificar hechos históricos.
           </p>
@@ -112,12 +122,12 @@ export default function LoginPage({ onLoginSuccess, onGoToRegister }) {
 
             <button
               type="submit"
-              disabled={cargando}
+              disabled={isLoading}
               className="w-full rounded-full bg-[#BFD9E8] hover:bg-[#A9CBDF]
                          text-[#2F4858] font-bold py-3.5 mt-2
                          transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {cargando ? "Ingresando..." : "Ingresar"}
+              {isLoading ? "Ingresando..." : "Ingresar"}
             </button>
           </form>
 

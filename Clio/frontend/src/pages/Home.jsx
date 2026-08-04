@@ -4,10 +4,14 @@ import InputPanel from "../components/InputPanel";
 import ReportPanel from "../components/ReportPanel";
 import ErrorBanner from "../components/ErrorBanner";
 import LoadingSpinner from "../components/LoadingSpinner";
-import LoginPage from "./Auth/LoginPage"; // ACTUALIZADO
-import RegisterPage from "./Auth/RegisterPage"; // ACTUALIZADO
-import { analizarTexto } from "../services/analysisService";
-import { getAuthToken, getAuthUser, clearAuthSession } from "../services/authStorage"; // ACTUALIZADO
+import LoginPage from "./Auth/LoginPage";
+import RegisterPage from "./Auth/RegisterPage";
+import { analyzeText } from "../services/analysisService";
+import {
+  getAuthToken,
+  getAuthUser,
+  clearAuthSession,
+} from "../services/authStorage";
 
 const featureList = [
   {
@@ -34,15 +38,15 @@ const featureList = [
 ];
 
 const Home = () => {
-  // ACTUALIZADO: estado de autenticación + vista (login/registro)
+  // Estado de autenticación y vista (login/registro)
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAuthToken());
-  const [vista, setVista] = useState("login");
+  const [view, setView] = useState("login");
 
   const [content, setContent] = useState("");
   const [report, setReport] = useState(null);
 
   // Estados generales
-  const [status, setStatus] = useState("inactivo");
+  const [status, setStatus] = useState("inactive");
   const [error, setError] = useState(null);
 
   // Referencia al textarea
@@ -53,18 +57,18 @@ const Home = () => {
   const analyzeContent = async () => {
     try {
       // Reiniciar estados
-      setStatus("cargando");
+      setStatus("loading");
       setError(null);
       setReport(null);
 
       const normalized = content.trim().toLowerCase();
 
       if (!normalized) {
-        setStatus("inactivo");
+        setStatus("inactive");
         return;
       }
 
-      const resultado = await analizarTexto(content);
+      const analysisResult = await analyzeText(content);
 
       const keyTerms = [
         "veracidad",
@@ -75,27 +79,27 @@ const Home = () => {
       ].filter((term) => normalized.includes(term));
 
       const indicators =
-        resultado.veredicto === "veraz"
+        analysisResult.verdict === "veraz"
           ? ["Estructura coherente", "Lenguaje directo y claro"]
-          : resultado.veredicto === "dudoso"
+          : analysisResult.verdict === "dudoso"
             ? ["Uso de palabras imprecisas", "Falta de fuentes concretas"]
             : ["Afirmaciones sin respaldo", "Lenguaje sensacionalista"];
 
       setReport({
-        verdict: resultado.veredicto,
-        explanation: resultado.explicacion,
+        verdict: analysisResult.verdict,
+        explanation: analysisResult.explanation,
         keyTerms,
         indicators,
       });
 
-      setStatus("resultado");
+      setStatus("result");
     } catch (err) {
       setStatus("error");
 
       setError({
-        codigo: err?.codigo || "ERROR_ANALISIS",
-        mensaje:
-          err?.mensaje ||
+        code: err?.code || "ERROR_ANALISIS",
+        message:
+          err?.message ||
           "No fue posible realizar el análisis. Por favor intenta de nuevo.",
       });
     }
@@ -111,15 +115,15 @@ const Home = () => {
     inputRef.current?.focus();
   };
 
-  // ACTUALIZADO: si no hay sesión, muestra login o registro según la vista
+  // Si no hay sesión, muestra login o registro según la vista
   if (!isAuthenticated) {
-    if (vista === "registro") {
-      return <RegisterPage onGoToLogin={() => setVista("login")} />;
+    if (view === "registro") {
+      return <RegisterPage onGoToLogin={() => setView("login")} />;
     }
     return (
       <LoginPage
         onLoginSuccess={() => setIsAuthenticated(true)}
-        onGoToRegister={() => setVista("registro")}
+        onGoToRegister={() => setView("registro")}
       />
     );
   }
@@ -129,7 +133,7 @@ const Home = () => {
       <Header />
 
       <div className="mx-auto max-w-6xl px-6 py-8">
-        {/* ACTUALIZADO: botón de cerrar sesión con nombre del usuario */}
+        {/* Botón de cierre de sesión con nombre del usuario */}
         <div className="flex justify-end mb-4">
           <button
             onClick={() => {
@@ -149,11 +153,18 @@ const Home = () => {
           </h1>
 
           <p className="mt-3 text-[#7b5f49] text-sm md:text-base max-w-2xl mx-auto">
-            Pega o escribe el texto sobre un hecho histórico que deseas verificar
+            Pega o escribe el texto sobre un hecho histórico que deseas
+            verificar
           </p>
 
           <p className="mt-1 text-[#a6886a] text-sm italic">
-            Ejemplo: Antes de la década de 1440, la inmensa mayoría de los textos se copiaban a mano, un proceso sumamente lento y costoso realizado principalmente por monjes en monasterios. Esta barrera significaba que el saber estaba restringido a las élites y que los índices de alfabetización eran extremadamente bajos. En Europa, el monopolio de la información residía casi en su totalidad en la Iglesia
+            Ejemplo: Antes de la década de 1440, la inmensa mayoría de los
+            textos se copiaban a mano, un proceso sumamente lento y costoso
+            realizado principalmente por monjes en monasterios. Esta barrera
+            significaba que el saber estaba restringido a las élites y que los
+            índices de alfabetización eran extremadamente bajos. En Europa, el
+            monopolio de la información residía casi en su totalidad en la
+            Iglesia
           </p>
         </div>
 
@@ -168,7 +179,7 @@ const Home = () => {
         />
 
         {/* Estado cargando */}
-        {status === "cargando" && (
+        {status === "loading" && (
           <div className="mt-8">
             <LoadingSpinner />
           </div>
@@ -177,14 +188,14 @@ const Home = () => {
         {/* Estado error */}
         {status === "error" && (
           <ErrorBanner
-            message={error?.mensaje}
-            code={error?.codigo}
+            message={error?.message}
+            code={error?.code}
             onRetry={analyzeContent}
           />
         )}
 
         {/* Estado resultado */}
-        {status === "resultado" && (
+        {status === "result" && (
           <div className="transition-all duration-500 ease-in opacity-100">
             <ReportPanel report={report} onReset={resetAnalysis} />
           </div>

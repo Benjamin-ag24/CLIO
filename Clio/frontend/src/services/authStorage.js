@@ -3,9 +3,9 @@
 const TOKEN_KEY = "clio_token";
 const USER_KEY = "clio_usuario";
 
-export const saveAuthSession = (token, usuario) => {
+export const saveAuthSession = (token, user) => {
   localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(USER_KEY, JSON.stringify(usuario));
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
 };
 
 export const getAuthToken = () => {

@@ -6,31 +6,39 @@ import { pool } from "../db.js";
 // POST /api/auth/register
 export const register = async (req, res) => {
   try {
-    const { nombre, apellido, email, password } = req.body;
+    const { nombre, apellido, first_name, last_name, email, password } =
+      req.body;
 
-    if (!nombre || !apellido || !email || !password) {
-      return res.status(400).json({ error: "Todos los campos son obligatorios" });
+    const firstName = first_name ?? nombre;
+    const lastName = last_name ?? apellido;
+
+    if (!firstName || !lastName || !email || !password) {
+      return res
+        .status(400)
+        .json({ error: "Todos los campos son obligatorios" });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
+      return res
+        .status(400)
+        .json({ error: "La contraseña debe tener al menos 6 caracteres" });
     }
 
-    // Verificar que el email no exista ya
-    const existente = await pool.query("SELECT id FROM usuarios WHERE email = $1", [email]);
+    const existente = await pool.query(
+      "SELECT id FROM users WHERE email = $1",
+      [email],
+    );
     if (existente.rows.length > 0) {
       return res.status(400).json({ error: "Ese correo ya está registrado" });
     }
 
-    // Hashear la contraseña
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Guardar el usuario (rol siempre 'user' por defecto, nunca lo manda el cliente)
     const resultado = await pool.query(
-      `INSERT INTO usuarios (nombre, apellido, email, password, rol)
+      `INSERT INTO users (first_name, last_name, email, password, role)
        VALUES ($1, $2, $3, $4, 'user')
-       RETURNING id, nombre, apellido, email, rol`,
-      [nombre, apellido, email, passwordHash]
+       RETURNING id, first_name, last_name, email, role`,
+      [firstName, lastName, email, passwordHash],
     );
 
     res.status(201).json({ usuario: resultado.rows[0] });
@@ -46,10 +54,14 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: "Correo y contraseña son obligatorios" });
+      return res
+        .status(400)
+        .json({ error: "Correo y contraseña son obligatorios" });
     }
 
-    const resultado = await pool.query("SELECT * FROM usuarios WHERE email = $1", [email]);
+    const resultado = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
     const usuario = resultado.rows[0];
 
     if (!usuario) {
@@ -65,21 +77,22 @@ export const login = async (req, res) => {
       {
         sub: usuario.id,
         email: usuario.email,
-        nombre: usuario.nombre,
-        rol: usuario.rol,
+        first_name: usuario.first_name,
+        last_name: usuario.last_name,
+        role: usuario.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" }
+      { expiresIn: "2h" },
     );
 
     res.json({
       token,
       usuario: {
         id: usuario.id,
-        nombre: usuario.nombre,
-        apellido: usuario.apellido,
+        nombre: usuario.first_name,
+        apellido: usuario.last_name,
         email: usuario.email,
-        rol: usuario.rol,
+        rol: usuario.role,
       },
     });
   } catch (error) {
