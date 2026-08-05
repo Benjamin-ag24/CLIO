@@ -5,7 +5,10 @@ const USER_KEY = "clio_usuario";
 
 export const saveAuthSession = (token, user) => {
   localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+  if (user) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  }
 };
 
 export const getAuthToken = () => {
@@ -14,7 +17,18 @@ export const getAuthToken = () => {
 
 export const getAuthUser = () => {
   const data = localStorage.getItem(USER_KEY);
-  return data ? JSON.parse(data) : null;
+
+  if (!data || data === "undefined") {
+    return null;
+  }
+
+  try {
+    return JSON.parse(data);
+  } catch (error) {
+    console.error("Invalid auth user data:", error);
+    localStorage.removeItem(USER_KEY);
+    return null;
+  }
 };
 
 export const clearAuthSession = () => {
