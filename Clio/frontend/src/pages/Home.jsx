@@ -1,9 +1,11 @@
+// frontend/src/pages/Home.jsx
 import { useMemo, useRef, useState } from "react";
 import Header from "../components/Header";
 import InputPanel from "../components/InputPanel";
 import ReportPanel from "../components/ReportPanel";
 import ErrorBanner from "../components/ErrorBanner";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Sidebar from "../components/Sidebar";
 import LoginPage from "./Auth/LoginPage";
 import RegisterPage from "./Auth/RegisterPage";
 import { analyzeText } from "../services/analysisService";
@@ -38,25 +40,27 @@ const featureList = [
 ];
 
 const Home = () => {
-  // Estado de autenticación y vista (login/registro)
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAuthToken());
   const [view, setView] = useState("login");
 
   const [content, setContent] = useState("");
   const [report, setReport] = useState(null);
 
-  // Estados generales
   const [status, setStatus] = useState("inactive");
   const [error, setError] = useState(null);
 
-  // Referencia al textarea
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   const inputRef = useRef(null);
 
-  const characterCount = useMemo(() => content.length, [content]);
+  const characterCount = useMemo(
+    () => content.length,
+    [content]
+  );
 
   const analyzeContent = async () => {
     try {
-      // Reiniciar estados
       setStatus("loading");
       setError(null);
       setReport(null);
@@ -80,10 +84,19 @@ const Home = () => {
 
       const indicators =
         analysisResult.verdict === "veraz"
-          ? ["Estructura coherente", "Lenguaje directo y claro"]
+          ? [
+              "Estructura coherente",
+              "Lenguaje directo y claro",
+            ]
           : analysisResult.verdict === "dudoso"
-            ? ["Uso de palabras imprecisas", "Falta de fuentes concretas"]
-            : ["Afirmaciones sin respaldo", "Lenguaje sensacionalista"];
+          ? [
+              "Uso de palabras imprecisas",
+              "Falta de fuentes concretas",
+            ]
+          : [
+              "Afirmaciones sin respaldo",
+              "Lenguaje sensacionalista",
+            ];
 
       setReport({
         verdict: analysisResult.verdict,
@@ -93,6 +106,8 @@ const Home = () => {
       });
 
       setStatus("result");
+
+      setRefreshTrigger((prev) => prev + 1);
     } catch (err) {
       setStatus("error");
 
@@ -109,17 +124,47 @@ const Home = () => {
     setContent("");
     setReport(null);
     setError(null);
-    setStatus("inactivo");
+    setStatus("inactive");
 
-    // Devuelve el foco al textarea
     inputRef.current?.focus();
   };
 
-  // Si no hay sesión, muestra login o registro según la vista
+  const selectAnalysis = (item) => {
+    setContent(item.originalText);
+
+    setReport({
+      verdict: item.verdict,
+      explanation: item.explanation,
+      keyTerms: [],
+      indicators:
+        item.verdict === "veraz"
+          ? [
+              "Estructura coherente",
+              "Lenguaje directo y claro",
+            ]
+          : item.verdict === "dudoso"
+          ? [
+              "Uso de palabras imprecisas",
+              "Falta de fuentes concretas",
+            ]
+          : [
+              "Afirmaciones sin respaldo",
+              "Lenguaje sensacionalista",
+            ],
+    });
+
+    setStatus("result");
+  };
+
   if (!isAuthenticated) {
     if (view === "registro") {
-      return <RegisterPage onGoToLogin={() => setView("login")} />;
+      return (
+        <RegisterPage
+          onGoToLogin={() => setView("login")}
+        />
+      );
     }
+
     return (
       <LoginPage
         onLoginSuccess={() => setIsAuthenticated(true)}
@@ -129,12 +174,25 @@ const Home = () => {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f2ec]">
-      <Header />
+    <main>
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        refreshTrigger={refreshTrigger}
+        onNewAnalysis={resetAnalysis}
+        onSelectAnalysis={selectAnalysis}
+      />
 
       <div className="mx-auto max-w-6xl px-6 py-8">
-        {/* Botón de cierre de sesión con nombre del usuario */}
-        <div className="flex justify-end mb-4">
+
+        <div className="flex justify-end items-center gap-4 mb-4">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="text-sm text-[#93816F] hover:text-[#5b3f2d] transition"
+          >
+            ☰ Historial
+          </button>
+
           <button
             onClick={() => {
               clearAuthSession();
@@ -146,29 +204,22 @@ const Home = () => {
           </button>
         </div>
 
-        {/* Título */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-[#5b3f2d] tracking-tight">
             ¿Qué hecho histórico quieres validar?
           </h1>
 
           <p className="mt-3 text-[#7b5f49] text-sm md:text-base max-w-2xl mx-auto">
-            Pega o escribe el texto sobre un hecho histórico que deseas
-            verificar
+            Pega o escribe el texto sobre un hecho histórico que deseas verificar
           </p>
 
           <p className="mt-1 text-[#a6886a] text-sm italic">
-            Ejemplo: Antes de la década de 1440, la inmensa mayoría de los
-            textos se copiaban a mano, un proceso sumamente lento y costoso
-            realizado principalmente por monjes en monasterios. Esta barrera
-            significaba que el saber estaba restringido a las élites y que los
-            índices de alfabetización eran extremadamente bajos. En Europa, el
-            monopolio de la información residía casi en su totalidad en la
-            Iglesia
+            Ejemplo: Antes de la década de 1440, la inmensa mayoría de los textos
+            se copiaban a mano, un proceso sumamente lento y costoso realizado
+            principalmente por monjes en monasterios.
           </p>
         </div>
 
-        {/* Panel de entrada */}
         <InputPanel
           ref={inputRef}
           content={content}
@@ -178,14 +229,12 @@ const Home = () => {
           characterCount={characterCount}
         />
 
-        {/* Estado cargando */}
         {status === "loading" && (
           <div className="mt-8">
             <LoadingSpinner />
           </div>
         )}
 
-        {/* Estado error */}
         {status === "error" && (
           <ErrorBanner
             message={error?.message}
@@ -194,14 +243,15 @@ const Home = () => {
           />
         )}
 
-        {/* Estado resultado */}
         {status === "result" && (
           <div className="transition-all duration-500 ease-in opacity-100">
-            <ReportPanel report={report} onReset={resetAnalysis} />
+            <ReportPanel
+              report={report}
+              onReset={resetAnalysis}
+            />
           </div>
         )}
 
-        {/* Tarjetas informativas */}
         <div className="grid gap-6 md:grid-cols-3 mt-12">
           {featureList.map((feature) => (
             <div
@@ -224,6 +274,7 @@ const Home = () => {
             </div>
           ))}
         </div>
+
       </div>
     </main>
   );
