@@ -8,24 +8,24 @@ Aplicación web que utiliza inteligencia artificial (Gemini) para verificar la v
 
 Clio te permite pegar un texto o afirmación histórica y recibir un análisis con:
 
-- *Semáforo de veracidad:* Verde (veraz), Amarillo (dudoso), Rojo (falso).
-- *Explicación detallada:* Entiende por qué se llegó a esa conclusión.
-- *Términos clave:* Palabras importantes detectadas en el análisis.
+- _Semáforo de veracidad:_ Verde (veraz), Amarillo (dudoso), Rojo (falso).
+- _Explicación detallada:_ Entiende por qué se llegó a esa conclusión.
+- _Términos clave:_ Palabras importantes detectadas en el análisis.
 
 ---
 
 ## 🚀 ¿Cómo usar Clio?
 
 1. Escribe o pega un texto histórico en el área de entrada.
-2. Haz clic en *"Validar hecho"*.
+2. Haz clic en _"Validar hecho"_.
 3. Espera unos segundos mientras la IA analiza el contenido.
 4. Revisa el reporte con el semáforo y la explicación.
 
-*Ejemplo:*
+_Ejemplo:_
 
 > "Antes de la década de 1440, la inmensa mayoría de los textos se copiaban a mano, un proceso sumamente lento y costoso realizado principalmente por monjes en monasterios. Esta barrera significaba que el saber estaba restringido a las élites y que los índices de alfabetización eran extremadamente bajos. En Europa, el monopolio de la información residía casi en su totalidad en la Iglesia"
 
-Puedes utilizar *"Limpiar"* para borrar el texto y comenzar de nuevo. Después de un análisis, *"Nuevo análisis"* devuelve la aplicación al estado inicial. Si ocurre un error de comunicación, utiliza *"Intentar de nuevo"* para repetir el análisis sin volver a escribir el contenido.
+Puedes utilizar _"Limpiar"_ para borrar el texto y comenzar de nuevo. Después de un análisis, _"Nuevo análisis"_ devuelve la aplicación al estado inicial. Si ocurre un error de comunicación, utiliza _"Intentar de nuevo"_ para repetir el análisis sin volver a escribir el contenido.
 
 ---
 
@@ -70,7 +70,7 @@ Reemplaza `tu_api_key_de_gemini` por tu clave real. No compartas este archivo ni
 Desde la carpeta `backend`, ejecuta:
 
 ```bash
-node src/server.js
+npm run dev
 ```
 
 El servidor quedará disponible en:
@@ -106,27 +106,6 @@ Abre esa dirección en el navegador con el backend ejecutándose en paralelo.
 
 ---
 
-## 🧪 Comandos disponibles
-
-### Frontend
-
-Ejecutar desde `frontend/`:
-
-```bash
-npm run dev      # Inicia el servidor de desarrollo
-npm run build    # Genera la compilación de producción
-npm run lint     # Ejecuta Oxlint
-npm run preview  # Sirve la compilación de producción localmente
-```
-
-### Backend
-
-Ejecutar desde `backend/`:
-
-```bash
-node src/server.js  # Inicia la API en el puerto 3000
-```
-
 El endpoint utilizado por el frontend es:
 
 ```text
@@ -137,7 +116,7 @@ Recibe un cuerpo JSON con este formato:
 
 ```json
 {
-	"texto": "Antes de la década de 1440, la inmensa mayoría de los textos se copiaban a mano, un proceso sumamente lento y costoso realizado principalmente por monjes en monasterios. Esta barrera significaba que el saber estaba restringido a las élites y que los índices de alfabetización eran extremadamente bajos. En Europa, el monopolio de la información residía casi en su totalidad en la Iglesia"
+  "texto": "Antes de la década de 1440, la inmensa mayoría de los textos se copiaban a mano, un proceso sumamente lento y costoso realizado principalmente por monjes en monasterios. Esta barrera significaba que el saber estaba restringido a las élites y que los índices de alfabetización eran extremadamente bajos. En Europa, el monopolio de la información residía casi en su totalidad en la Iglesia"
 }
 ```
 

@@ -1,7 +1,9 @@
 // backend/src/controllers/authController.js
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { pool } from "../db.js";
+import { AppDataSource } from "../config/database.js";
+
+const userRepository = AppDataSource.getRepository("User");
 
 // POST /api/auth/register
 export const register = async (req, res) => {
@@ -9,38 +11,54 @@ export const register = async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
 
     if (!firstName || !lastName || !email || !password) {
-      return res
-        .status(400)
-        .json({ error: "Todos los campos son obligatorios" });
+      return res.status(400).json({
+        error: "All fields are required",
+      });
     }
 
     if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ error: "La contraseña debe tener al menos 6 caracteres" });
+      return res.status(400).json({
+        error: "Password must be at least 6 characters long",
+      });
     }
 
-    const existente = await pool.query(
-      "SELECT id FROM usuarios WHERE email = $1",
-      [email]
-    );
-    if (existente.rows.length > 0) {
-      return res.status(400).json({ error: "Ese correo ya está registrado" });
+    const existingUser = await userRepository.findOneBy({
+      email,
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        error: "Email is already registered",
+      });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const resultado = await pool.query(
-      `INSERT INTO usuarios (nombre, apellido, email, password, rol)
-       VALUES ($1, $2, $3, $4, 'user')
-       RETURNING id, nombre, apellido, email, rol`,
-      [firstName, lastName, email, passwordHash]
-    );
+    const newUser = userRepository.create({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      role: "user",
+    });
 
-    res.status(201).json({ usuario: resultado.rows[0] });
+    const savedUser = await userRepository.save(newUser);
+
+    return res.status(201).json({
+      user: {
+        id: savedUser.id,
+        firstName: savedUser.firstName,
+        lastName: savedUser.lastName,
+        email: savedUser.email,
+        role: savedUser.role,
+      },
+    });
   } catch (error) {
-    console.error("Error en registro:", error);
-    res.status(500).json({ error: "Error al registrar el usuario" });
+    console.error("User registration failed:", error);
+
+    return res.status(500).json({
+      error: "User registration failed",
+    });
   }
 };
 
@@ -50,49 +68,60 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ error: "Correo y contraseña son obligatorios" });
+      return res.status(400).json({
+        error: "Email and password are required",
+      });
     }
 
-    const resultado = await pool.query(
-      "SELECT * FROM usuarios WHERE email = $1",
-      [email]
+    const user = await userRepository.findOneBy({
+      email,
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        error: "User not found",
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      user.password
     );
-    const usuario = resultado.rows[0];
 
-    if (!usuario) {
-      return res.status(400).json({ error: "Usuario no encontrado" });
-    }
-
-    const passwordValida = await bcrypt.compare(password, usuario.password);
-    if (!passwordValida) {
-      return res.status(400).json({ error: "Contraseña incorrecta" });
+    if (!isPasswordValid) {
+      return res.status(400).json({
+        error: "Incorrect password",
+      });
     }
 
     const token = jwt.sign(
       {
-        sub: usuario.id,
-        email: usuario.email,
-        nombre: usuario.nombre,
-        rol: usuario.rol,
+        sub: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        role: user.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" }
+      {
+        expiresIn: "2h",
+      }
     );
 
-    res.json({
+    return res.json({
       token,
-      usuario: {
-        id: usuario.id,
-        nombre: usuario.nombre,
-        apellido: usuario.apellido,
-        email: usuario.email,
-        rol: usuario.rol,
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
-    console.error("Error en login:", error);
-    res.status(500).json({ error: "Error al iniciar sesión" });
+    console.error("User login failed:", error);
+
+    return res.status(500).json({
+      error: "User login failed",
+    });
   }
 };

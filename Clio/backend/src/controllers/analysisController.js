@@ -1,10 +1,12 @@
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
-import { pool } from "../db.js";
+import { AppDataSource } from "../config/database.js";
 
 dotenv.config();
 
 const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+const analysisRepository = AppDataSource.getRepository("Analysis");
 
 const RESPONSE_SCHEMA = {
   type: "object",
@@ -27,19 +29,15 @@ Eres "Clio", un asistente de inteligencia artificial experto en verificar la ver
 Tu tarea es analizar el texto que el usuario te proporciona y determinar si la información es verdadera, dudosa o falsa.
 
 Reglas que debes seguir de manera estricta:
-1. Solo respondes en formato JSON. Tu respuesta debe ser un objeto JSON válido con la siguiente estructura:
-   {
-     "veredicto": "veraz" | "dudoso" | "falso",
-     "explicacion": "Aquí va tu explicación detallada en lenguaje simple."
-   }
+1. Solo respondes en formato JSON.
 2. No incluyas texto adicional fuera del objeto JSON.
-3. Eres estricto con el tema: si el texto no es sobre un hecho histórico, el veredicto debe ser "falso" y la explicación debe indicar que el tema no es histórico.
-4. Explica tu razonamiento: siempre debes proporcionar una explicación clara.
-5. Solo analizas párrafos o afirmaciones desarrolladas, no preguntas ni enunciados sueltos. Si el usuario envía una pregunta o una afirmación demasiado corta y sin contexto, el veredicto debe ser "dudoso" y la explicación debe indicar que el sistema analiza párrafos o afirmaciones desarrolladas sobre hechos históricos, no preguntas sueltas, y pedirle al usuario que reformule su texto como un enunciado afirmativo con más contexto.
+3. Si el texto no es sobre un hecho histórico, el veredicto debe ser "falso".
+4. Explica siempre tu razonamiento de forma clara.
+5. Solo analizas párrafos o afirmaciones desarrolladas, no preguntas ni enunciados sueltos.
 `;
 
 async function generateWithRetries(params, maxAttempts = 3) {
-  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await genAI.models.generateContent(params);
     } catch (error) {
@@ -51,9 +49,11 @@ async function generateWithRetries(params, maxAttempts = 3) {
       }
 
       const waitTime = 1000 * attempt;
+
       console.log(
         `Gemini saturado, reintentando en ${waitTime}ms (intento ${attempt}/${maxAttempts})`,
       );
+
       await new Promise((resolve) => setTimeout(resolve, waitTime));
     }
   }
@@ -73,7 +73,7 @@ function parseGeminiResponse(text) {
       explanation:
         parsedResponse.explicacion || "No se pudo determinar el resultado.",
     };
-  } catch (parseError) {
+  } catch {
     console.error("Error al parsear JSON de Gemini:", text);
     throw new Error("La IA no devolvió un formato válido");
   }
@@ -94,7 +94,9 @@ export const createAnalysis = async (req, res) => {
     const originalText = getOriginalText(req.body);
 
     if (!originalText) {
-      return res.status(400).json({ error: "El texto es obligatorio" });
+      return res.status(400).json({
+        error: "El texto es obligatorio",
+      });
     }
 
     const result = await generateWithRetries({
@@ -108,40 +110,36 @@ export const createAnalysis = async (req, res) => {
     });
 
     const parsedResponse = parseGeminiResponse(result.text);
+
     const userId = Number(req.user?.sub ?? req.user?.id);
 
-    const inserted = await pool.query(
-      `INSERT INTO analysis (
-        user_id,
-        original_text,
-        analyzed_text,
-        verdict,
-        explanation,
-        keywords,
-        is_deleted
-      ) VALUES ($1, $2, $3, $4, $5, $6, false)
-      RETURNING id, user_id, original_text, analyzed_text, verdict, explanation, keywords, is_deleted, created_at, updated_at`,
-      [
-        userId,
-        originalText,
-        parsedResponse.explanation,
-        parsedResponse.verdict,
-        parsedResponse.explanation,
-        JSON.stringify([]),
-      ],
-    );
+    const analysis = analysisRepository.create({
+      user: {
+        id: userId,
+      },
+      originalText,
+      analyzedText: parsedResponse.explanation,
+      verdict: parsedResponse.verdict,
+      explanation: parsedResponse.explanation,
+      keywords: [],
+      isDeleted: false,
+    });
 
-    return res.status(201).json(inserted.rows[0]);
+    const savedAnalysis = await analysisRepository.save(analysis);
+
+    return res.status(201).json(savedAnalysis);
   } catch (error) {
     console.error("Error al crear análisis:", error);
 
     if (error.message === "La IA no devolvió un formato válido") {
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({
+        error: error.message,
+      });
     }
 
-    return res
-      .status(500)
-      .json({ error: "Error al procesar la solicitud con IA" });
+    return res.status(500).json({
+      error: "Error al procesar la solicitud con IA",
+    });
   }
 };
 
@@ -149,18 +147,25 @@ export const listAnalysis = async (req, res) => {
   try {
     const userId = Number(req.user?.sub ?? req.user?.id);
 
-    const result = await pool.query(
-      `SELECT id, user_id, original_text, analyzed_text, verdict, explanation, keywords, is_deleted, created_at, updated_at
-       FROM analysis
-       WHERE user_id = $1 AND is_deleted = false
-       ORDER BY created_at DESC`,
-      [userId],
-    );
+    const analyses = await analysisRepository.find({
+      where: {
+        user: {
+          id: userId,
+        },
+        isDeleted: false,
+      },
+      order: {
+        createdAt: "DESC",
+      },
+    });
 
-    return res.json(result.rows);
+    return res.json(analyses);
   } catch (error) {
     console.error("Error al listar análisis:", error);
-    return res.status(500).json({ error: "Error al obtener los análisis" });
+
+    return res.status(500).json({
+      error: "Error al obtener los análisis",
+    });
   }
 };
 
@@ -171,36 +176,44 @@ export const updateAnalysis = async (req, res) => {
     const userId = Number(req.user?.sub ?? req.user?.id);
 
     if (!originalText) {
-      return res.status(400).json({ error: "El texto es obligatorio" });
+      return res.status(400).json({
+        error: "El texto es obligatorio",
+      });
     }
 
-    const existing = await pool.query(
-      `SELECT user_id FROM analysis WHERE id = $1 AND is_deleted = false`,
-      [analysisId],
-    );
+    const analysis = await analysisRepository.findOne({
+      where: {
+        id: analysisId,
+        isDeleted: false,
+      },
+      relations: {
+        user: true,
+      },
+    });
 
-    if (existing.rows.length === 0) {
-      return res.status(404).json({ error: "Análisis no encontrado" });
+    if (!analysis) {
+      return res.status(404).json({
+        error: "Análisis no encontrado",
+      });
     }
 
-    if (existing.rows[0].user_id !== userId) {
-      return res
-        .status(403)
-        .json({ error: "No tienes permisos para editar este análisis" });
+    if (analysis.user.id !== userId) {
+      return res.status(403).json({
+        error: "No tienes permisos para editar este análisis",
+      });
     }
 
-    const updated = await pool.query(
-      `UPDATE analysis
-       SET original_text = $1, updated_at = CURRENT_TIMESTAMP
-       WHERE id = $2 AND user_id = $3
-       RETURNING id, user_id, original_text, analyzed_text, verdict, explanation, keywords, is_deleted, created_at, updated_at`,
-      [originalText, analysisId, userId],
-    );
+    analysis.originalText = originalText;
 
-    return res.json(updated.rows[0]);
+    const updatedAnalysis = await analysisRepository.save(analysis);
+
+    return res.json(updatedAnalysis);
   } catch (error) {
     console.error("Error al actualizar análisis:", error);
-    return res.status(500).json({ error: "Error al actualizar el análisis" });
+
+    return res.status(500).json({
+      error: "Error al actualizar el análisis",
+    });
   }
 };
 
@@ -209,35 +222,41 @@ export const deleteAnalysis = async (req, res) => {
     const analysisId = Number(req.params.id);
     const userId = Number(req.user?.sub ?? req.user?.id);
 
-    const existing = await pool.query(
-      `SELECT user_id FROM analysis WHERE id = $1 AND is_deleted = false`,
-      [analysisId],
-    );
+    const analysis = await analysisRepository.findOne({
+      where: {
+        id: analysisId,
+        isDeleted: false,
+      },
+      relations: {
+        user: true,
+      },
+    });
 
-    if (existing.rows.length === 0) {
-      return res.status(404).json({ error: "Análisis no encontrado" });
+    if (!analysis) {
+      return res.status(404).json({
+        error: "Análisis no encontrado",
+      });
     }
 
-    if (existing.rows[0].user_id !== userId) {
-      return res
-        .status(403)
-        .json({ error: "No tienes permisos para eliminar este análisis" });
+    if (analysis.user.id !== userId) {
+      return res.status(403).json({
+        error: "No tienes permisos para eliminar este análisis",
+      });
     }
 
-    const deleted = await pool.query(
-      `UPDATE analysis
-       SET is_deleted = true, updated_at = CURRENT_TIMESTAMP
-       WHERE id = $1 AND user_id = $2
-       RETURNING id, user_id, original_text, analyzed_text, verdict, explanation, keywords, is_deleted, created_at, updated_at`,
-      [analysisId, userId],
-    );
+    analysis.isDeleted = true;
+
+    const deletedAnalysis = await analysisRepository.save(analysis);
 
     return res.json({
       message: "Análisis eliminado correctamente",
-      analysis: deleted.rows[0],
+      analysis: deletedAnalysis,
     });
   } catch (error) {
     console.error("Error al eliminar análisis:", error);
-    return res.status(500).json({ error: "Error al eliminar el análisis" });
+
+    return res.status(500).json({
+      error: "Error al eliminar el análisis",
+    });
   }
 };

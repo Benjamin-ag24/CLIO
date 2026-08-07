@@ -39,7 +39,7 @@ export default function LoginPage({ onLoginSuccess, onGoToRegister }) {
         throw new Error(data.error || "Credenciales inválidas");
       }
 
-      saveAuthSession(data.token, data.usuario);
+      saveAuthSession(data.token, data.user);
       onLoginSuccess();
     } catch (err) {
       setError(err.message);
