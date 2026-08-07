@@ -10,9 +10,11 @@ const VERDICT_STYLES = {
 
 const API_URL = "http://localhost:3000/api/analysis";
 
-function formatDate(isoString) {
+const formatDate = (isoString) => {
   if (!isoString) return "";
+
   const date = new Date(isoString);
+
   return date.toLocaleString("es-EC", {
     day: "2-digit",
     month: "2-digit",
@@ -20,20 +22,23 @@ function formatDate(isoString) {
     hour: "2-digit",
     minute: "2-digit",
   });
-}
+};
 
-function truncateText(text, max = 70) {
+const truncateText = (text, max = 70) => {
   if (!text) return "";
-  return text.length > max ? text.slice(0, max).trim() + "…" : text;
-}
 
-export default function Sidebar({
+  return text.length > max
+    ? text.slice(0, max).trim() + "…"
+    : text;
+};
+
+const Sidebar = ({
   isOpen,
   onClose,
   onSelectAnalysis,
   onNewAnalysis,
   refreshTrigger,
-}) {
+}) => {
   const [analyses, setAnalyses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -44,6 +49,7 @@ export default function Sidebar({
     const fetchHistory = async () => {
       setIsLoading(true);
       setError("");
+
       try {
         const response = await fetch(API_URL, {
           headers: {
@@ -69,24 +75,26 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Dark overlay when open, click to close */}
       {isOpen && (
         <div
+          className="fixed inset-0 bg-black/30 z-40"
           onClick={onClose}
-          className="fixed inset-0 bg-[#2B1F16]/30 z-40 transition-opacity"
         />
       )}
 
-      {/* Side panel */}
       <aside
-        className={`fixed top-0 left-0 h-full w-[320px] bg-[#FBFAF6] border-r border-[#E9E1D3]
-                    z-50 transform transition-transform duration-300 ease-in-out
+        className={`fixed top-0 left-0 h-full w-[320px] bg-[#FBFAF6] 
+                    border-r border-[#E9E1D3] z-50 
+                    transform transition-transform duration-300 ease-in-out
                     ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex flex-col h-full">
-          {/* Panel header */}
+
           <div className="flex items-center justify-between px-5 py-5 border-b border-[#E9E1D3]">
-            <h2 className="text-lg font-bold text-[#4A3226]">Historial</h2>
+            <h2 className="text-lg font-bold text-[#4A3226]">
+              Historial
+            </h2>
+
             <button
               onClick={onClose}
               className="text-[#93816F] hover:text-[#4A3226] transition text-xl leading-none"
@@ -96,22 +104,22 @@ export default function Sidebar({
             </button>
           </div>
 
-          {/* New analysis button */}
           <div className="px-5 pt-4">
             <button
               onClick={() => {
                 onNewAnalysis();
                 onClose();
               }}
-              className="w-full rounded-full bg-[#BFD9E8] hover:bg-[#A9CBDF]
+              className="w-full rounded-full bg-[#BFD9E8] 
+                         hover:bg-[#A9CBDF]
                          text-[#2F4858] font-bold py-2.5 transition"
             >
               + Nuevo análisis
             </button>
           </div>
 
-          {/* Analysis list */}
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2">
+
             {isLoading && (
               <p className="text-sm text-[#93816F] text-center py-6">
                 Cargando historial...
@@ -133,7 +141,9 @@ export default function Sidebar({
             {!isLoading &&
               !error &&
               analyses.map((item) => {
-                const style = VERDICT_STYLES[item.verdict] || VERDICT_STYLES.dudoso;
+                const style =
+                  VERDICT_STYLES[item.verdict] ||
+                  VERDICT_STYLES.dudoso;
 
                 return (
                   <button
@@ -142,29 +152,39 @@ export default function Sidebar({
                       onSelectAnalysis(item);
                       onClose();
                     }}
-                    className="w-full text-left rounded-xl border border-[#E9E1D3] bg-white
-                               px-4 py-3 hover:border-[#6FA8C9] hover:bg-[#FBFAF6] transition"
+                    className="w-full text-left rounded-xl 
+                               border border-[#E9E1D3] bg-white
+                               px-4 py-3 hover:border-[#6FA8C9]
+                               hover:bg-[#FBFAF6] transition"
                   >
                     <div className="flex items-center justify-between mb-1.5">
                       <span
                         className="text-xs font-bold px-2 py-0.5 rounded-full"
-                        style={{ backgroundColor: style.bg, color: style.text }}
+                        style={{
+                          backgroundColor: style.bg,
+                          color: style.text,
+                        }}
                       >
                         {style.label}
                       </span>
+
                       <span className="text-xs text-[#B3A392]">
                         {formatDate(item.createdAt)}
                       </span>
                     </div>
+
                     <p className="text-sm text-[#4A3226] leading-snug">
                       {truncateText(item.originalText)}
                     </p>
                   </button>
                 );
               })}
+
           </div>
         </div>
       </aside>
     </>
   );
-}
+};
+
+export default Sidebar;
