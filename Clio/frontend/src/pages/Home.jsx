@@ -4,6 +4,7 @@ import InputPanel from "../components/InputPanel";
 import ReportPanel from "../components/ReportPanel";
 import ErrorBanner from "../components/ErrorBanner";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Sidebar from "../components/Sidebar"; // NEW
 import LoginPage from "./Auth/LoginPage";
 import RegisterPage from "./Auth/RegisterPage";
 import { analyzeText } from "../services/analysisService";
@@ -49,6 +50,10 @@ const Home = () => {
   const [status, setStatus] = useState("inactive");
   const [error, setError] = useState(null);
 
+  // NEW: estado del historial lateral
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   // Referencia al textarea
   const inputRef = useRef(null);
 
@@ -93,6 +98,7 @@ const Home = () => {
       });
 
       setStatus("result");
+      setRefreshTrigger((prev) => prev + 1); // NEW: refresca el historial
     } catch (err) {
       setStatus("error");
 
@@ -109,10 +115,27 @@ const Home = () => {
     setContent("");
     setReport(null);
     setError(null);
-    setStatus("inactivo");
+    setStatus("inactive"); // CORREGIDO: antes decía "inactivo"
 
     // Devuelve el foco al textarea
     inputRef.current?.focus();
+  };
+
+  // NEW: carga un análisis del historial en los paneles principales
+  const selectAnalysis = (item) => {
+    setContent(item.originalText);
+    setReport({
+      verdict: item.verdict,
+      explanation: item.explanation,
+      keyTerms: [],
+      indicators:
+        item.verdict === "veraz"
+          ? ["Estructura coherente", "Lenguaje directo y claro"]
+          : item.verdict === "dudoso"
+            ? ["Uso de palabras imprecisas", "Falta de fuentes concretas"]
+            : ["Afirmaciones sin respaldo", "Lenguaje sensacionalista"],
+    });
+    setStatus("result");
   };
 
   // Si no hay sesión, muestra login o registro según la vista
@@ -132,9 +155,24 @@ const Home = () => {
     <main className="min-h-screen bg-[#f7f2ec]">
       <Header />
 
+      {/* NEW: panel lateral de historial */}
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        refreshTrigger={refreshTrigger}
+        onNewAnalysis={resetAnalysis}
+        onSelectAnalysis={selectAnalysis}
+      />
+
       <div className="mx-auto max-w-6xl px-6 py-8">
-        {/* Botón de cierre de sesión con nombre del usuario */}
-        <div className="flex justify-end mb-4">
+        {/* Botones de historial y cierre de sesión */}
+        <div className="flex justify-end items-center gap-4 mb-4">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="text-sm text-[#93816F] hover:text-[#5b3f2d] transition"
+          >
+            ☰ Historial
+          </button>
           <button
             onClick={() => {
               clearAuthSession();
