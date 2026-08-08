@@ -1,6 +1,7 @@
 // frontend/src/components/Sidebar.jsx
 import { useEffect, useState } from "react";
 import { getAuthToken } from "../services/authStorage";
+import { updateAnalysis, deleteAnalysis } from "../services/analysisService";
 
 const VERDICT_STYLES = {
   veraz: { bg: "#EAF5EC", text: "#3E7C50", label: "Veraz" },
@@ -27,9 +28,7 @@ const formatDate = (isoString) => {
 const truncateText = (text, max = 70) => {
   if (!text) return "";
 
-  return text.length > max
-    ? text.slice(0, max).trim() + "…"
-    : text;
+  return text.length > max ? text.slice(0, max).trim() + "…" : text;
 };
 
 const Sidebar = ({
@@ -43,43 +42,70 @@ const Sidebar = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const fetchHistory = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(API_URL, {
+        headers: {
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("No fue posible cargar el historial");
+      }
+
+      const data = await response.json();
+      setAnalyses(data);
+    } catch (err) {
+      setError(err.message || "Error al cargar el historial");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!isOpen) return;
-
-    const fetchHistory = async () => {
-      setIsLoading(true);
-      setError("");
-
-      try {
-        const response = await fetch(API_URL, {
-          headers: {
-            Authorization: `Bearer ${getAuthToken()}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("No fue posible cargar el historial");
-        }
-
-        const data = await response.json();
-        setAnalyses(data);
-      } catch (err) {
-        setError(err.message || "Error al cargar el historial");
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
     fetchHistory();
   }, [isOpen, refreshTrigger]);
 
+  const handleEdit = async (event, item) => {
+    event.stopPropagation();
+
+    const newText = window.prompt("Edita el texto del análisis:", item.originalText);
+
+    if (!newText || newText.trim() === "") return;
+
+    try {
+      await updateAnalysis(item.id, newText);
+      fetchHistory();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleDelete = async (event, id) => {
+    event.stopPropagation();
+
+    const confirmed = window.confirm("¿Seguro que quieres eliminar este análisis?");
+
+    if (!confirmed) return;
+
+    try {
+      await deleteAnalysis(id);
+      fetchHistory();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   return (
     <>
       {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 z-40"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
       )}
 
       <aside
@@ -89,11 +115,8 @@ const Sidebar = ({
                     ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex flex-col h-full">
-
           <div className="flex items-center justify-between px-5 py-5 border-b border-[#E9E1D3]">
-            <h2 className="text-lg font-bold text-[#4A3226]">
-              Historial
-            </h2>
+            <h2 className="text-lg font-bold text-[#4A3226]">Historial</h2>
 
             <button
               onClick={onClose}
@@ -119,7 +142,6 @@ const Sidebar = ({
           </div>
 
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2">
-
             {isLoading && (
               <p className="text-sm text-[#93816F] text-center py-6">
                 Cargando historial...
@@ -127,9 +149,7 @@ const Sidebar = ({
             )}
 
             {!isLoading && error && (
-              <p className="text-sm text-[#C3564F] text-center py-6">
-                {error}
-              </p>
+              <p className="text-sm text-[#C3564F] text-center py-6">{error}</p>
             )}
 
             {!isLoading && !error && analyses.length === 0 && (
@@ -141,18 +161,16 @@ const Sidebar = ({
             {!isLoading &&
               !error &&
               analyses.map((item) => {
-                const style =
-                  VERDICT_STYLES[item.verdict] ||
-                  VERDICT_STYLES.dudoso;
+                const style = VERDICT_STYLES[item.verdict] || VERDICT_STYLES.dudoso;
 
                 return (
-                  <button
+                  <div
                     key={item.id}
                     onClick={() => {
                       onSelectAnalysis(item);
                       onClose();
                     }}
-                    className="w-full text-left rounded-xl 
+                    className="w-full text-left rounded-xl cursor-pointer
                                border border-[#E9E1D3] bg-white
                                px-4 py-3 hover:border-[#6FA8C9]
                                hover:bg-[#FBFAF6] transition"
@@ -176,10 +194,25 @@ const Sidebar = ({
                     <p className="text-sm text-[#4A3226] leading-snug">
                       {truncateText(item.originalText)}
                     </p>
-                  </button>
+
+                    <div className="flex gap-3 mt-2">
+                      <button
+                        onClick={(event) => handleEdit(event, item)}
+                        className="text-xs text-[#6FA8C9] hover:text-[#4A3226] transition"
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        onClick={(event) => handleDelete(event, item.id)}
+                        className="text-xs text-[#C3564F] hover:text-[#4A3226] transition"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
                 );
               })}
-
           </div>
         </div>
       </aside>
