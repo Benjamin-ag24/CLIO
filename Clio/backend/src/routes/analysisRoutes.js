@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verifyToken } from "../authMiddleware.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 import {
   createAnalysis,
   deleteAnalysis,
