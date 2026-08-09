@@ -1,7 +1,6 @@
-// backend/src/authMiddleware.js
 import jwt from "jsonwebtoken";
 
-export function verifyToken(req, res, next) {
+export const verifyToken = (req, res, next) => {
   const authHeader = req.header("Authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -21,10 +20,9 @@ export function verifyToken(req, res, next) {
       error: "Token inválido o expirado.",
     });
   }
-}
+};
 
-// NUEVO: verifica que el usuario tenga el rol requerido
-export function checkRole(requiredRole) {
+export const checkRole = (requiredRole) => {
   return (req, res, next) => {
     const userRole = req.user?.role ?? req.user?.rol;
 
@@ -35,4 +33,4 @@ export function checkRole(requiredRole) {
     }
     next();
   };
-}
+};

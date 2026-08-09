@@ -4,7 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import { AppDataSource } from "./config/database.js";
-import { verifyToken } from "./authMiddleware.js";
+import { verifyToken } from "./middleware/authMiddleware.js";
 import authRoutes from "./routes/authRoutes.js";
 import analysisRoutes from "./routes/analysisRoutes.js";
 import { createAnalysis } from "./controllers/analysisController.js";
