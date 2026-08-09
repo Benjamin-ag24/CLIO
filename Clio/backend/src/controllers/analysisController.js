@@ -11,15 +11,19 @@ const analysisRepository = AppDataSource.getRepository("Analysis");
 const RESPONSE_SCHEMA = {
   type: "object",
   properties: {
-    veredicto: {
+    verdict: {
       type: "string",
       enum: ["veraz", "dudoso", "falso"],
     },
-    explicacion: {
+    explanation: {
       type: "string",
     },
+    keywords: {
+      type: "array",
+      items: { type: "string" },
+    },
   },
-  required: ["veredicto", "explicacion"],
+  required: ["verdict", "explanation", "keywords"],
   additionalProperties: false,
 };
 
@@ -34,9 +38,10 @@ Reglas que debes seguir de manera estricta:
 3. Si el texto no es sobre un hecho histórico, el veredicto debe ser "falso".
 4. Explica siempre tu razonamiento de forma clara.
 5. Solo analizas párrafos o afirmaciones desarrolladas, no preguntas ni enunciados sueltos.
+6. Identifica entre 3 y 5 términos clave del texto (personas, lugares, fechas o eventos históricos relevantes) en "keywords".
 `;
 
-async function generateWithRetries(params, maxAttempts = 3) {
+const generateWithRetries = async (params, maxAttempts = 3) => {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await genAI.models.generateContent(params);
@@ -57,9 +62,9 @@ async function generateWithRetries(params, maxAttempts = 3) {
       await new Promise((resolve) => setTimeout(resolve, waitTime));
     }
   }
-}
+};
 
-function parseGeminiResponse(text) {
+const parseGeminiResponse = (text) => {
   try {
     const cleanJson = text
       .replace(/```json\s*/g, "")
@@ -69,25 +74,26 @@ function parseGeminiResponse(text) {
     const parsedResponse = JSON.parse(cleanJson);
 
     return {
-      verdict: parsedResponse.veredicto || "dudoso",
+      verdict: parsedResponse.verdict || "dudoso",
       explanation:
-        parsedResponse.explicacion || "No se pudo determinar el resultado.",
+        parsedResponse.explanation || "No se pudo determinar el resultado.",
+      keywords: parsedResponse.keywords || [],
     };
   } catch {
     console.error("Error al parsear JSON de Gemini:", text);
     throw new Error("La IA no devolvió un formato válido");
   }
-}
+};
 
-function getOriginalText(body) {
-  const text = body?.text ?? body?.texto ?? body?.original_text;
+const getOriginalText = (body) => {
+  const text = body?.text ?? body?.original_text;
 
   if (typeof text !== "string") {
     return "";
   }
 
   return text.trim();
-}
+};
 
 export const createAnalysis = async (req, res) => {
   try {
@@ -113,21 +119,38 @@ export const createAnalysis = async (req, res) => {
 
     const userId = Number(req.user?.sub ?? req.user?.id);
 
-    const analysis = analysisRepository.create({
-      user: {
-        id: userId,
-      },
-      originalText,
-      analyzedText: parsedResponse.explanation,
+    let savedAnalysis = null;
+    let saved = true;
+
+    try {
+      const analysis = analysisRepository.create({
+        user: {
+          id: userId,
+        },
+        originalText,
+        analyzedText: parsedResponse.explanation,
+        verdict: parsedResponse.verdict,
+        explanation: parsedResponse.explanation,
+        keywords: parsedResponse.keywords,
+        isDeleted: false,
+      });
+
+      savedAnalysis = await analysisRepository.save(analysis);
+    } catch (dbError) {
+      console.error("Error al guardar el análisis en la base de datos:", dbError);
+      saved = false;
+    }
+
+    if (saved) {
+      return res.status(201).json(savedAnalysis);
+    }
+
+    return res.status(201).json({
       verdict: parsedResponse.verdict,
       explanation: parsedResponse.explanation,
-      keywords: [],
-      isDeleted: false,
+      keywords: parsedResponse.keywords,
+      saved: false,
     });
-
-    const savedAnalysis = await analysisRepository.save(analysis);
-
-    return res.status(201).json(savedAnalysis);
   } catch (error) {
     console.error("Error al crear análisis:", error);
 
@@ -203,7 +226,23 @@ export const updateAnalysis = async (req, res) => {
       });
     }
 
+    const result = await generateWithRetries({
+      model: "gemini-3.5-flash",
+      contents: originalText,
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
+        responseMimeType: "application/json",
+        responseJsonSchema: RESPONSE_SCHEMA,
+      },
+    });
+
+    const parsedResponse = parseGeminiResponse(result.text);
+
     analysis.originalText = originalText;
+    analysis.analyzedText = parsedResponse.explanation;
+    analysis.verdict = parsedResponse.verdict;
+    analysis.explanation = parsedResponse.explanation;
+    analysis.keywords = parsedResponse.keywords;
 
     const updatedAnalysis = await analysisRepository.save(analysis);
 
