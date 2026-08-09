@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function RegisterPage({ onRegisterSuccess, onGoToLogin }) {
+const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -189,4 +189,6 @@ export default function RegisterPage({ onRegisterSuccess, onGoToLogin }) {
       </div>
     </div>
   );
-}
+};
+
+export default RegisterPage;
