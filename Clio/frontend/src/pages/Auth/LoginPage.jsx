@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { saveAuthSession } from "../../services/authStorage";
 
-export default function LoginPage({ onLoginSuccess, onGoToRegister }) {
+const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -148,4 +148,6 @@ export default function LoginPage({ onLoginSuccess, onGoToRegister }) {
       </div>
     </div>
   );
-}
+};
+
+export default LoginPage;
