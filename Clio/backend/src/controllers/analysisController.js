@@ -11,19 +11,19 @@ const analysisRepository = AppDataSource.getRepository("Analysis");
 const RESPONSE_SCHEMA = {
   type: "object",
   properties: {
-    veredicto: {
+    verdict: {
       type: "string",
       enum: ["veraz", "dudoso", "falso"],
     },
-    explicacion: {
+    explanation: {
       type: "string",
     },
-    terminos_clave: {
+    keywords: {
       type: "array",
       items: { type: "string" },
     },
   },
-  required: ["veredicto", "explicacion", "terminos_clave"],
+  required: ["verdict", "explanation", "keywords"],
   additionalProperties: false,
 };
 
@@ -38,7 +38,7 @@ Reglas que debes seguir de manera estricta:
 3. Si el texto no es sobre un hecho histórico, el veredicto debe ser "falso".
 4. Explica siempre tu razonamiento de forma clara.
 5. Solo analizas párrafos o afirmaciones desarrolladas, no preguntas ni enunciados sueltos.
-6. Identifica entre 3 y 5 términos clave del texto (personas, lugares, fechas o eventos históricos relevantes) en "terminos_clave".
+6. Identifica entre 3 y 5 términos clave del texto (personas, lugares, fechas o eventos históricos relevantes) en "keywords".
 `;
 
 const generateWithRetries = async (params, maxAttempts = 3) => {
@@ -74,10 +74,10 @@ const parseGeminiResponse = (text) => {
     const parsedResponse = JSON.parse(cleanJson);
 
     return {
-      verdict: parsedResponse.veredicto || "dudoso",
+      verdict: parsedResponse.verdict || "dudoso",
       explanation:
-        parsedResponse.explicacion || "No se pudo determinar el resultado.",
-      keywords: parsedResponse.terminos_clave || [],
+        parsedResponse.explanation || "No se pudo determinar el resultado.",
+      keywords: parsedResponse.keywords || [],
     };
   } catch {
     console.error("Error al parsear JSON de Gemini:", text);
@@ -86,7 +86,7 @@ const parseGeminiResponse = (text) => {
 };
 
 const getOriginalText = (body) => {
-  const text = body?.text ?? body?.texto ?? body?.original_text;
+  const text = body?.text ?? body?.original_text;
 
   if (typeof text !== "string") {
     return "";
