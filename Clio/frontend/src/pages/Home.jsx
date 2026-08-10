@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import InputPanel from "../components/InputPanel";
 import ReportPanel from "../components/ReportPanel";
 import ErrorBanner from "../components/ErrorBanner";
-import LoadingSpinner from "../components/LoadingSpinner";
+import Loading from "../common/Loading";
 import Sidebar from "../components/Sidebar";
 import LoginPage from "./Auth/LoginPage";
 import RegisterPage from "./Auth/RegisterPage";
@@ -229,7 +229,7 @@ const Home = () => {
 
         {status === "loading" && (
           <div className="mt-8">
-            <LoadingSpinner />
+            <Loading />
           </div>
         )}
 
