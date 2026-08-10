@@ -1,3 +1,5 @@
+import Button from "../common/Button";
+
 const ErrorBanner = ({ message, code, onRetry }) => {
   return (
     <div className="mt-8 rounded-3xl border border-red-200 bg-red-50 p-6 shadow-[0_8px_30px_-12px_rgba(220,38,38,0.15)]">
@@ -24,12 +26,9 @@ const ErrorBanner = ({ message, code, onRetry }) => {
       </div>
 
       <div className="mt-6 flex justify-end">
-        <button
-          onClick={onRetry}
-          className="inline-flex items-center justify-center rounded-full bg-red-600 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-red-500/20 transition-colors hover:bg-red-700"
-        >
+        <Button variant="danger" onClick={onRetry}>
           Intentar de nuevo
-        </button>
+        </Button>
       </div>
     </div>
   );

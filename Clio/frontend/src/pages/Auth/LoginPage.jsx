@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { saveAuthSession } from "../../services/authStorage";
+import Button from "../../common/Button";
 
 const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
   const [email, setEmail] = useState("");
@@ -120,25 +121,25 @@ const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
               </div>
             )}
 
-            <button
+            <Button
               type="submit"
+              variant="accent"
+              className="w-full py-3.5 mt-2"
               disabled={isLoading}
-              className="w-full rounded-full bg-[#BFD9E8] hover:bg-[#A9CBDF]
-                         text-[#2F4858] font-bold py-3.5 mt-2
-                         transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isLoading ? "Ingresando..." : "Ingresar"}
-            </button>
+            </Button>
           </form>
 
           <p className="text-center text-sm text-[#93816F] mt-6">
             ¿No tienes cuenta?{" "}
-            <button
+            <Button
+              variant="text"
+              className="text-[#6FA8C9] font-semibold hover:underline hover:text-[#6FA8C9]"
               onClick={onGoToRegister}
-              className="text-[#6FA8C9] font-semibold hover:underline"
             >
               Regístrate
-            </button>
+            </Button>
           </p>
         </div>
 

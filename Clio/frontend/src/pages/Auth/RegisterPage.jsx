@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Button from "../../common/Button";
 
 const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
   const [firstName, setFirstName] = useState("");
@@ -160,26 +161,26 @@ const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
                 </div>
               )}
 
-              <button
+              <Button
                 type="submit"
+                variant="accent"
+                className="w-full py-3.5 mt-2"
                 disabled={isLoading}
-                className="w-full rounded-full bg-[#BFD9E8] hover:bg-[#A9CBDF]
-                           text-[#2F4858] font-bold py-3.5 mt-2
-                           transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Creando cuenta..." : "Crear cuenta"}
-              </button>
+              </Button>
             </form>
           )}
 
           <p className="text-center text-sm text-[#93816F] mt-6">
             ¿Ya tienes cuenta?{" "}
-            <button
+            <Button
+              variant="text"
+              className="text-[#6FA8C9] font-semibold hover:underline hover:text-[#6FA8C9]"
               onClick={onGoToLogin}
-              className="text-[#6FA8C9] font-semibold hover:underline"
             >
               Inicia sesión
-            </button>
+            </Button>
           </p>
         </div>
 
