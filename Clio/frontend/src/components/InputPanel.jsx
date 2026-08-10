@@ -1,4 +1,5 @@
 import { forwardRef, useState } from "react";
+import Button from "../common/Button";
 
 const InputPanel = forwardRef(
   ({ content, onChange, onClear, onAnalyze, characterCount }, ref) => {
@@ -83,10 +84,11 @@ const InputPanel = forwardRef(
           </div>
 
           <div className="flex gap-3">
-            <button
+            <Button
+              variant="primary"
+              className="flex-1"
               onClick={handleAnalyze}
               disabled={isLoading || !content.trim()}
-              className="flex-1 rounded-full bg-[#7fb3d1] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#6a9eb8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -115,14 +117,11 @@ const InputPanel = forwardRef(
               ) : (
                 "Validar hecho"
               )}
-            </button>
+            </Button>
 
-            <button
-              onClick={handleClear}
-              className="rounded-full border border-[#e8ddd0] px-6 py-3 text-sm font-medium text-[#7b5f49] hover:bg-[#f7f2ec] transition-colors"
-            >
+            <Button variant="secondary" onClick={handleClear}>
               Limpiar
-            </button>
+            </Button>
           </div>
         </div>
       </div>

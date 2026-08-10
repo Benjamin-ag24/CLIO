@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { getAuthToken } from "../services/authStorage";
 import { updateAnalysis, deleteAnalysis } from "../services/analysisService";
+import Button from "../common/Button";
 
 const VERDICT_STYLES = {
   veraz: { bg: "#EAF5EC", text: "#3E7C50", label: "Veraz" },
@@ -118,27 +119,27 @@ const Sidebar = ({
           <div className="flex items-center justify-between px-5 py-5 border-b border-[#E9E1D3]">
             <h2 className="text-lg font-bold text-[#4A3226]">Historial</h2>
 
-            <button
+            <Button
+              variant="text"
               onClick={onClose}
-              className="text-[#93816F] hover:text-[#4A3226] transition text-xl leading-none"
+              className="text-xl leading-none"
               aria-label="Cerrar historial"
             >
               ✕
-            </button>
+            </Button>
           </div>
 
           <div className="px-5 pt-4">
-            <button
+            <Button
+              variant="accent"
+              className="w-full"
               onClick={() => {
                 onNewAnalysis();
                 onClose();
               }}
-              className="w-full rounded-full bg-[#BFD9E8] 
-                         hover:bg-[#A9CBDF]
-                         text-[#2F4858] font-bold py-2.5 transition"
             >
               + Nuevo análisis
-            </button>
+            </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2">
@@ -196,19 +197,21 @@ const Sidebar = ({
                     </p>
 
                     <div className="flex gap-3 mt-2">
-                      <button
+                      <Button
+                        variant="text"
+                        className="text-[#6FA8C9] hover:text-[#4A3226]"
                         onClick={(event) => handleEdit(event, item)}
-                        className="text-xs text-[#6FA8C9] hover:text-[#4A3226] transition"
                       >
                         Editar
-                      </button>
+                      </Button>
 
-                      <button
+                      <Button
+                        variant="text"
+                        className="text-[#C3564F] hover:text-[#4A3226]"
                         onClick={(event) => handleDelete(event, item.id)}
-                        className="text-xs text-[#C3564F] hover:text-[#4A3226] transition"
                       >
                         Eliminar
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 );

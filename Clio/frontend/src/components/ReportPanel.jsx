@@ -1,5 +1,6 @@
 ﻿import { useState } from "react";
 import Semaphore, { renderHighlightedText } from "./Semaphore";
+import Button from "../common/Button";
 
 const buildReportText = ({ verdict, explanation, keyTerms, indicators }) => {
   const text = [
@@ -126,24 +127,16 @@ const ReportPanel = ({ report, onReset }) => {
       </div>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <button
-          onClick={handleCopy}
-          type="button"
-          className="inline-flex items-center justify-center rounded-full border border-[#e8ddd0] bg-white px-6 py-3 text-sm font-medium text-[#7b5f49] transition-colors hover:bg-[#f7f2ec]"
-        >
+        <Button variant="secondary" onClick={handleCopy} type="button">
           <span className="mr-2 text-base">
             {copyState === "copied" ? "✅" : "📋"}
           </span>
           {copyState === "copied" ? "Reporte copiado" : "Copiar reporte"}
-        </button>
+        </Button>
 
-        <button
-          onClick={onReset}
-          type="button"
-          className="inline-flex items-center justify-center rounded-full bg-[#7fb3d1] px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-[#7fb3d1]/20 transition-colors hover:bg-[#6a9eb8]"
-        >
+        <Button variant="primary" onClick={onReset} type="button">
           Nuevo análisis
-        </button>
+        </Button>
       </div>
     </div>
   );

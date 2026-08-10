@@ -4,10 +4,11 @@ import Header from "../components/Header";
 import InputPanel from "../components/InputPanel";
 import ReportPanel from "../components/ReportPanel";
 import ErrorBanner from "../components/ErrorBanner";
-import LoadingSpinner from "../components/LoadingSpinner";
+import Loading from "../common/Loading";
 import Sidebar from "../components/Sidebar";
 import LoginPage from "./Auth/LoginPage";
 import RegisterPage from "./Auth/RegisterPage";
+import Button from "../common/Button";
 import { analyzeText } from "../services/analysisService";
 import {
   getAuthToken,
@@ -186,22 +187,19 @@ const Home = () => {
       <div className="mx-auto max-w-6xl px-6 py-8">
 
         <div className="flex justify-end items-center gap-4 mb-4">
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="text-sm text-[#93816F] hover:text-[#5b3f2d] transition"
-          >
+          <Button variant="text" onClick={() => setIsSidebarOpen(true)}>
             ☰ Historial
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="text"
             onClick={() => {
               clearAuthSession();
               setIsAuthenticated(false);
             }}
-            className="text-sm text-[#93816F] hover:text-[#5b3f2d] transition"
           >
             Cerrar sesión ({getAuthUser()?.nombre})
-          </button>
+          </Button>
         </div>
 
         <div className="text-center mb-8">
@@ -231,7 +229,7 @@ const Home = () => {
 
         {status === "loading" && (
           <div className="mt-8">
-            <LoadingSpinner />
+            <Loading />
           </div>
         )}
 
