@@ -73,3 +73,10 @@ SELECT
   (SELECT COUNT(*) FROM analysis WHERE is_deleted = FALSE AND verdict = 'veraz') AS veraz_total,
   (SELECT COUNT(*) FROM analysis WHERE is_deleted = FALSE AND verdict = 'dudoso') AS dudoso_total,
   (SELECT COUNT(*) FROM analysis WHERE is_deleted = FALSE AND verdict = 'falso') AS falso_total;
+---Vista de las keywords mas recientes
+CREATE OR REPLACE VIEW view_keywords_catalog AS
+SELECT k.id, k.keyword, k.created_at,COALESCE(usage.usage_count, 0) AS usage_count
+FROM keywords k LEFT JOIN (SELECT keyword_text AS keyword,COUNT(*) AS usage_count
+FROM analysis, LATERAL jsonb_array_elements_text(keywords) AS keyword_text
+WHERE is_deleted = FALSE GROUP BY keyword_text) usage ON usage.keyword = k.keyword
+ORDER BY usage_count DESC, k.keyword ASC;

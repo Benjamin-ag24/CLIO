@@ -1,22 +1,31 @@
 ﻿import { useState } from "react";
-import Semaphore, { renderHighlightedText } from "./Semaphore";
+import Semaphore, { renderHighlightedText } from "./Semaphore/Semaphore";
 import Button from "../common/Button";
+import { analysisCopy } from "../constants/analysisConstants";
 
 const buildReportText = ({ verdict, explanation, keyTerms, indicators }) => {
   const text = [
-    "Reporte final de resultados",
-    `Veredicto: ${verdict}`,
+    analysisCopy.reportPanel.copy.defaultTitle,
+    `${analysisCopy.reportPanel.copy.verdictPrefix} ${verdict}`,
     "",
-    "Explicación:",
+    analysisCopy.reportPanel.copy.explanationLabel,
     explanation,
   ];
 
   if (keyTerms?.length) {
-    text.push("", "Términos clave:", keyTerms.join(", "));
+    text.push(
+      "",
+      analysisCopy.reportPanel.copy.keyTermsLabel,
+      keyTerms.join(", "),
+    );
   }
 
   if (indicators?.length) {
-    text.push("", "Indicadores:", ...indicators.map((item) => `- ${item}`));
+    text.push(
+      "",
+      analysisCopy.reportPanel.copy.indicatorsLabel,
+      ...indicators.map((item) => `- ${item}`),
+    );
   }
 
   return text.join("\n");
@@ -63,10 +72,10 @@ const ReportPanel = ({ report, onReset }) => {
         <section className="rounded-3xl border border-[#e8ddd0] bg-[#fcfaf7] p-5">
           <div className="mb-4">
             <span className="text-xs font-semibold uppercase tracking-[0.24em] text-[#a78a6f]">
-              Semáforo
+              {analysisCopy.reportPanel.sections.semaphore.label}
             </span>
             <h2 className="mt-2 text-lg font-semibold text-[#5b3f2d]">
-              Evaluación inmediata
+              {analysisCopy.reportPanel.sections.semaphore.title}
             </h2>
           </div>
           <Semaphore verdict={verdict} />
@@ -75,10 +84,10 @@ const ReportPanel = ({ report, onReset }) => {
         <section className="rounded-3xl border border-[#e8ddd0] bg-[#fcfaf7] p-5">
           <div className="mb-4">
             <span className="text-xs font-semibold uppercase tracking-[0.24em] text-[#a78a6f]">
-              Explicación
+              {analysisCopy.reportPanel.sections.explanation.label}
             </span>
             <h2 className="mt-2 text-lg font-semibold text-[#5b3f2d]">
-              Qué se detectó en el contenido
+              {analysisCopy.reportPanel.sections.explanation.title}
             </h2>
           </div>
           <div className="space-y-4 text-sm leading-7 text-[#6e5544]">
@@ -87,7 +96,7 @@ const ReportPanel = ({ report, onReset }) => {
             {indicators?.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-[#a78a6f]">
-                  Indicadores
+                  {analysisCopy.reportPanel.sections.indicators}
                 </h3>
                 <ul className="mt-3 space-y-2">
                   {indicators.map((indicator) => (
@@ -108,7 +117,7 @@ const ReportPanel = ({ report, onReset }) => {
             {keyTerms?.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-[#a78a6f]">
-                  Términos clave
+                  {analysisCopy.reportPanel.sections.keyTerms}
                 </h3>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {keyTerms.map((term) => (
@@ -131,11 +140,13 @@ const ReportPanel = ({ report, onReset }) => {
           <span className="mr-2 text-base">
             {copyState === "copied" ? "✅" : "📋"}
           </span>
-          {copyState === "copied" ? "Reporte copiado" : "Copiar reporte"}
+          {copyState === "copied"
+            ? analysisCopy.reportPanel.copy.copied
+            : analysisCopy.reportPanel.copy.button}
         </Button>
 
         <Button variant="primary" onClick={onReset} type="button">
-          Nuevo análisis
+          {analysisCopy.reportPanel.copy.newAnalysis}
         </Button>
       </div>
     </div>

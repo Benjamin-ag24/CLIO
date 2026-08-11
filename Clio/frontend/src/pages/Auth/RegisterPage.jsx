@@ -4,6 +4,11 @@ import Logo from "../../common/Logo";
 import Card from "../../common/Card";
 import TextField from "../../common/TextField";
 import Alert from "../../common/Alert";
+import {
+  authCopy,
+  authValidationMessages,
+  authApiEndpoints,
+} from "../../constants/authConstants";
 
 const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
   const [firstName, setFirstName] = useState("");
@@ -16,15 +21,15 @@ const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
 
   const validateForm = () => {
     if (!firstName.trim() || !lastName.trim()) {
-      setError("Nombre y apellido son obligatorios.");
+      setError(authValidationMessages.requiredNames);
       return false;
     }
     if (!email.includes("@")) {
-      setError("Ingresa un correo electrónico válido.");
+      setError(authValidationMessages.invalidEmail);
       return false;
     }
     if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres.");
+      setError(authValidationMessages.passwordLength);
       return false;
     }
     return true;
@@ -38,7 +43,7 @@ const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
 
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:3000/api/auth/register", {
+      const response = await fetch(authApiEndpoints.register, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ firstName, lastName, email, password }),
@@ -47,7 +52,9 @@ const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "No fue posible registrarte");
+        throw new Error(
+          data.error || authValidationMessages.defaultRegisterError,
+        );
       }
 
       setIsSuccess(true);
@@ -66,28 +73,26 @@ const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
 
         <Card>
           <h2 className="text-2xl font-bold text-[#4A3226] mb-1">
-            Crear cuenta
+            {authCopy.register.title}
           </h2>
           <p className="text-sm text-[#93816F] mb-6">
-            Regístrate para empezar a verificar hechos históricos.
+            {authCopy.register.description}
           </p>
 
           {isSuccess ? (
-            <Alert variant="success">
-              ¡Cuenta creada! Redirigiendo al inicio de sesión...
-            </Alert>
+            <Alert variant="success">{authCopy.register.success}</Alert>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <TextField
-                  label="Nombre"
+                  label={authCopy.register.fields.firstName}
                   type="text"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                 />
 
                 <TextField
-                  label="Apellido"
+                  label={authCopy.register.fields.lastName}
                   type="text"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
@@ -95,19 +100,19 @@ const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
               </div>
 
               <TextField
-                label="Correo electrónico"
+                label={authCopy.register.fields.email}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="tucorreo@ejemplo.com"
+                placeholder={authCopy.register.placeholders.email}
               />
 
               <TextField
-                label="Contraseña"
+                label={authCopy.register.fields.password}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mínimo 6 caracteres"
+                placeholder={authCopy.register.placeholders.password}
               />
 
               {error && <Alert variant="error">{error}</Alert>}
@@ -118,25 +123,27 @@ const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
                 className="w-full py-3.5 mt-2"
                 disabled={isLoading}
               >
-                {isLoading ? "Creando cuenta..." : "Crear cuenta"}
+                {isLoading
+                  ? authCopy.register.buttons.loading
+                  : authCopy.register.buttons.submit}
               </Button>
             </form>
           )}
 
           <p className="text-center text-sm text-[#93816F] mt-6">
-            ¿Ya tienes cuenta?{" "}
+            {authCopy.register.footer.hasAccount}{" "}
             <Button
               variant="text"
               className="text-[#6FA8C9] font-semibold hover:underline hover:text-[#6FA8C9]"
               onClick={onGoToLogin}
             >
-              Inicia sesión
+              {authCopy.register.footer.action}
             </Button>
           </p>
         </Card>
 
         <p className="text-center text-xs text-[#B3A392] mt-6 tracking-wide">
-          PUCE TEC · DEVCHALLENGE 2026
+          {authCopy.register.brand}
         </p>
       </div>
     </div>

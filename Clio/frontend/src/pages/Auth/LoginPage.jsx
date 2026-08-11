@@ -5,6 +5,11 @@ import Logo from "../../common/Logo";
 import Card from "../../common/Card";
 import TextField from "../../common/TextField";
 import Alert from "../../common/Alert";
+import {
+  authCopy,
+  authValidationMessages,
+  authApiEndpoints,
+} from "../../constants/authConstants";
 
 const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
   const [email, setEmail] = useState("");
@@ -14,11 +19,11 @@ const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
 
   const validateForm = () => {
     if (!email.includes("@")) {
-      setError("Ingresa un correo electrónico válido.");
+      setError(authValidationMessages.invalidEmail);
       return false;
     }
     if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres.");
+      setError(authValidationMessages.passwordLength);
       return false;
     }
     return true;
@@ -32,7 +37,7 @@ const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
 
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:3000/api/auth/login", {
+      const response = await fetch(authApiEndpoints.login, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -41,7 +46,7 @@ const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Credenciales inválidas");
+        throw new Error(data.error || authValidationMessages.defaultLoginError);
       }
 
       saveAuthSession(data.token, data.user);
@@ -60,27 +65,27 @@ const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
 
         <Card>
           <h2 className="text-2xl font-bold text-[#4A3226] mb-1">
-            Iniciar sesión
+            {authCopy.login.title}
           </h2>
           <p className="text-sm text-[#93816F] mb-6">
-            Ingresa tus credenciales para verificar hechos históricos.
+            {authCopy.login.description}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <TextField
-              label="Correo electrónico"
+              label={authCopy.login.fields.email}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="tucorreo@ejemplo.com"
+              placeholder={authCopy.login.placeholders.email}
             />
 
             <TextField
-              label="Contraseña"
+              label={authCopy.login.fields.password}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder={authCopy.login.placeholders.password}
             />
 
             {error && <Alert variant="error">{error}</Alert>}
@@ -91,24 +96,26 @@ const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
               className="w-full py-3.5 mt-2"
               disabled={isLoading}
             >
-              {isLoading ? "Ingresando..." : "Ingresar"}
+              {isLoading
+                ? authCopy.login.buttons.loading
+                : authCopy.login.buttons.submit}
             </Button>
           </form>
 
           <p className="text-center text-sm text-[#93816F] mt-6">
-            ¿No tienes cuenta?{" "}
+            {authCopy.login.footer.noAccount}{" "}
             <Button
               variant="text"
               className="text-[#6FA8C9] font-semibold hover:underline hover:text-[#6FA8C9]"
               onClick={onGoToRegister}
             >
-              Regístrate
+              {authCopy.login.footer.action}
             </Button>
           </p>
         </Card>
 
         <p className="text-center text-xs text-[#B3A392] mt-6 tracking-wide">
-          PUCE TEC · DEVCHALLENGE 2026
+          {authCopy.login.brand}
         </p>
       </div>
     </div>

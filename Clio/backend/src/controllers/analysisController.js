@@ -7,7 +7,7 @@ dotenv.config();
 const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const analysisRepository = AppDataSource.getRepository("Analysis");
-const keywordRepository = AppDataSource.getRepository("Keyword"); // NUEVO
+const keywordRepository = AppDataSource.getRepository("Keyword"); 
 
 const RESPONSE_SCHEMA = {
   type: "object",
@@ -96,7 +96,7 @@ const getOriginalText = (body) => {
   return text.trim();
 };
 
-// NUEVO: inserta cada keyword nueva en el catálogo, ignorando las que ya existen
+
 const syncKeywordsCatalog = async (keywords) => {
   if (!Array.isArray(keywords) || keywords.length === 0) return;
 
@@ -158,7 +158,7 @@ export const createAnalysis = async (req, res) => {
 
       savedAnalysis = await analysisRepository.save(analysis);
 
-      await syncKeywordsCatalog(parsedResponse.keywords); // NUEVO
+      await syncKeywordsCatalog(parsedResponse.keywords); 
     } catch (dbError) {
       console.error("Error al guardar el análisis en la base de datos:", dbError);
       saved = false;
@@ -269,7 +269,7 @@ export const updateAnalysis = async (req, res) => {
 
     const updatedAnalysis = await analysisRepository.save(analysis);
 
-    await syncKeywordsCatalog(parsedResponse.keywords); // NUEVO
+    await syncKeywordsCatalog(parsedResponse.keywords); 
 
     return res.json(updatedAnalysis);
   } catch (error) {
