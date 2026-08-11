@@ -8,6 +8,7 @@ import Loading from "../common/Loading";
 import Sidebar from "../components/Sidebar";
 import LoginPage from "./Auth/LoginPage";
 import RegisterPage from "./Auth/RegisterPage";
+import AdminDashboard from "./Admin/AdminDashboard";
 import Button from "../common/Button";
 import { analyzeText } from "../services/analysisService";
 import {
@@ -44,6 +45,9 @@ const Home = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAuthToken());
   const [view, setView] = useState("login");
 
+ 
+  const [currentSection, setCurrentSection] = useState("app");
+
   const [content, setContent] = useState("");
   const [report, setReport] = useState(null);
 
@@ -55,10 +59,7 @@ const Home = () => {
 
   const inputRef = useRef(null);
 
-  const characterCount = useMemo(
-    () => content.length,
-    [content]
-  );
+  const characterCount = useMemo(() => content.length, [content]);
 
   const analyzeContent = async () => {
     try {
@@ -85,19 +86,10 @@ const Home = () => {
 
       const indicators =
         analysisResult.verdict === "veraz"
-          ? [
-              "Estructura coherente",
-              "Lenguaje directo y claro",
-            ]
+          ? ["Estructura coherente", "Lenguaje directo y claro"]
           : analysisResult.verdict === "dudoso"
-          ? [
-              "Uso de palabras imprecisas",
-              "Falta de fuentes concretas",
-            ]
-          : [
-              "Afirmaciones sin respaldo",
-              "Lenguaje sensacionalista",
-            ];
+          ? ["Uso de palabras imprecisas", "Falta de fuentes concretas"]
+          : ["Afirmaciones sin respaldo", "Lenguaje sensacionalista"];
 
       setReport({
         verdict: analysisResult.verdict,
@@ -139,19 +131,10 @@ const Home = () => {
       keyTerms: [],
       indicators:
         item.verdict === "veraz"
-          ? [
-              "Estructura coherente",
-              "Lenguaje directo y claro",
-            ]
+          ? ["Estructura coherente", "Lenguaje directo y claro"]
           : item.verdict === "dudoso"
-          ? [
-              "Uso de palabras imprecisas",
-              "Falta de fuentes concretas",
-            ]
-          : [
-              "Afirmaciones sin respaldo",
-              "Lenguaje sensacionalista",
-            ],
+          ? ["Uso de palabras imprecisas", "Falta de fuentes concretas"]
+          : ["Afirmaciones sin respaldo", "Lenguaje sensacionalista"],
     });
 
     setStatus("result");
@@ -159,11 +142,7 @@ const Home = () => {
 
   if (!isAuthenticated) {
     if (view === "registro") {
-      return (
-        <RegisterPage
-          onGoToLogin={() => setView("login")}
-        />
-      );
+      return <RegisterPage onGoToLogin={() => setView("login")} />;
     }
 
     return (
@@ -172,6 +151,11 @@ const Home = () => {
         onGoToRegister={() => setView("registro")}
       />
     );
+  }
+
+
+  if (currentSection === "adminDashboard") {
+    return <AdminDashboard onBack={() => setCurrentSection("app")} />;
   }
 
   return (
@@ -185,8 +169,16 @@ const Home = () => {
       />
 
       <div className="mx-auto max-w-6xl px-6 py-8">
-
         <div className="flex justify-end items-center gap-4 mb-4">
+          {getAuthUser()?.role === "admin" && (
+            <Button
+              variant="text"
+              onClick={() => setCurrentSection("adminDashboard")}
+            >
+              📊 Panel admin
+            </Button>
+          )}
+
           <Button variant="text" onClick={() => setIsSidebarOpen(true)}>
             ☰ Historial
           </Button>
@@ -198,7 +190,8 @@ const Home = () => {
               setIsAuthenticated(false);
             }}
           >
-            Cerrar sesión ({getAuthUser()?.nombre})
+
+            Cerrar sesión ({getAuthUser()?.firstName})
           </Button>
         </div>
 
@@ -243,10 +236,7 @@ const Home = () => {
 
         {status === "result" && (
           <div className="transition-all duration-500 ease-in opacity-100">
-            <ReportPanel
-              report={report}
-              onReset={resetAnalysis}
-            />
+            <ReportPanel report={report} onReset={resetAnalysis} />
           </div>
         )}
 
@@ -272,7 +262,6 @@ const Home = () => {
             </div>
           ))}
         </div>
-
       </div>
     </main>
   );

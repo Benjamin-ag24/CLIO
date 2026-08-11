@@ -45,6 +45,12 @@ const User = new EntitySchema({
       nullable: false,
     },
 
+    isActive: {
+      type: "boolean",
+      name: "is_active",
+      default: true,
+    },
+
     createdAt: {
       type: "timestamp",
       name: "created_at",

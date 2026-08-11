@@ -8,6 +8,8 @@ import { verifyToken } from "./middleware/authMiddleware.js";
 import authRoutes from "./routes/authRoutes.js";
 import analysisRoutes from "./routes/analysisRoutes.js";
 import { createAnalysis } from "./controllers/analysisController.js";
+import statisticsRoutes from "./routes/statisticsRoutes.js";
+import keywordRoutes from "./routes/keywordRoutes.js";
 
 dotenv.config();
 
@@ -18,6 +20,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/admin/keywords", keywordRoutes);
+app.use("/api/admin/statistics", statisticsRoutes);
 app.use("/api/analysis", analysisRoutes);
 app.post("/api/analyze", verifyToken, createAnalysis);
 
