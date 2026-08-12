@@ -3,32 +3,40 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import Button from "../common/Button";
 import Loading from "../common/Loading";
-import Alert from "../common/Alert";
+import ErrorBanner from "../components/ErrorBanner";
+import ReportPanel from "../components/ReportPanel";
 
-import { getAnalysisById } from "../services/analysisService";
-import { ROUTE_PATHS } from "../constants/routePaths";
+import {
+  getAnalysisById,
+} from "../services/analysisService";
+
+import { analysisCopy } from "../constants/analysisConstants";
+import { ROUTE_PATHS } from "../routes/routePaths";
 
 const AnalysisPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [analysis, setAnalysis] = useState(null);
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const loadAnalysis = async () => {
       try {
         setIsLoading(true);
-        setError("");
+        setError(null);
 
         const data = await getAnalysisById(id);
 
         setAnalysis(data);
       } catch (err) {
-        setError(
-          err?.message || "No fue posible obtener el análisis.",
-        );
+        setError({
+          code: err?.code || "ANALYSIS_ERROR",
+          message:
+            err?.message ||
+            "No fue posible obtener el análisis.",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -37,93 +45,96 @@ const AnalysisPage = () => {
     loadAnalysis();
   }, [id]);
 
+  const getIndicators = (verdict) => {
+    if (verdict === "veraz") {
+      return analysisCopy.indicators.veraz;
+    }
+
+    if (verdict === "dudoso") {
+      return analysisCopy.indicators.dudoso;
+    }
+
+    return analysisCopy.indicators.falso;
+  };
+
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#F7F2EC] p-8">
-        <Loading />
+      <main className="min-h-screen bg-[#F7F2EC] px-6 py-8">
+        <div className="mx-auto max-w-6xl">
+          <Loading />
+        </div>
       </main>
     );
   }
 
   if (error) {
     return (
-      <main className="min-h-screen bg-[#F7F2EC] p-8">
-        <Alert variant="error">{error}</Alert>
+      <main className="min-h-screen bg-[#F7F2EC] px-6 py-8">
+        <div className="mx-auto max-w-6xl">
+          <ErrorBanner
+            message={error.message}
+            code={error.code}
+            onRetry={() => window.location.reload()}
+          />
 
-        <Button
-          variant="text"
-          onClick={() => navigate(ROUTE_PATHS.DASHBOARD)}
-        >
-          Back to Dashboard
-        </Button>
+          <Button
+            variant="text"
+            className="mt-4"
+            onClick={() => navigate(ROUTE_PATHS.DASHBOARD)}
+          >
+            Back to Analysis
+          </Button>
+        </div>
       </main>
     );
   }
 
+  if (!analysis) {
+    return null;
+  }
+
+  const report = {
+    verdict: analysis.verdict,
+    explanation: analysis.explanation,
+    keyTerms: analysis.keywords || [],
+    indicators: getIndicators(analysis.verdict),
+  };
+
   return (
-    <main className="min-h-screen bg-[#F7F2EC] p-8">
-      <div className="mx-auto max-w-4xl">
+    <main className="min-h-screen bg-[#F7F2EC]">
+      <div className="mx-auto max-w-6xl px-6 py-8">
         <Button
           variant="text"
           onClick={() => navigate(ROUTE_PATHS.DASHBOARD)}
+          className="mb-6"
         >
-          Back to Dashboard
+          Back to Analysis
         </Button>
 
-        <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
-          <h1 className="text-2xl font-bold text-[#5b3f2d]">
-            Analysis #{analysis.id}
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-[#5b3f2d]">
+            Analysis
           </h1>
 
-          <div className="mt-6">
-            <h2 className="font-semibold text-[#5b3f2d]">
-              Original Text
-            </h2>
-
-            <p className="mt-2 text-[#7b5f49]">
-              {analysis.originalText}
-            </p>
-          </div>
-
-          <div className="mt-6">
-            <h2 className="font-semibold text-[#5b3f2d]">
-              Verdict
-            </h2>
-
-            <p className="mt-2 text-[#7b5f49]">
-              {analysis.verdict}
-            </p>
-          </div>
-
-          <div className="mt-6">
-            <h2 className="font-semibold text-[#5b3f2d]">
-              Explanation
-            </h2>
-
-            <p className="mt-2 text-[#7b5f49]">
-              {analysis.explanation}
-            </p>
-          </div>
-
-          {analysis.keywords?.length > 0 && (
-            <div className="mt-6">
-              <h2 className="font-semibold text-[#5b3f2d]">
-                Keywords
-              </h2>
-
-              <div className="mt-2 flex flex-wrap gap-2">
-                {analysis.keywords.map((keyword) => (
-                  <span
-                    key={keyword}
-                    className="rounded-full bg-[#F7F2EC] px-3 py-1 text-sm text-[#7b5f49]"
-                  >
-                    {keyword}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+          <p className="mt-2 text-[#7b5f49]">
+            Analysis #{analysis.id}
+          </p>
         </div>
+
+        <div className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-[#5b3f2d] mb-3">
+            Original Text
+          </h2>
+
+          <p className="text-sm leading-relaxed text-[#7b5f49] whitespace-pre-wrap">
+            {analysis.originalText}
+          </p>
+        </div>
+
+        <ReportPanel
+          report={report}
+          onReset={() => navigate(ROUTE_PATHS.DASHBOARD)}
+        />
       </div>
     </main>
   );

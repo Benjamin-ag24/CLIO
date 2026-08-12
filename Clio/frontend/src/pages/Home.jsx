@@ -22,7 +22,7 @@ import {
 } from "../constants/homePageConstants";
 
 import { analysisCopy } from "../constants/analysisConstants";
-import { ROUTE_PATHS } from "../constants/routePaths";
+import { ROUTE_PATHS } from "../routes/routePaths";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -104,23 +104,7 @@ const Home = () => {
   };
 
   const selectAnalysis = (item) => {
-    navigate(ROUTE_PATHS.DASHBOARD);
-
-    setContent(item.originalText);
-
-    setReport({
-      verdict: item.verdict,
-      explanation: item.explanation,
-      keyTerms: [],
-      indicators:
-        item.verdict === "veraz"
-          ? analysisCopy.indicators.veraz
-          : item.verdict === "dudoso"
-            ? analysisCopy.indicators.dudoso
-            : analysisCopy.indicators.falso,
-    });
-
-    setStatus("result");
+    navigate(ROUTE_PATHS.ANALYSIS_BY_ID(item.id));
   };
 
   const showAnalysis = () => {
@@ -138,6 +122,8 @@ const Home = () => {
 
   return (
     <main>
+      <Header />
+
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}

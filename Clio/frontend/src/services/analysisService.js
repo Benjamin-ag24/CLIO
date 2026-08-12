@@ -67,7 +67,8 @@ export const getAnalysisById = async (id) => {
     throw {
       code: error.code || "NETWORK_ERROR",
       message:
-        error.message || "No fue posible obtener el análisis.",
+        error.message ||
+        "No fue posible obtener el análisis.",
     };
   }
 };
@@ -97,7 +98,8 @@ export const updateAnalysis = async (id, text) => {
     throw {
       code: error.code || "NETWORK_ERROR",
       message:
-        error.message || "No fue posible editar el análisis.",
+        error.message ||
+        "No fue posible editar el análisis.",
     };
   }
 };
@@ -123,7 +125,8 @@ export const deleteAnalysis = async (id) => {
     throw {
       code: error.code || "NETWORK_ERROR",
       message:
-        error.message || "No fue posible eliminar el análisis.",
+        error.message ||
+        "No fue posible eliminar el análisis.",
     };
   }
 };

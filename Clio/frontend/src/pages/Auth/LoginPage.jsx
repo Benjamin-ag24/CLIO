@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { saveAuthSession } from "../../services/authStorage";
 import Button from "../../common/Button";
 import Logo from "../../common/Logo";
 import Card from "../../common/Card";
 import TextField from "../../common/TextField";
 import Alert from "../../common/Alert";
+
 import {
   authCopy,
   authValidationMessages,
   authApiEndpoints,
 } from "../../constants/authConstants";
-import { ROUTE_PATHS } from "../../constants/routePaths";
+
+import { ROUTE_PATHS } from "../../routes/routePaths";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -46,8 +49,13 @@ const LoginPage = () => {
     try {
       const response = await fetch(authApiEndpoints.login, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
       });
 
       const data = await response.json();
@@ -59,7 +67,10 @@ const LoginPage = () => {
       }
 
       saveAuthSession(data.token, data.user);
-      navigate(ROUTE_PATHS.DASHBOARD);
+
+      navigate(ROUTE_PATHS.DASHBOARD, {
+        replace: true,
+      });
     } catch (err) {
       setError(err.message);
     } finally {
