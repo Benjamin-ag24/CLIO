@@ -4,7 +4,9 @@ import { AppDataSource } from "../config/database.js";
 
 dotenv.config();
 
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 
 const analysisRepository = AppDataSource.getRepository("Analysis");
 const keywordRepository = AppDataSource.getRepository("Keyword");
@@ -21,7 +23,9 @@ const RESPONSE_SCHEMA = {
     },
     keywords: {
       type: "array",
-      items: { type: "string" },
+      items: {
+        type: "string",
+      },
     },
   },
   required: ["verdict", "explanation", "keywords"],
@@ -34,6 +38,7 @@ Eres "Clio", un asistente de inteligencia artificial experto en verificar la ver
 Tu tarea es analizar el texto que el usuario te proporciona y determinar si la información es verdadera, dudosa o falsa.
 
 Reglas que debes seguir de manera estricta:
+
 1. Solo respondes en formato JSON.
 2. No incluyas texto adicional fuera del objeto JSON.
 3. Si el texto no es sobre un hecho histórico, el veredicto debe ser "falso".
@@ -68,7 +73,7 @@ const generateWithRetries = async (params, maxAttempts = 3) => {
 const parseGeminiResponse = (text) => {
   try {
     const cleanJson = text
-      .replace(/```json\s*/g, "")
+      .replace(/```json\s*/gi, "")
       .replace(/```\s*/g, "")
       .trim();
 
@@ -78,10 +83,13 @@ const parseGeminiResponse = (text) => {
       verdict: parsedResponse.verdict || "dudoso",
       explanation:
         parsedResponse.explanation || "No se pudo determinar el resultado.",
-      keywords: parsedResponse.keywords || [],
+      keywords: Array.isArray(parsedResponse.keywords)
+        ? parsedResponse.keywords
+        : [],
     };
   } catch {
     console.error("Error al parsear JSON de Gemini:", text);
+
     throw new Error("La IA no devolvió un formato válido");
   }
 };
@@ -97,20 +105,38 @@ const getOriginalText = (body) => {
 };
 
 const syncKeywordsCatalog = async (keywords) => {
-  if (!Array.isArray(keywords) || keywords.length === 0) return;
+  if (!Array.isArray(keywords) || keywords.length === 0) {
+    return;
+  }
 
   for (const keyword of keywords) {
+    if (typeof keyword !== "string") {
+      continue;
+    }
+
     const trimmed = keyword.trim();
-    if (!trimmed) continue;
+
+    if (!trimmed) {
+      continue;
+    }
 
     try {
-      const existing = await keywordRepository.findOneBy({ keyword: trimmed });
+      const existing = await keywordRepository.findOneBy({
+        keyword: trimmed,
+      });
+
       if (!existing) {
-        const newKeyword = keywordRepository.create({ keyword: trimmed });
+        const newKeyword = keywordRepository.create({
+          keyword: trimmed,
+        });
+
         await keywordRepository.save(newKeyword);
       }
     } catch (error) {
-      console.error(`Error al sincronizar keyword "${trimmed}":`, error);
+      console.error(
+        `Error al sincronizar keyword "${trimmed}":`,
+        error,
+      );
     }
   }
 };
@@ -139,12 +165,21 @@ export const createAnalysis = async (req, res) => {
 
     const userId = Number(req.user?.sub ?? req.user?.id);
 
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({
+        error: "Usuario no autenticado",
+      });
+    }
+
     let savedAnalysis = null;
     let saved = true;
 
     try {
       savedAnalysis = await AppDataSource.transaction(async (manager) => {
-        await manager.query(`SET LOCAL app.current_user_id = '${userId}'`);
+        await manager.query(
+          "SET LOCAL app.current_user_id = $1",
+          [userId],
+        );
 
         const analysisRepo = manager.getRepository("Analysis");
 
@@ -165,7 +200,11 @@ export const createAnalysis = async (req, res) => {
 
       await syncKeywordsCatalog(parsedResponse.keywords);
     } catch (dbError) {
-      console.error("Error al guardar el análisis en la base de datos:", dbError);
+      console.error(
+        "Error al guardar el análisis en la base de datos:",
+        dbError,
+      );
+
       saved = false;
     }
 
@@ -198,6 +237,12 @@ export const listAnalysis = async (req, res) => {
   try {
     const userId = Number(req.user?.sub ?? req.user?.id);
 
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({
+        error: "Usuario no autenticado",
+      });
+    }
+
     const analyses = await analysisRepository.find({
       where: {
         user: {
@@ -220,15 +265,70 @@ export const listAnalysis = async (req, res) => {
   }
 };
 
+export const getAnalysisById = async (req, res) => {
+  try {
+    const analysisId = Number(req.params.id);
+    const userId = Number(req.user?.sub ?? req.user?.id);
+
+    if (!Number.isInteger(analysisId) || analysisId <= 0) {
+      return res.status(400).json({
+        error: "ID de análisis inválido",
+      });
+    }
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({
+        error: "Usuario no autenticado",
+      });
+    }
+
+    const analysis = await analysisRepository.findOne({
+      where: {
+        id: analysisId,
+        isDeleted: false,
+        user: {
+          id: userId,
+        },
+      },
+    });
+
+    if (!analysis) {
+      return res.status(404).json({
+        error: "Análisis no encontrado",
+      });
+    }
+
+    return res.json(analysis);
+  } catch (error) {
+    console.error("Error al obtener análisis:", error);
+
+    return res.status(500).json({
+      error: "Error al obtener el análisis",
+    });
+  }
+};
+
 export const updateAnalysis = async (req, res) => {
   try {
     const analysisId = Number(req.params.id);
     const originalText = getOriginalText(req.body);
     const userId = Number(req.user?.sub ?? req.user?.id);
 
+    if (!Number.isInteger(analysisId) || analysisId <= 0) {
+      return res.status(400).json({
+        error: "ID de análisis inválido",
+      });
+    }
+
     if (!originalText) {
       return res.status(400).json({
         error: "El texto es obligatorio",
+      });
+    }
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({
+        error: "Usuario no autenticado",
       });
     }
 
@@ -272,17 +372,30 @@ export const updateAnalysis = async (req, res) => {
     analysis.explanation = parsedResponse.explanation;
     analysis.keywords = parsedResponse.keywords;
 
-    const updatedAnalysis = await AppDataSource.transaction(async (manager) => {
-      await manager.query(`SET LOCAL app.current_user_id = '${userId}'`);
-      const analysisRepo = manager.getRepository("Analysis");
-      return await analysisRepo.save(analysis);
-    });
+    const updatedAnalysis = await AppDataSource.transaction(
+      async (manager) => {
+        await manager.query(
+          "SET LOCAL app.current_user_id = $1",
+          [userId],
+        );
+
+        const analysisRepo = manager.getRepository("Analysis");
+
+        return await analysisRepo.save(analysis);
+      },
+    );
 
     await syncKeywordsCatalog(parsedResponse.keywords);
 
     return res.json(updatedAnalysis);
   } catch (error) {
     console.error("Error al actualizar análisis:", error);
+
+    if (error.message === "La IA no devolvió un formato válido") {
+      return res.status(500).json({
+        error: error.message,
+      });
+    }
 
     return res.status(500).json({
       error: "Error al actualizar el análisis",
@@ -294,6 +407,18 @@ export const deleteAnalysis = async (req, res) => {
   try {
     const analysisId = Number(req.params.id);
     const userId = Number(req.user?.sub ?? req.user?.id);
+
+    if (!Number.isInteger(analysisId) || analysisId <= 0) {
+      return res.status(400).json({
+        error: "ID de análisis inválido",
+      });
+    }
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({
+        error: "Usuario no autenticado",
+      });
+    }
 
     const analysis = await analysisRepository.findOne({
       where: {
@@ -319,11 +444,18 @@ export const deleteAnalysis = async (req, res) => {
 
     analysis.isDeleted = true;
 
-    const deletedAnalysis = await AppDataSource.transaction(async (manager) => {
-      await manager.query(`SET LOCAL app.current_user_id = '${userId}'`);
-      const analysisRepo = manager.getRepository("Analysis");
-      return await analysisRepo.save(analysis);
-    });
+    const deletedAnalysis = await AppDataSource.transaction(
+      async (manager) => {
+        await manager.query(
+          "SET LOCAL app.current_user_id = $1",
+          [userId],
+        );
+
+        const analysisRepo = manager.getRepository("Analysis");
+
+        return await analysisRepo.save(analysis);
+      },
+    );
 
     return res.json({
       message: "Análisis eliminado correctamente",
