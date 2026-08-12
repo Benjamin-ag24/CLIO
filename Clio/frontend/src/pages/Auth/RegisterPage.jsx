@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import Button from "../../common/Button";
 import Logo from "../../common/Logo";
 import Card from "../../common/Card";
 import TextField from "../../common/TextField";
 import Alert from "../../common/Alert";
+
 import {
   authCopy,
   authValidationMessages,
   authApiEndpoints,
 } from "../../constants/authConstants";
-import { ROUTE_PATHS } from "../../constants/routePaths";
+
+import { ROUTE_PATHS } from "../../routes/routePaths";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -53,8 +56,15 @@ const RegisterPage = () => {
     try {
       const response = await fetch(authApiEndpoints.register, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, email, password }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password,
+        }),
       });
 
       const data = await response.json();
@@ -66,7 +76,12 @@ const RegisterPage = () => {
       }
 
       setIsSuccess(true);
-      setTimeout(() => navigate(ROUTE_PATHS.LOGIN), 1500);
+
+      setTimeout(() => {
+        navigate(ROUTE_PATHS.LOGIN, {
+          replace: true,
+        });
+      }, 1500);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -89,7 +104,9 @@ const RegisterPage = () => {
           </p>
 
           {isSuccess ? (
-            <Alert variant="success">{authCopy.register.success}</Alert>
+            <Alert variant="success">
+              {authCopy.register.success}
+            </Alert>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
