@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { saveAuthSession } from "../../services/authStorage";
+import { login } from "../../services/authService";
 import Button from "../../common/Button";
 import Logo from "../../common/Logo";
 import Card from "../../common/Card";
@@ -11,7 +12,6 @@ import Alert from "../../common/Alert";
 import {
   authCopy,
   authValidationMessages,
-  authApiEndpoints,
 } from "../../constants/authConstants";
 
 import { ROUTE_PATHS } from "../../routes/routePaths";
@@ -47,24 +47,7 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(authApiEndpoints.login, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error || authValidationMessages.defaultLoginError,
-        );
-      }
+      const data = await login(email, password);
 
       saveAuthSession(data.token, data.user);
 
@@ -72,7 +55,7 @@ const LoginPage = () => {
         replace: true,
       });
     } catch (err) {
-      setError(err.message);
+      setError(err.message || authValidationMessages.defaultLoginError);
     } finally {
       setIsLoading(false);
     }

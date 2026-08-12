@@ -6,11 +6,11 @@ import Logo from "../../common/Logo";
 import Card from "../../common/Card";
 import TextField from "../../common/TextField";
 import Alert from "../../common/Alert";
+import { register } from "../../services/authService";
 
 import {
   authCopy,
   authValidationMessages,
-  authApiEndpoints,
 } from "../../constants/authConstants";
 
 import { ROUTE_PATHS } from "../../routes/routePaths";
@@ -54,26 +54,7 @@ const RegisterPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(authApiEndpoints.register, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email,
-          password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error || authValidationMessages.defaultRegisterError,
-        );
-      }
+      await register(firstName, lastName, email, password);
 
       setIsSuccess(true);
 
@@ -83,7 +64,7 @@ const RegisterPage = () => {
         });
       }, 1500);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || authValidationMessages.defaultRegisterError);
     } finally {
       setIsLoading(false);
     }
