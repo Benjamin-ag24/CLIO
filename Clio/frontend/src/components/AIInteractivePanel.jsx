@@ -2,7 +2,7 @@ import { forwardRef, useState } from "react";
 import Button from "../common/Button";
 import { analysisCopy } from "../constants/analysisConstants";
 
-const InputPanel = forwardRef(
+const AIInteractivePanel = forwardRef(
   ({ content, onChange, onClear, onAnalyze, characterCount }, ref) => {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +34,6 @@ const InputPanel = forwardRef(
       setError("");
       onClear();
 
-      // Devuelve el foco al textarea
       if (ref?.current) {
         ref.current.focus();
       }
@@ -129,6 +128,6 @@ const InputPanel = forwardRef(
   },
 );
 
-InputPanel.displayName = "InputPanel";
+AIInteractivePanel.displayName = "AIInteractivePanel";
 
-export default InputPanel;
+export default AIInteractivePanel;
