@@ -1,5 +1,6 @@
-// frontend/src/pages/Home.jsx
 import { useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+
 import Header from "../components/Header";
 import AIInteractivePanel from "../components/AIInteractivePanel";
 import ReportPanel from "../components/ReportPanel";
@@ -7,22 +8,27 @@ import AuditHistory from "../components/AuditHistory";
 import ErrorBanner from "../components/ErrorBanner";
 import Loading from "../common/Loading";
 import Sidebar from "../components/Sidebar";
-import LoginPage from "./Auth/LoginPage";
-import RegisterPage from "./Auth/RegisterPage";
 import Button from "../common/Button";
+
 import { analyzeText } from "../services/analysisService";
 import {
-  getAuthToken,
   getAuthUser,
   clearAuthSession,
 } from "../services/authStorage";
-import { featureList, homePageCopy } from "../constants/homePageConstants";
+
+import {
+  featureList,
+  homePageCopy,
+} from "../constants/homePageConstants";
+
 import { analysisCopy } from "../constants/analysisConstants";
+import { ROUTE_PATHS } from "../constants/routePaths";
 
 const Home = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(!!getAuthToken());
-  const [view, setView] = useState("login");
-  const [activeView, setActiveView] = useState("analysis");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isAuditView = location.pathname === ROUTE_PATHS.AUDIT;
 
   const [content, setContent] = useState("");
   const [report, setReport] = useState(null);
@@ -35,7 +41,10 @@ const Home = () => {
 
   const inputRef = useRef(null);
 
-  const characterCount = useMemo(() => content.length, [content]);
+  const characterCount = useMemo(
+    () => content.length,
+    [content],
+  );
 
   const analyzeContent = async () => {
     try {
@@ -95,7 +104,8 @@ const Home = () => {
   };
 
   const selectAnalysis = (item) => {
-    setActiveView("analysis");
+    navigate(ROUTE_PATHS.DASHBOARD);
+
     setContent(item.originalText);
 
     setReport({
@@ -114,25 +124,17 @@ const Home = () => {
   };
 
   const showAnalysis = () => {
-    setActiveView("analysis");
+    navigate(ROUTE_PATHS.DASHBOARD);
   };
 
   const showAudit = () => {
-    setActiveView("audit");
+    navigate(ROUTE_PATHS.AUDIT);
   };
 
-  if (!isAuthenticated) {
-    if (view === "registro") {
-      return <RegisterPage onGoToLogin={() => setView("login")} />;
-    }
-
-    return (
-      <LoginPage
-        onLoginSuccess={() => setIsAuthenticated(true)}
-        onGoToRegister={() => setView("registro")}
-      />
-    );
-  }
+  const handleLogout = () => {
+    clearAuthSession();
+    navigate(ROUTE_PATHS.LOGIN);
+  };
 
   return (
     <main>
@@ -147,8 +149,11 @@ const Home = () => {
 
       <div className="mx-auto max-w-6xl px-6 py-8">
         <div className="flex justify-end items-center gap-4 mb-4">
-          {activeView === "audit" && (
-            <Button variant="text" onClick={showAnalysis}>
+          {isAuditView && (
+            <Button
+              variant="text"
+              onClick={showAnalysis}
+            >
               Back to Analysis
             </Button>
           )}
@@ -162,16 +167,15 @@ const Home = () => {
 
           <Button
             variant="text"
-            onClick={() => {
-              clearAuthSession();
-              setIsAuthenticated(false);
-            }}
+            onClick={handleLogout}
           >
-            {homePageCopy.actions.logoutPrefix} ({getAuthUser()?.nombre})
+            {homePageCopy.actions.logoutPrefix} (
+            {getAuthUser()?.nombre}
+            )
           </Button>
         </div>
 
-        {activeView === "analysis" ? (
+        {!isAuditView ? (
           <>
             <div className="text-center mb-8">
               <h1 className="text-3xl md:text-4xl font-bold text-[#5b3f2d] tracking-tight">

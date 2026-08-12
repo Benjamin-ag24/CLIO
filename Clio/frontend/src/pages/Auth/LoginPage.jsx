@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { saveAuthSession } from "../../services/authStorage";
 import Button from "../../common/Button";
 import Logo from "../../common/Logo";
@@ -10,8 +11,11 @@ import {
   authValidationMessages,
   authApiEndpoints,
 } from "../../constants/authConstants";
+import { ROUTE_PATHS } from "../../constants/routePaths";
 
-const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
+const LoginPage = () => {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -22,10 +26,12 @@ const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
       setError(authValidationMessages.invalidEmail);
       return false;
     }
+
     if (password.length < 6) {
       setError(authValidationMessages.passwordLength);
       return false;
     }
+
     return true;
   };
 
@@ -36,6 +42,7 @@ const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
     if (!validateForm()) return;
 
     setIsLoading(true);
+
     try {
       const response = await fetch(authApiEndpoints.login, {
         method: "POST",
@@ -46,11 +53,13 @@ const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || authValidationMessages.defaultLoginError);
+        throw new Error(
+          data.error || authValidationMessages.defaultLoginError,
+        );
       }
 
       saveAuthSession(data.token, data.user);
-      onLoginSuccess();
+      navigate(ROUTE_PATHS.DASHBOARD);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -67,6 +76,7 @@ const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
           <h2 className="text-2xl font-bold text-[#4A3226] mb-1">
             {authCopy.login.title}
           </h2>
+
           <p className="text-sm text-[#93816F] mb-6">
             {authCopy.login.description}
           </p>
@@ -107,7 +117,7 @@ const LoginPage = ({ onLoginSuccess, onGoToRegister }) => {
             <Button
               variant="text"
               className="text-[#6FA8C9] font-semibold hover:underline hover:text-[#6FA8C9]"
-              onClick={onGoToRegister}
+              onClick={() => navigate(ROUTE_PATHS.REGISTER)}
             >
               {authCopy.login.footer.action}
             </Button>
