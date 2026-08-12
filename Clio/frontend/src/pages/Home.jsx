@@ -1,7 +1,7 @@
 // frontend/src/pages/Home.jsx
 import { useMemo, useRef, useState } from "react";
 import Header from "../components/Header";
-import InputPanel from "../components/InputPanel";
+import AIInteractivePanel from "../components/AIInteractivePanel";
 import ReportPanel from "../components/ReportPanel";
 import ErrorBanner from "../components/ErrorBanner";
 import Loading from "../common/Loading";
@@ -164,7 +164,7 @@ const Home = () => {
           </p>
         </div>
 
-        <InputPanel
+        <AIInteractivePanel
           ref={inputRef}
           content={content}
           onChange={setContent}
