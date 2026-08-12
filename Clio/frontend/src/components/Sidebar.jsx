@@ -1,7 +1,10 @@
 // frontend/src/components/Sidebar.jsx
 import { useEffect, useState } from "react";
-import { getAuthToken } from "../services/authStorage";
-import { updateAnalysis, deleteAnalysis } from "../services/analysisService";
+import {
+  getAnalysisHistory,
+  updateAnalysis,
+  deleteAnalysis,
+} from "../services/analysisService";
 import Button from "../common/Button";
 import { analysisCopy } from "../constants/analysisConstants";
 
@@ -22,8 +25,6 @@ const VERDICT_STYLES = {
     label: analysisCopy.verdicts.falso.label,
   },
 };
-
-const API_URL = "http://localhost:3000/api/analysis";
 
 const formatDate = (isoString) => {
   if (!isoString) return "";
@@ -62,17 +63,7 @@ const Sidebar = ({
     setError("");
 
     try {
-      const response = await fetch(API_URL, {
-        headers: {
-          Authorization: `Bearer ${getAuthToken()}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(analysisCopy.sidebar.errorDefault);
-      }
-
-      const data = await response.json();
+      const data = await getAnalysisHistory();
       setAnalyses(data);
     } catch (err) {
       setError(err.message || analysisCopy.sidebar.errorDefault);
