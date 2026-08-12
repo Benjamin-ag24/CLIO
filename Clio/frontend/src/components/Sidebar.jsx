@@ -50,6 +50,7 @@ const Sidebar = ({
   onClose,
   onSelectAnalysis,
   onNewAnalysis,
+  onViewAudit,
   refreshTrigger,
 }) => {
   const [analyses, setAnalyses] = useState([]);
@@ -107,7 +108,9 @@ const Sidebar = ({
   const handleDelete = async (event, id) => {
     event.stopPropagation();
 
-    const confirmed = window.confirm(analysisCopy.sidebar.deleteConfirm);
+    const confirmed = window.confirm(
+      analysisCopy.sidebar.deleteConfirm,
+    );
 
     if (!confirmed) return;
 
@@ -122,12 +125,15 @@ const Sidebar = ({
   return (
     <>
       {isOpen && (
-        <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
+        <div
+          className="fixed inset-0 bg-black/30 z-40"
+          onClick={onClose}
+        />
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-full w-[320px] bg-[#FBFAF6] 
-                    border-r border-[#E9E1D3] z-50 
+        className={`fixed top-0 left-0 h-full w-[320px] bg-[#FBFAF6]
+                    border-r border-[#E9E1D3] z-50
                     transform transition-transform duration-300 ease-in-out
                     ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
@@ -158,6 +164,17 @@ const Sidebar = ({
             >
               {analysisCopy.sidebar.newAnalysis}
             </Button>
+
+            <Button
+              variant="text"
+              className="w-full mt-2"
+              onClick={() => {
+                onViewAudit();
+                onClose();
+              }}
+            >
+              Audit History
+            </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2">
@@ -168,7 +185,9 @@ const Sidebar = ({
             )}
 
             {!isLoading && error && (
-              <p className="text-sm text-[#C3564F] text-center py-6">{error}</p>
+              <p className="text-sm text-[#C3564F] text-center py-6">
+                {error}
+              </p>
             )}
 
             {!isLoading && !error && analyses.length === 0 && (
@@ -181,7 +200,8 @@ const Sidebar = ({
               !error &&
               analyses.map((item) => {
                 const style =
-                  VERDICT_STYLES[item.verdict] || VERDICT_STYLES.dudoso;
+                  VERDICT_STYLES[item.verdict] ||
+                  VERDICT_STYLES.dudoso;
 
                 return (
                   <div
@@ -219,7 +239,9 @@ const Sidebar = ({
                       <Button
                         variant="text"
                         className="text-[#6FA8C9] hover:text-[#4A3226]"
-                        onClick={(event) => handleEdit(event, item)}
+                        onClick={(event) =>
+                          handleEdit(event, item)
+                        }
                       >
                         {analysisCopy.sidebar.edit}
                       </Button>
@@ -227,7 +249,9 @@ const Sidebar = ({
                       <Button
                         variant="text"
                         className="text-[#C3564F] hover:text-[#4A3226]"
-                        onClick={(event) => handleDelete(event, item.id)}
+                        onClick={(event) =>
+                          handleDelete(event, item.id)
+                        }
                       >
                         {analysisCopy.sidebar.delete}
                       </Button>

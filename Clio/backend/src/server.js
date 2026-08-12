@@ -10,6 +10,7 @@ import analysisRoutes from "./routes/analysisRoutes.js";
 import { createAnalysis } from "./controllers/analysisController.js";
 import statisticsRoutes from "./routes/statisticsRoutes.js";
 import keywordRoutes from "./routes/keywordRoutes.js";
+import auditRoutes from "./routes/auditRoutes.js";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/admin/keywords", keywordRoutes);
 app.use("/api/admin/statistics", statisticsRoutes);
+app.use("/api/admin/audit", auditRoutes);
 app.use("/api/analysis", analysisRoutes);
 app.post("/api/analyze", verifyToken, createAnalysis);
 

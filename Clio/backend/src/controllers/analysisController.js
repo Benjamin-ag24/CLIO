@@ -7,7 +7,7 @@ dotenv.config();
 const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const analysisRepository = AppDataSource.getRepository("Analysis");
-const keywordRepository = AppDataSource.getRepository("Keyword"); 
+const keywordRepository = AppDataSource.getRepository("Keyword");
 
 const RESPONSE_SCHEMA = {
   type: "object",
@@ -96,7 +96,6 @@ const getOriginalText = (body) => {
   return text.trim();
 };
 
-
 const syncKeywordsCatalog = async (keywords) => {
   if (!Array.isArray(keywords) || keywords.length === 0) return;
 
@@ -144,21 +143,27 @@ export const createAnalysis = async (req, res) => {
     let saved = true;
 
     try {
-      const analysis = analysisRepository.create({
-        user: {
-          id: userId,
-        },
-        originalText,
-        analyzedText: parsedResponse.explanation,
-        verdict: parsedResponse.verdict,
-        explanation: parsedResponse.explanation,
-        keywords: parsedResponse.keywords,
-        isDeleted: false,
+      savedAnalysis = await AppDataSource.transaction(async (manager) => {
+        await manager.query(`SET LOCAL app.current_user_id = '${userId}'`);
+
+        const analysisRepo = manager.getRepository("Analysis");
+
+        const analysis = analysisRepo.create({
+          user: {
+            id: userId,
+          },
+          originalText,
+          analyzedText: parsedResponse.explanation,
+          verdict: parsedResponse.verdict,
+          explanation: parsedResponse.explanation,
+          keywords: parsedResponse.keywords,
+          isDeleted: false,
+        });
+
+        return await analysisRepo.save(analysis);
       });
 
-      savedAnalysis = await analysisRepository.save(analysis);
-
-      await syncKeywordsCatalog(parsedResponse.keywords); 
+      await syncKeywordsCatalog(parsedResponse.keywords);
     } catch (dbError) {
       console.error("Error al guardar el análisis en la base de datos:", dbError);
       saved = false;
@@ -267,9 +272,13 @@ export const updateAnalysis = async (req, res) => {
     analysis.explanation = parsedResponse.explanation;
     analysis.keywords = parsedResponse.keywords;
 
-    const updatedAnalysis = await analysisRepository.save(analysis);
+    const updatedAnalysis = await AppDataSource.transaction(async (manager) => {
+      await manager.query(`SET LOCAL app.current_user_id = '${userId}'`);
+      const analysisRepo = manager.getRepository("Analysis");
+      return await analysisRepo.save(analysis);
+    });
 
-    await syncKeywordsCatalog(parsedResponse.keywords); 
+    await syncKeywordsCatalog(parsedResponse.keywords);
 
     return res.json(updatedAnalysis);
   } catch (error) {
@@ -310,7 +319,11 @@ export const deleteAnalysis = async (req, res) => {
 
     analysis.isDeleted = true;
 
-    const deletedAnalysis = await analysisRepository.save(analysis);
+    const deletedAnalysis = await AppDataSource.transaction(async (manager) => {
+      await manager.query(`SET LOCAL app.current_user_id = '${userId}'`);
+      const analysisRepo = manager.getRepository("Analysis");
+      return await analysisRepo.save(analysis);
+    });
 
     return res.json({
       message: "Análisis eliminado correctamente",
