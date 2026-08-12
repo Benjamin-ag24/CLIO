@@ -3,6 +3,7 @@ import { useMemo, useRef, useState } from "react";
 import Header from "../components/Header";
 import AIInteractivePanel from "../components/AIInteractivePanel";
 import ReportPanel from "../components/ReportPanel";
+import AuditHistory from "../components/AuditHistory";
 import ErrorBanner from "../components/ErrorBanner";
 import Loading from "../common/Loading";
 import Sidebar from "../components/Sidebar";
@@ -21,6 +22,7 @@ import { analysisCopy } from "../constants/analysisConstants";
 const Home = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAuthToken());
   const [view, setView] = useState("login");
+  const [activeView, setActiveView] = useState("analysis");
 
   const [content, setContent] = useState("");
   const [report, setReport] = useState(null);
@@ -93,6 +95,7 @@ const Home = () => {
   };
 
   const selectAnalysis = (item) => {
+    setActiveView("analysis");
     setContent(item.originalText);
 
     setReport({
@@ -108,6 +111,14 @@ const Home = () => {
     });
 
     setStatus("result");
+  };
+
+  const showAnalysis = () => {
+    setActiveView("analysis");
+  };
+
+  const showAudit = () => {
+    setActiveView("audit");
   };
 
   if (!isAuthenticated) {
@@ -131,11 +142,21 @@ const Home = () => {
         refreshTrigger={refreshTrigger}
         onNewAnalysis={resetAnalysis}
         onSelectAnalysis={selectAnalysis}
+        onViewAudit={showAudit}
       />
 
       <div className="mx-auto max-w-6xl px-6 py-8">
         <div className="flex justify-end items-center gap-4 mb-4">
-          <Button variant="text" onClick={() => setIsSidebarOpen(true)}>
+          {activeView === "audit" && (
+            <Button variant="text" onClick={showAnalysis}>
+              Back to Analysis
+            </Button>
+          )}
+
+          <Button
+            variant="text"
+            onClick={() => setIsSidebarOpen(true)}
+          >
             {homePageCopy.actions.history}
           </Button>
 
@@ -150,71 +171,80 @@ const Home = () => {
           </Button>
         </div>
 
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#5b3f2d] tracking-tight">
-            {homePageCopy.title}
-          </h1>
+        {activeView === "analysis" ? (
+          <>
+            <div className="text-center mb-8">
+              <h1 className="text-3xl md:text-4xl font-bold text-[#5b3f2d] tracking-tight">
+                {homePageCopy.title}
+              </h1>
 
-          <p className="mt-3 text-[#7b5f49] text-sm md:text-base max-w-2xl mx-auto">
-            {homePageCopy.description}
-          </p>
+              <p className="mt-3 text-[#7b5f49] text-sm md:text-base max-w-2xl mx-auto">
+                {homePageCopy.description}
+              </p>
 
-          <p className="mt-1 text-[#a6886a] text-sm italic">
-            {homePageCopy.example}
-          </p>
-        </div>
-
-        <AIInteractivePanel
-          ref={inputRef}
-          content={content}
-          onChange={setContent}
-          onClear={resetAnalysis}
-          onAnalyze={analyzeContent}
-          characterCount={characterCount}
-        />
-
-        {status === "loading" && (
-          <div className="mt-8">
-            <Loading />
-          </div>
-        )}
-
-        {status === "error" && (
-          <ErrorBanner
-            message={error?.message}
-            code={error?.code}
-            onRetry={analyzeContent}
-          />
-        )}
-
-        {status === "result" && (
-          <div className="transition-all duration-500 ease-in opacity-100">
-            <ReportPanel report={report} onReset={resetAnalysis} />
-          </div>
-        )}
-
-        <div className="grid gap-6 md:grid-cols-3 mt-12">
-          {featureList.map((feature) => (
-            <div
-              key={feature.title}
-              className="rounded-2xl bg-white p-6 shadow-[0_8px_30px_-12px_rgba(91,55,35,0.2)] hover:shadow-[0_16px_40px_-16px_rgba(91,55,35,0.25)] transition-shadow duration-300"
-            >
-              <div
-                className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl text-xl ${feature.accent} text-white shadow-sm`}
-              >
-                {feature.icon}
-              </div>
-
-              <h3 className="text-base font-semibold text-[#5b3f2d]">
-                {feature.title}
-              </h3>
-
-              <p className="mt-2 text-sm leading-relaxed text-[#7b5f49]">
-                {feature.description}
+              <p className="mt-1 text-[#a6886a] text-sm italic">
+                {homePageCopy.example}
               </p>
             </div>
-          ))}
-        </div>
+
+            <AIInteractivePanel
+              ref={inputRef}
+              content={content}
+              onChange={setContent}
+              onClear={resetAnalysis}
+              onAnalyze={analyzeContent}
+              characterCount={characterCount}
+            />
+
+            {status === "loading" && (
+              <div className="mt-8">
+                <Loading />
+              </div>
+            )}
+
+            {status === "error" && (
+              <ErrorBanner
+                message={error?.message}
+                code={error?.code}
+                onRetry={analyzeContent}
+              />
+            )}
+
+            {status === "result" && (
+              <div className="transition-all duration-500 ease-in opacity-100">
+                <ReportPanel
+                  report={report}
+                  onReset={resetAnalysis}
+                />
+              </div>
+            )}
+
+            <div className="grid gap-6 md:grid-cols-3 mt-12">
+              {featureList.map((feature) => (
+                <div
+                  key={feature.title}
+                  className="rounded-2xl bg-white p-6 shadow-[0_8px_30px_-12px_rgba(91,55,35,0.2)] hover:shadow-[0_16px_40px_-16px_rgba(91,55,35,0.25)] transition-shadow duration-300"
+                >
+                  <div
+                    className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl text-xl ${feature.accent} text-white shadow-sm`}
+                  >
+                    {feature.icon}
+                  </div>
+
+                  <h3 className="text-base font-semibold text-[#5b3f2d]">
+                    {feature.title}
+                  </h3>
+
+                  <p className="mt-2 text-sm leading-relaxed text-[#7b5f49]">
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <AuditHistory />
+        )}
       </div>
     </main>
   );
