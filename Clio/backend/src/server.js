@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 
 import { AppDataSource } from "./config/database.js";
 import { verifyToken } from "./middleware/authMiddleware.js";
+import logger from "./middleware/logger.middleware.js";
 import authRoutes from "./routes/authRoutes.js";
 import analysisRoutes from "./routes/analysisRoutes.js";
 import { createAnalysis } from "./controllers/analysisController.js";
@@ -19,6 +20,7 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(logger);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admin/keywords", keywordRoutes);
