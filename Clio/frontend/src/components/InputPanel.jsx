@@ -1,5 +1,6 @@
 import { forwardRef, useState } from "react";
 import Button from "../common/Button";
+import { analysisCopy } from "../constants/analysisConstants";
 
 const InputPanel = forwardRef(
   ({ content, onChange, onClear, onAnalyze, characterCount }, ref) => {
@@ -10,12 +11,12 @@ const InputPanel = forwardRef(
 
     const handleAnalyze = async () => {
       if (!content.trim()) {
-        setError("El campo no puede estar vacío");
+        setError(analysisCopy.inputPanel.validation.empty);
         return;
       }
 
       if (content.trim().length < 10) {
-        setError("El texto es muy corto, el análisis puede ser impreciso");
+        setError(analysisCopy.inputPanel.validation.short);
         return;
       }
 
@@ -43,15 +44,14 @@ const InputPanel = forwardRef(
       <div className="rounded-3xl bg-white p-6 shadow-[0_8px_30px_-12px_rgba(91,55,35,0.15)]">
         <div className="space-y-4">
           <div>
-
             <p className="mt-1 text-sm text-[#7b5f49]">
-              Pega o escribe el texto que deseas verificar
+              {analysisCopy.inputPanel.helperText}
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-[#5b3f2d] mb-1">
-              Texto a analizar
+              {analysisCopy.inputPanel.title}
             </label>
 
             <textarea
@@ -61,7 +61,7 @@ const InputPanel = forwardRef(
                 onChange(e.target.value);
                 if (error) setError("");
               }}
-              placeholder="Escribe aquí tu texto histórico o fragmento a verificar..."
+              placeholder={analysisCopy.inputPanel.placeholder}
               className="w-full rounded-2xl border border-[#e8ddd0] p-4 text-[#5b3f2d] placeholder-[#b8a392] focus:border-[#7fb3d1] focus:outline-none focus:ring-2 focus:ring-[#7fb3d1]/30 transition-all min-h-[120px] resize-y"
               maxLength={maxLength}
             />
@@ -112,15 +112,15 @@ const InputPanel = forwardRef(
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  Analizando...
+                  {analysisCopy.inputPanel.buttons.analyzing}
                 </span>
               ) : (
-                "Validar hecho"
+                analysisCopy.inputPanel.buttons.analyze
               )}
             </Button>
 
             <Button variant="secondary" onClick={handleClear}>
-              Limpiar
+              {analysisCopy.inputPanel.buttons.clear}
             </Button>
           </div>
         </div>

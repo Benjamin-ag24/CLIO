@@ -3,11 +3,24 @@ import { useEffect, useState } from "react";
 import { getAuthToken } from "../services/authStorage";
 import { updateAnalysis, deleteAnalysis } from "../services/analysisService";
 import Button from "../common/Button";
+import { analysisCopy } from "../constants/analysisConstants";
 
 const VERDICT_STYLES = {
-  veraz: { bg: "#EAF5EC", text: "#3E7C50", label: "Veraz" },
-  dudoso: { bg: "#F1DFC0", text: "#8C6239", label: "Dudoso" },
-  falso: { bg: "#FBEAE8", text: "#C3564F", label: "Falso" },
+  veraz: {
+    bg: "#EAF5EC",
+    text: "#3E7C50",
+    label: analysisCopy.verdicts.veraz.label,
+  },
+  dudoso: {
+    bg: "#F1DFC0",
+    text: "#8C6239",
+    label: analysisCopy.verdicts.dudoso.label,
+  },
+  falso: {
+    bg: "#FBEAE8",
+    text: "#C3564F",
+    label: analysisCopy.verdicts.falso.label,
+  },
 };
 
 const API_URL = "http://localhost:3000/api/analysis";
@@ -55,13 +68,13 @@ const Sidebar = ({
       });
 
       if (!response.ok) {
-        throw new Error("No fue posible cargar el historial");
+        throw new Error(analysisCopy.sidebar.errorDefault);
       }
 
       const data = await response.json();
       setAnalyses(data);
     } catch (err) {
-      setError(err.message || "Error al cargar el historial");
+      setError(err.message || analysisCopy.sidebar.errorDefault);
     } finally {
       setIsLoading(false);
     }
@@ -76,7 +89,10 @@ const Sidebar = ({
   const handleEdit = async (event, item) => {
     event.stopPropagation();
 
-    const newText = window.prompt("Edita el texto del análisis:", item.originalText);
+    const newText = window.prompt(
+      analysisCopy.sidebar.editPrompt,
+      item.originalText,
+    );
 
     if (!newText || newText.trim() === "") return;
 
@@ -91,7 +107,7 @@ const Sidebar = ({
   const handleDelete = async (event, id) => {
     event.stopPropagation();
 
-    const confirmed = window.confirm("¿Seguro que quieres eliminar este análisis?");
+    const confirmed = window.confirm(analysisCopy.sidebar.deleteConfirm);
 
     if (!confirmed) return;
 
@@ -117,13 +133,15 @@ const Sidebar = ({
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between px-5 py-5 border-b border-[#E9E1D3]">
-            <h2 className="text-lg font-bold text-[#4A3226]">Historial</h2>
+            <h2 className="text-lg font-bold text-[#4A3226]">
+              {analysisCopy.sidebar.title}
+            </h2>
 
             <Button
               variant="text"
               onClick={onClose}
               className="text-xl leading-none"
-              aria-label="Cerrar historial"
+              aria-label={analysisCopy.sidebar.closeLabel}
             >
               ✕
             </Button>
@@ -138,14 +156,14 @@ const Sidebar = ({
                 onClose();
               }}
             >
-              + Nuevo análisis
+              {analysisCopy.sidebar.newAnalysis}
             </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2">
             {isLoading && (
               <p className="text-sm text-[#93816F] text-center py-6">
-                Cargando historial...
+                {analysisCopy.sidebar.loading}
               </p>
             )}
 
@@ -155,14 +173,15 @@ const Sidebar = ({
 
             {!isLoading && !error && analyses.length === 0 && (
               <p className="text-sm text-[#93816F] text-center py-6">
-                Aún no tienes análisis guardados.
+                {analysisCopy.sidebar.empty}
               </p>
             )}
 
             {!isLoading &&
               !error &&
               analyses.map((item) => {
-                const style = VERDICT_STYLES[item.verdict] || VERDICT_STYLES.dudoso;
+                const style =
+                  VERDICT_STYLES[item.verdict] || VERDICT_STYLES.dudoso;
 
                 return (
                   <div
@@ -202,7 +221,7 @@ const Sidebar = ({
                         className="text-[#6FA8C9] hover:text-[#4A3226]"
                         onClick={(event) => handleEdit(event, item)}
                       >
-                        Editar
+                        {analysisCopy.sidebar.edit}
                       </Button>
 
                       <Button
@@ -210,7 +229,7 @@ const Sidebar = ({
                         className="text-[#C3564F] hover:text-[#4A3226]"
                         onClick={(event) => handleDelete(event, item.id)}
                       >
-                        Eliminar
+                        {analysisCopy.sidebar.delete}
                       </Button>
                     </div>
                   </div>

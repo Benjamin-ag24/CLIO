@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { DataSource } from "typeorm";
 import User from "../models/User.js";
 import Analysis from "../models/Analysis.js";
+import Keyword from "../models/Keyword.js";
 
 dotenv.config();
 
@@ -20,5 +21,6 @@ export const AppDataSource = new DataSource({
   entities: [
     User,
     Analysis,
+    Keyword,
   ],
 });

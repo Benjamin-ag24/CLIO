@@ -15,30 +15,8 @@ import {
   getAuthUser,
   clearAuthSession,
 } from "../services/authStorage";
-
-const featureList = [
-  {
-    title: "Verificación rigurosa",
-    description:
-      "Analizamos tu afirmación y la contrastamos con fuentes históricas confiables y académicas.",
-    accent: "bg-[#7fb3d1]",
-    icon: "🔍",
-  },
-  {
-    title: "Fuentes confiables",
-    description:
-      "Utilizamos libros, artículos académicos y archivos históricos para ofrecerte información sustentada.",
-    accent: "bg-[#caa77d]",
-    icon: "📚",
-  },
-  {
-    title: "Aprende y comprende",
-    description:
-      "No solo decimos si es verdadero o falso, sino que te explicamos el contexto histórico.",
-    accent: "bg-[#a6886a]",
-    icon: "🧠",
-  },
-];
+import { featureList, homePageCopy } from "../constants/homePageConstants";
+import { analysisCopy } from "../constants/analysisConstants";
 
 const Home = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAuthToken());
@@ -55,10 +33,7 @@ const Home = () => {
 
   const inputRef = useRef(null);
 
-  const characterCount = useMemo(
-    () => content.length,
-    [content]
-  );
+  const characterCount = useMemo(() => content.length, [content]);
 
   const analyzeContent = async () => {
     try {
@@ -75,29 +50,16 @@ const Home = () => {
 
       const analysisResult = await analyzeText(content);
 
-      const keyTerms = [
-        "veracidad",
-        "indicios",
-        "fuentes",
-        "comprobable",
-        "engañoso",
-      ].filter((term) => normalized.includes(term));
+      const keyTerms = analysisCopy.keyTerms.filter((term) =>
+        normalized.includes(term),
+      );
 
       const indicators =
         analysisResult.verdict === "veraz"
-          ? [
-              "Estructura coherente",
-              "Lenguaje directo y claro",
-            ]
+          ? analysisCopy.indicators.veraz
           : analysisResult.verdict === "dudoso"
-          ? [
-              "Uso de palabras imprecisas",
-              "Falta de fuentes concretas",
-            ]
-          : [
-              "Afirmaciones sin respaldo",
-              "Lenguaje sensacionalista",
-            ];
+            ? analysisCopy.indicators.dudoso
+            : analysisCopy.indicators.falso;
 
       setReport({
         verdict: analysisResult.verdict,
@@ -139,19 +101,10 @@ const Home = () => {
       keyTerms: [],
       indicators:
         item.verdict === "veraz"
-          ? [
-              "Estructura coherente",
-              "Lenguaje directo y claro",
-            ]
+          ? analysisCopy.indicators.veraz
           : item.verdict === "dudoso"
-          ? [
-              "Uso de palabras imprecisas",
-              "Falta de fuentes concretas",
-            ]
-          : [
-              "Afirmaciones sin respaldo",
-              "Lenguaje sensacionalista",
-            ],
+            ? analysisCopy.indicators.dudoso
+            : analysisCopy.indicators.falso,
     });
 
     setStatus("result");
@@ -159,11 +112,7 @@ const Home = () => {
 
   if (!isAuthenticated) {
     if (view === "registro") {
-      return (
-        <RegisterPage
-          onGoToLogin={() => setView("login")}
-        />
-      );
+      return <RegisterPage onGoToLogin={() => setView("login")} />;
     }
 
     return (
@@ -185,10 +134,9 @@ const Home = () => {
       />
 
       <div className="mx-auto max-w-6xl px-6 py-8">
-
         <div className="flex justify-end items-center gap-4 mb-4">
           <Button variant="text" onClick={() => setIsSidebarOpen(true)}>
-            ☰ Historial
+            {homePageCopy.actions.history}
           </Button>
 
           <Button
@@ -198,23 +146,21 @@ const Home = () => {
               setIsAuthenticated(false);
             }}
           >
-            Cerrar sesión ({getAuthUser()?.nombre})
+            {homePageCopy.actions.logoutPrefix} ({getAuthUser()?.nombre})
           </Button>
         </div>
 
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-[#5b3f2d] tracking-tight">
-            ¿Qué hecho histórico quieres validar?
+            {homePageCopy.title}
           </h1>
 
           <p className="mt-3 text-[#7b5f49] text-sm md:text-base max-w-2xl mx-auto">
-            Pega o escribe el texto sobre un hecho histórico que deseas verificar
+            {homePageCopy.description}
           </p>
 
           <p className="mt-1 text-[#a6886a] text-sm italic">
-            Ejemplo: Antes de la década de 1440, la inmensa mayoría de los textos
-            se copiaban a mano, un proceso sumamente lento y costoso realizado
-            principalmente por monjes en monasterios.
+            {homePageCopy.example}
           </p>
         </div>
 
@@ -243,10 +189,7 @@ const Home = () => {
 
         {status === "result" && (
           <div className="transition-all duration-500 ease-in opacity-100">
-            <ReportPanel
-              report={report}
-              onReset={resetAnalysis}
-            />
+            <ReportPanel report={report} onReset={resetAnalysis} />
           </div>
         )}
 
@@ -272,7 +215,6 @@ const Home = () => {
             </div>
           ))}
         </div>
-
       </div>
     </main>
   );

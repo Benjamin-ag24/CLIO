@@ -1,35 +1,5 @@
-const verdictMap = {
-  veraz: {
-    label: "Veraz",
-    hint: "El contenido parece consistente y confiable.",
-    bg: "bg-emerald-50",
-    text: "text-emerald-800",
-    ring: "ring-emerald-100",
-    dot: "bg-emerald-500",
-  },
-  dudoso: {
-    label: "Dudoso",
-    hint: "Hay señales que requieren una revisión más profunda.",
-    bg: "bg-amber-50",
-    text: "text-amber-800",
-    ring: "ring-amber-100",
-    dot: "bg-amber-400",
-  },
-  falso: {
-    label: "Falso",
-    hint: "El contenido muestra indicios de información incorrecta.",
-    bg: "bg-rose-50",
-    text: "text-rose-800",
-    ring: "ring-rose-100",
-    dot: "bg-rose-500",
-  },
-};
-
-const levels = [
-  { key: "veraz", label: "Veraz", color: "bg-emerald-500" },
-  { key: "dudoso", label: "Dudoso", color: "bg-amber-400" },
-  { key: "falso", label: "Falso", color: "bg-rose-500" },
-];
+import { analysisCopy } from "../../constants/analysisConstants";
+import { levels, verdictMap } from "./constantsForSemaphore";
 
 const renderHighlightedText = (text, terms) => {
   if (!terms?.length) return text;
@@ -91,10 +61,11 @@ const Semaphore = ({ verdict = "dudoso" }) => {
           className={`rounded-[28px] px-5 py-4 ${config.bg} ${config.ring} border ${config.ring}`}
         >
           <p className={`text-lg font-medium ${config.text}`}>
-            Resultado inmediato
+            {config.immediate || analysisCopy.verdicts.veraz.immediate}
           </p>
           <p className={`mt-2 text-sm ${config.text}`}>
-            Se refleja en el semáforo para que lo veas rápido.
+            {config.immediateDescription ||
+              analysisCopy.verdicts.veraz.immediateDescription}
           </p>
         </div>
       </div>

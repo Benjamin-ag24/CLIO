@@ -1,4 +1,5 @@
 import Button from "../common/Button";
+import { analysisCopy } from "../constants/analysisConstants";
 
 const ErrorBanner = ({ message, code, onRetry }) => {
   return (
@@ -10,14 +11,13 @@ const ErrorBanner = ({ message, code, onRetry }) => {
 
         <div className="flex-1">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600">
-            Error en el análisis
+            {analysisCopy.errorBanner.title}
           </p>
           <h3 className="mt-2 text-lg font-semibold text-[#7c1d1d]">
-            No pudimos completar la verificación
+            {analysisCopy.errorBanner.subtitle}
           </h3>
           <p className="mt-3 text-sm leading-7 text-[#7c1d1d]">
-            {message ||
-              "Ocurrió un problema inesperado al procesar tu contenido."}
+            {message || analysisCopy.errorBanner.fallbackMessage}
           </p>
           {code && (
             <p className="mt-2 text-xs text-red-600/80">Código: {code}</p>
@@ -27,7 +27,7 @@ const ErrorBanner = ({ message, code, onRetry }) => {
 
       <div className="mt-6 flex justify-end">
         <Button variant="danger" onClick={onRetry}>
-          Intentar de nuevo
+          {analysisCopy.errorBanner.retry}
         </Button>
       </div>
     </div>
