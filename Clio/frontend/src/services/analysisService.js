@@ -4,7 +4,6 @@ const API_URL = "http://localhost:3000/api/analysis";
 
 export const analyzeText = async (text) => {
   try {
-    // Validar que exista texto
     if (!text || text.trim() === "") {
       throw {
         code: "EMPTY_TEXT",
@@ -12,7 +11,6 @@ export const analyzeText = async (text) => {
       };
     }
 
-    // Enviar texto al backend
     const response = await fetch(API_URL, {
       method: "POST",
       headers: {
@@ -24,7 +22,6 @@ export const analyzeText = async (text) => {
       }),
     });
 
-    // Verificar si la API respondió con error
     if (!response.ok) {
       throw {
         code: "API_ERROR",
@@ -33,21 +30,44 @@ export const analyzeText = async (text) => {
       };
     }
 
-    // Obtener respuesta del backend
     const data = await response.json();
 
-    // Devolver objeto estructurado
     return {
       verdict: data.verdict,
       explanation: data.explanation,
     };
   } catch (error) {
-    // Error de red o error controlado
     throw {
       code: error.code || "NETWORK_ERROR",
       message:
         error.message ||
         "No fue posible conectarse con la inteligencia artificial.",
+    };
+  }
+};
+
+export const getAnalysisById = async (id) => {
+  try {
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw {
+        code: "API_ERROR",
+        message: "No se pudo obtener el análisis.",
+      };
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw {
+      code: error.code || "NETWORK_ERROR",
+      message:
+        error.message || "No fue posible obtener el análisis.",
     };
   }
 };
@@ -76,7 +96,8 @@ export const updateAnalysis = async (id, text) => {
   } catch (error) {
     throw {
       code: error.code || "NETWORK_ERROR",
-      message: error.message || "No fue posible editar el análisis.",
+      message:
+        error.message || "No fue posible editar el análisis.",
     };
   }
 };
@@ -101,7 +122,8 @@ export const deleteAnalysis = async (id) => {
   } catch (error) {
     throw {
       code: error.code || "NETWORK_ERROR",
-      message: error.message || "No fue posible eliminar el análisis.",
+      message:
+        error.message || "No fue posible eliminar el análisis.",
     };
   }
 };

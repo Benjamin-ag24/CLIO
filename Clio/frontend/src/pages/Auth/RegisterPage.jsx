@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../common/Button";
 import Logo from "../../common/Logo";
 import Card from "../../common/Card";
@@ -9,8 +10,11 @@ import {
   authValidationMessages,
   authApiEndpoints,
 } from "../../constants/authConstants";
+import { ROUTE_PATHS } from "../../constants/routePaths";
 
-const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
+const RegisterPage = () => {
+  const navigate = useNavigate();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -24,14 +28,17 @@ const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
       setError(authValidationMessages.requiredNames);
       return false;
     }
+
     if (!email.includes("@")) {
       setError(authValidationMessages.invalidEmail);
       return false;
     }
+
     if (password.length < 6) {
       setError(authValidationMessages.passwordLength);
       return false;
     }
+
     return true;
   };
 
@@ -42,6 +49,7 @@ const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
     if (!validateForm()) return;
 
     setIsLoading(true);
+
     try {
       const response = await fetch(authApiEndpoints.register, {
         method: "POST",
@@ -58,7 +66,7 @@ const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
       }
 
       setIsSuccess(true);
-      setTimeout(() => onGoToLogin(), 1500);
+      setTimeout(() => navigate(ROUTE_PATHS.LOGIN), 1500);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -75,6 +83,7 @@ const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
           <h2 className="text-2xl font-bold text-[#4A3226] mb-1">
             {authCopy.register.title}
           </h2>
+
           <p className="text-sm text-[#93816F] mb-6">
             {authCopy.register.description}
           </p>
@@ -135,7 +144,7 @@ const RegisterPage = ({ onRegisterSuccess, onGoToLogin }) => {
             <Button
               variant="text"
               className="text-[#6FA8C9] font-semibold hover:underline hover:text-[#6FA8C9]"
-              onClick={onGoToLogin}
+              onClick={() => navigate(ROUTE_PATHS.LOGIN)}
             >
               {authCopy.register.footer.action}
             </Button>
