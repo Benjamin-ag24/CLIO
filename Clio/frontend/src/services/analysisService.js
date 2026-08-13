@@ -130,3 +130,29 @@ export const deleteAnalysis = async (id) => {
     };
   }
 };
+
+export const getAnalysisHistory = async () => {
+  try {
+    const response = await fetch(API_URL, {
+      headers: {
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw {
+        code: "API_ERROR",
+        message: "No fue posible cargar el historial.",
+      };
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw {
+      code: error.code || "NETWORK_ERROR",
+      message:
+        error.message ||
+        "No fue posible cargar el historial.",
+    };
+  }
+};

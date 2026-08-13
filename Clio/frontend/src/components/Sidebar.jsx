@@ -1,3 +1,4 @@
+// frontend/src/components/Sidebar.jsx
 import { useEffect, useState } from "react";
 import { getAuthToken } from "../services/authStorage";
 import {
@@ -32,6 +33,10 @@ const formatDate = (isoString) => {
 
   const date = new Date(isoString);
 
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
   return date.toLocaleString("es-EC", {
     day: "2-digit",
     month: "2-digit",
@@ -45,7 +50,7 @@ const truncateText = (text, max = 70) => {
   if (!text) return "";
 
   return text.length > max
-    ? text.slice(0, max).trim() + "…"
+    ? `${text.slice(0, max).trim()}…`
     : text;
 };
 
@@ -62,12 +67,10 @@ const Sidebar = ({
 
   const [editingAnalysis, setEditingAnalysis] = useState(null);
   const [editText, setEditText] = useState("");
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [editError, setEditError] = useState("");
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   const [deletingAnalysis, setDeletingAnalysis] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState("");
 
   const fetchHistory = async () => {
     setIsLoading(true);
@@ -87,7 +90,6 @@ const Sidebar = ({
       }
 
       const data = await response.json();
-
       setAnalyses(data);
     } catch (err) {
       setError(
@@ -110,44 +112,36 @@ const Sidebar = ({
 
     setEditingAnalysis(item);
     setEditText(item.originalText || "");
-    setEditError("");
   };
 
   const closeEditModal = () => {
-    if (isUpdating) return;
+    if (isSavingEdit) return;
 
     setEditingAnalysis(null);
     setEditText("");
-    setEditError("");
   };
 
-  const handleUpdate = async () => {
-    const normalizedText = editText.trim();
+  const handleSaveEdit = async () => {
+    const trimmedText = editText.trim();
 
-    if (!normalizedText) {
-      setEditError("El texto es obligatorio.");
+    if (!trimmedText) {
       return;
     }
 
-    setIsUpdating(true);
-    setEditError("");
+    setIsSavingEdit(true);
 
     try {
       await updateAnalysis(
         editingAnalysis.id,
-        normalizedText,
+        trimmedText,
       );
 
       await fetchHistory();
-
       closeEditModal();
     } catch (err) {
-      setEditError(
-        err.message ||
-          "No fue posible actualizar el análisis.",
-      );
+      alert(err.message);
     } finally {
-      setIsUpdating(false);
+      setIsSavingEdit(false);
     }
   };
 
@@ -155,31 +149,26 @@ const Sidebar = ({
     event.stopPropagation();
 
     setDeletingAnalysis(item);
-    setDeleteError("");
   };
 
   const closeDeleteModal = () => {
     if (isDeleting) return;
 
     setDeletingAnalysis(null);
-    setDeleteError("");
   };
 
   const handleDelete = async () => {
+    if (!deletingAnalysis) return;
+
     setIsDeleting(true);
-    setDeleteError("");
 
     try {
       await deleteAnalysis(deletingAnalysis.id);
 
       await fetchHistory();
-
       closeDeleteModal();
     } catch (err) {
-      setDeleteError(
-        err.message ||
-          "No fue posible eliminar el análisis.",
-      );
+      alert(err.message);
     } finally {
       setIsDeleting(false);
     }
@@ -321,60 +310,72 @@ const Sidebar = ({
         </div>
       </aside>
 
-      {/* EDIT MODAL */}
-      {editingAnalysis && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl">
-            <div className="mb-5">
-              <h2 className="text-2xl font-bold text-[#4A3226]">
-                Editar análisis
-              </h2>
 
-              <p className="mt-1 text-sm text-[#93816F]">
-                Modifica el texto del análisis y vuelve a
-                analizarlo.
-              </p>
+      {editingAnalysis && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4"
+          onClick={closeEditModal}
+        >
+          <div
+            className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 className="text-2xl font-bold text-[#4A3226]">
+              Editar análisis
+            </h2>
+
+            <p className="mt-2 text-sm text-[#93816F]">
+              Modifica el texto del análisis y vuelve a
+              analizarlo para obtener un nuevo resultado.
+            </p>
+
+            <div className="mt-5">
+              <label
+                htmlFor="edit-analysis-text"
+                className="mb-2 block text-sm font-semibold text-[#4A3226]"
+              >
+                Texto del análisis
+              </label>
+
+              <textarea
+                id="edit-analysis-text"
+                value={editText}
+                onChange={(event) =>
+                  setEditText(event.target.value)
+                }
+                rows={8}
+                disabled={isSavingEdit}
+                className="w-full resize-none rounded-xl border border-[#E9E1D3]
+                           bg-[#FBFAF6] p-4 text-sm text-[#4A3226]
+                           outline-none transition
+                           focus:border-[#6FA8C9]
+                           focus:ring-2 focus:ring-[#6FA8C9]/20
+                           disabled:opacity-60"
+                placeholder="Escribe el texto que deseas analizar..."
+              />
             </div>
 
-            <textarea
-              value={editText}
-              onChange={(event) =>
-                setEditText(event.target.value)
-              }
-              rows={8}
-              disabled={isUpdating}
-              className="w-full resize-none rounded-xl border border-[#E9E1D3]
-                         bg-[#FBFAF6] p-4 text-sm text-[#4A3226]
-                         outline-none transition
-                         focus:border-[#6FA8C9] focus:ring-2
-                         focus:ring-[#6FA8C9]/20"
-              placeholder="Escribe el texto que deseas analizar..."
-            />
-
-            {editError && (
-              <p className="mt-3 rounded-lg bg-[#FBEAE8] px-4 py-3 text-sm text-[#C3564F]">
-                {editError}
-              </p>
-            )}
-
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="secondary"
                 type="button"
                 onClick={closeEditModal}
-                disabled={isUpdating}
+                disabled={isSavingEdit}
               >
                 Cancelar
               </Button>
 
               <Button
-                variant="primary"
+                variant="accent"
                 type="button"
-                onClick={handleUpdate}
-                disabled={isUpdating}
+                onClick={handleSaveEdit}
+                disabled={
+                  isSavingEdit ||
+                  !editText.trim()
+                }
               >
-                {isUpdating
-                  ? "Guardando..."
+                {isSavingEdit
+                  ? "Guardando y analizando..."
                   : "Guardar y volver a analizar"}
               </Button>
             </div>
@@ -382,34 +383,40 @@ const Sidebar = ({
         </div>
       )}
 
-      {/* DELETE MODAL */}
+
       {deletingAnalysis && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <div className="mb-5">
-              <h2 className="text-2xl font-bold text-[#4A3226]">
-                Eliminar análisis
-              </h2>
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4"
+          onClick={closeDeleteModal}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 className="text-2xl font-bold text-[#4A3226]">
+              Eliminar análisis
+            </h2>
 
-              <p className="mt-2 text-sm leading-6 text-[#7B5F49]">
-                ¿Estás seguro de que deseas eliminar este
-                análisis? Esta acción no se puede deshacer.
-              </p>
-            </div>
+            <p className="mt-3 text-sm leading-6 text-[#7B5F49]">
+              ¿Estás seguro de que deseas eliminar este
+              análisis?
+            </p>
 
-            <div className="rounded-xl border border-[#E9E1D3] bg-[#FBFAF6] p-4">
+            <div className="mt-4 rounded-xl bg-[#FBFAF6] p-4">
               <p className="text-sm leading-6 text-[#4A3226]">
-                {deletingAnalysis.originalText}
+                {truncateText(
+                  deletingAnalysis.originalText,
+                  180,
+                )}
               </p>
             </div>
 
-            {deleteError && (
-              <p className="mt-3 rounded-lg bg-[#FBEAE8] px-4 py-3 text-sm text-[#C3564F]">
-                {deleteError}
-              </p>
-            )}
+            <p className="mt-4 text-xs leading-5 text-[#93816F]">
+              El análisis dejará de aparecer en tu
+              historial.
+            </p>
 
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="secondary"
                 type="button"
@@ -420,15 +427,15 @@ const Sidebar = ({
               </Button>
 
               <Button
-                variant="primary"
+                variant="text"
                 type="button"
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="!bg-[#C3564F] hover:!bg-[#A9443F]"
+                className="bg-[#C3564F] px-5 py-2.5 text-white rounded-lg hover:bg-[#A9433D]"
               >
                 {isDeleting
                   ? "Eliminando..."
-                  : "Sí, eliminar"}
+                  : "Eliminar"}
               </Button>
             </div>
           </div>

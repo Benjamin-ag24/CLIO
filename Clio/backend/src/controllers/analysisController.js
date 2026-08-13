@@ -1,98 +1,8 @@
-import dotenv from "dotenv";
-import { GoogleGenAI } from "@google/genai";
 import { AppDataSource } from "../config/database.js";
-
-dotenv.config();
-
-const genAI = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
+import { analyzeWithGemini } from "../services/geminiService.js";
 
 const analysisRepository = AppDataSource.getRepository("Analysis");
 const keywordRepository = AppDataSource.getRepository("Keyword");
-
-const RESPONSE_SCHEMA = {
-  type: "object",
-  properties: {
-    verdict: {
-      type: "string",
-      enum: ["veraz", "dudoso", "falso"],
-    },
-    explanation: {
-      type: "string",
-    },
-    keywords: {
-      type: "array",
-      items: {
-        type: "string",
-      },
-    },
-  },
-  required: ["verdict", "explanation", "keywords"],
-  additionalProperties: false,
-};
-
-const SYSTEM_PROMPT = `
-Eres "Clio", un asistente de inteligencia artificial experto en verificar la veracidad de información histórica.
-
-Tu tarea es analizar el texto que el usuario te proporciona y determinar si la información es verdadera, dudosa o falsa.
-
-Reglas que debes seguir de manera estricta:
-
-1. Solo respondes en formato JSON.
-2. No incluyas texto adicional fuera del objeto JSON.
-3. Si el texto no es sobre un hecho histórico, el veredicto debe ser "falso".
-4. Explica siempre tu razonamiento de forma clara.
-5. Solo analizas párrafos o afirmaciones desarrolladas, no preguntas ni enunciados sueltos.
-6. Identifica entre 3 y 5 términos clave del texto (personas, lugares, fechas o eventos históricos relevantes) en "keywords".
-`;
-
-const generateWithRetries = async (params, maxAttempts = 3) => {
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      return await genAI.models.generateContent(params);
-    } catch (error) {
-      const isRateLimit = error.status === 503;
-      const isLastAttempt = attempt === maxAttempts;
-
-      if (!isRateLimit || isLastAttempt) {
-        throw error;
-      }
-
-      const waitTime = 1000 * attempt;
-
-      console.log(
-        `Gemini saturado, reintentando en ${waitTime}ms (intento ${attempt}/${maxAttempts})`,
-      );
-
-      await new Promise((resolve) => setTimeout(resolve, waitTime));
-    }
-  }
-};
-
-const parseGeminiResponse = (text) => {
-  try {
-    const cleanJson = text
-      .replace(/```json\s*/gi, "")
-      .replace(/```\s*/g, "")
-      .trim();
-
-    const parsedResponse = JSON.parse(cleanJson);
-
-    return {
-      verdict: parsedResponse.verdict || "dudoso",
-      explanation:
-        parsedResponse.explanation || "No se pudo determinar el resultado.",
-      keywords: Array.isArray(parsedResponse.keywords)
-        ? parsedResponse.keywords
-        : [],
-    };
-  } catch {
-    console.error("Error al parsear JSON de Gemini:", text);
-
-    throw new Error("La IA no devolvió un formato válido");
-  }
-};
 
 const getOriginalText = (body) => {
   const text = body?.text ?? body?.original_text;
@@ -151,17 +61,7 @@ export const createAnalysis = async (req, res) => {
       });
     }
 
-    const result = await generateWithRetries({
-      model: "gemini-3.5-flash",
-      contents: originalText,
-      config: {
-        systemInstruction: SYSTEM_PROMPT,
-        responseMimeType: "application/json",
-        responseJsonSchema: RESPONSE_SCHEMA,
-      },
-    });
-
-    const parsedResponse = parseGeminiResponse(result.text);
+    const parsedResponse = await analyzeWithGemini(originalText);
 
     const userId = Number(req.user?.sub ?? req.user?.id);
 
@@ -354,17 +254,7 @@ export const updateAnalysis = async (req, res) => {
       });
     }
 
-    const result = await generateWithRetries({
-      model: "gemini-3.5-flash",
-      contents: originalText,
-      config: {
-        systemInstruction: SYSTEM_PROMPT,
-        responseMimeType: "application/json",
-        responseJsonSchema: RESPONSE_SCHEMA,
-      },
-    });
-
-    const parsedResponse = parseGeminiResponse(result.text);
+    const parsedResponse = await analyzeWithGemini(originalText);
 
     analysis.originalText = originalText;
     analysis.analyzedText = parsedResponse.explanation;

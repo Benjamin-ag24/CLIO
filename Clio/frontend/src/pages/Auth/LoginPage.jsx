@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { saveAuthSession } from "../../services/authStorage";
+import { login } from "../../services/authService";
 import Button from "../../common/Button";
 import Logo from "../../common/Logo";
 import Card from "../../common/Card";
@@ -11,7 +12,6 @@ import Alert from "../../common/Alert";
 import {
   authCopy,
   authValidationMessages,
-  authApiEndpoints,
 } from "../../constants/authConstants";
 
 import { ROUTE_PATHS } from "../../routes/routePaths";
@@ -38,43 +38,21 @@ const LoginPage = () => {
     return true;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError("");
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
     setIsLoading(true);
 
     try {
-      const response = await fetch(authApiEndpoints.login, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-
-      const data = await response.json();
-
-      console.log("LOGIN RESPONSE:", data);
-
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-            authValidationMessages.defaultLoginError,
-        );
-      }
+      const data = await login(email, password);
 
       saveAuthSession(data.token, data.user);
 
-      console.log("USER:", data.user);
-      console.log("ROLE:", data.user?.role);
-
-      // Redirect according to the user's role
       if (data.user?.role === "admin") {
         navigate(ROUTE_PATHS.ADMIN, {
           replace: true,
@@ -88,7 +66,7 @@ const LoginPage = () => {
       console.error("LOGIN ERROR:", err);
 
       setError(
-        err.message ||
+        err?.message ||
           authValidationMessages.defaultLoginError,
       );
     } finally {
@@ -118,7 +96,9 @@ const LoginPage = () => {
               label={authCopy.login.fields.email}
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(event) =>
+                setEmail(event.target.value)
+              }
               placeholder={authCopy.login.placeholders.email}
             />
 
@@ -126,8 +106,8 @@ const LoginPage = () => {
               label={authCopy.login.fields.password}
               type="password"
               value={password}
-              onChange={(e) =>
-                setPassword(e.target.value)
+              onChange={(event) =>
+                setPassword(event.target.value)
               }
               placeholder={
                 authCopy.login.placeholders.password
