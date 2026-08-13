@@ -2,7 +2,6 @@ import { AppDataSource } from "../config/database.js";
 import { analyzeWithGemini } from "../services/geminiService.js";
 
 const analysisRepository = AppDataSource.getRepository("Analysis");
-const keywordRepository = AppDataSource.getRepository("Keyword");
 
 const getOriginalText = (body) => {
   const text = body?.text ?? body?.original_text;
@@ -14,10 +13,12 @@ const getOriginalText = (body) => {
   return text.trim();
 };
 
-const syncKeywordsCatalog = async (keywords) => {
+const syncKeywordsCatalog = async (keywords, manager) => {
   if (!Array.isArray(keywords) || keywords.length === 0) {
     return;
   }
+
+  const keywordRepository = manager.getRepository("Keyword");
 
   for (const keyword of keywords) {
     if (typeof keyword !== "string") {
@@ -71,19 +72,18 @@ export const createAnalysis = async (req, res) => {
       });
     }
 
-    let savedAnalysis = null;
-    let saved = true;
-
-    try {
-      savedAnalysis = await AppDataSource.transaction(async (manager) => {
+    const savedAnalysis = await AppDataSource.transaction(
+      async (manager) => {
+        // Set the current user only for this transaction.
         await manager.query(
-          "SET LOCAL app.current_user_id = $1",
-          [userId],
+          "SELECT set_config('app.current_user_id', $1, true)",
+          [String(userId)],
         );
 
-        const analysisRepo = manager.getRepository("Analysis");
+        const analysisRepository =
+          manager.getRepository("Analysis");
 
-        const analysis = analysisRepo.create({
+        const analysis = analysisRepository.create({
           user: {
             id: userId,
           },
@@ -95,33 +95,26 @@ export const createAnalysis = async (req, res) => {
           isDeleted: false,
         });
 
-        return await analysisRepo.save(analysis);
-      });
+        const savedAnalysis =
+          await analysisRepository.save(analysis);
 
-      await syncKeywordsCatalog(parsedResponse.keywords);
-    } catch (dbError) {
-      console.error(
-        "Error al guardar el análisis en la base de datos:",
-        dbError,
-      );
+        await syncKeywordsCatalog(
+          parsedResponse.keywords,
+          manager,
+        );
 
-      saved = false;
-    }
+        return savedAnalysis;
+      },
+    );
 
-    if (saved) {
-      return res.status(201).json(savedAnalysis);
-    }
-
-    return res.status(201).json({
-      verdict: parsedResponse.verdict,
-      explanation: parsedResponse.explanation,
-      keywords: parsedResponse.keywords,
-      saved: false,
-    });
+    return res.status(201).json(savedAnalysis);
   } catch (error) {
     console.error("Error al crear análisis:", error);
 
-    if (error.message === "La IA no devolvió un formato válido") {
+    if (
+      error.message ===
+      "La IA no devolvió un formato válido"
+    ) {
       return res.status(500).json({
         error: error.message,
       });
@@ -135,7 +128,9 @@ export const createAnalysis = async (req, res) => {
 
 export const listAnalysis = async (req, res) => {
   try {
-    const userId = Number(req.user?.sub ?? req.user?.id);
+    const userId = Number(
+      req.user?.sub ?? req.user?.id,
+    );
 
     if (!Number.isInteger(userId) || userId <= 0) {
       return res.status(401).json({
@@ -168,7 +163,9 @@ export const listAnalysis = async (req, res) => {
 export const getAnalysisById = async (req, res) => {
   try {
     const analysisId = Number(req.params.id);
-    const userId = Number(req.user?.sub ?? req.user?.id);
+    const userId = Number(
+      req.user?.sub ?? req.user?.id,
+    );
 
     if (!Number.isInteger(analysisId) || analysisId <= 0) {
       return res.status(400).json({
@@ -212,7 +209,9 @@ export const updateAnalysis = async (req, res) => {
   try {
     const analysisId = Number(req.params.id);
     const originalText = getOriginalText(req.body);
-    const userId = Number(req.user?.sub ?? req.user?.id);
+    const userId = Number(
+      req.user?.sub ?? req.user?.id,
+    );
 
     if (!Number.isInteger(analysisId) || analysisId <= 0) {
       return res.status(400).json({
@@ -254,7 +253,8 @@ export const updateAnalysis = async (req, res) => {
       });
     }
 
-    const parsedResponse = await analyzeWithGemini(originalText);
+    const parsedResponse =
+      await analyzeWithGemini(originalText);
 
     analysis.originalText = originalText;
     analysis.analyzedText = parsedResponse.explanation;
@@ -262,26 +262,41 @@ export const updateAnalysis = async (req, res) => {
     analysis.explanation = parsedResponse.explanation;
     analysis.keywords = parsedResponse.keywords;
 
-    const updatedAnalysis = await AppDataSource.transaction(
-      async (manager) => {
-        await manager.query(
-          "SET LOCAL app.current_user_id = $1",
-          [userId],
-        );
+    const updatedAnalysis =
+      await AppDataSource.transaction(
+        async (manager) => {
+          // Set the current user only for this transaction.
+          await manager.query(
+            "SELECT set_config('app.current_user_id', $1, true)",
+            [String(userId)],
+          );
 
-        const analysisRepo = manager.getRepository("Analysis");
+          const analysisRepository =
+            manager.getRepository("Analysis");
 
-        return await analysisRepo.save(analysis);
-      },
-    );
+          const savedAnalysis =
+            await analysisRepository.save(analysis);
 
-    await syncKeywordsCatalog(parsedResponse.keywords);
+          await syncKeywordsCatalog(
+            parsedResponse.keywords,
+            manager,
+          );
+
+          return savedAnalysis;
+        },
+      );
 
     return res.json(updatedAnalysis);
   } catch (error) {
-    console.error("Error al actualizar análisis:", error);
+    console.error(
+      "Error al actualizar análisis:",
+      error,
+    );
 
-    if (error.message === "La IA no devolvió un formato válido") {
+    if (
+      error.message ===
+      "La IA no devolvió un formato válido"
+    ) {
       return res.status(500).json({
         error: error.message,
       });
@@ -296,7 +311,9 @@ export const updateAnalysis = async (req, res) => {
 export const deleteAnalysis = async (req, res) => {
   try {
     const analysisId = Number(req.params.id);
-    const userId = Number(req.user?.sub ?? req.user?.id);
+    const userId = Number(
+      req.user?.sub ?? req.user?.id,
+    );
 
     if (!Number.isInteger(analysisId) || analysisId <= 0) {
       return res.status(400).json({
@@ -334,25 +351,31 @@ export const deleteAnalysis = async (req, res) => {
 
     analysis.isDeleted = true;
 
-    const deletedAnalysis = await AppDataSource.transaction(
-      async (manager) => {
-        await manager.query(
-          "SET LOCAL app.current_user_id = $1",
-          [userId],
-        );
+    const deletedAnalysis =
+      await AppDataSource.transaction(
+        async (manager) => {
+          // Set the current user only for this transaction.
+          await manager.query(
+            "SELECT set_config('app.current_user_id', $1, true)",
+            [String(userId)],
+          );
 
-        const analysisRepo = manager.getRepository("Analysis");
+          const analysisRepository =
+            manager.getRepository("Analysis");
 
-        return await analysisRepo.save(analysis);
-      },
-    );
+          return await analysisRepository.save(analysis);
+        },
+      );
 
     return res.json({
       message: "Análisis eliminado correctamente",
       analysis: deletedAnalysis,
     });
   } catch (error) {
-    console.error("Error al eliminar análisis:", error);
+    console.error(
+      "Error al eliminar análisis:",
+      error,
+    );
 
     return res.status(500).json({
       error: "Error al eliminar el análisis",
