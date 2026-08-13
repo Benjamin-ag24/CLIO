@@ -4,8 +4,10 @@ import Home from "../pages/Home";
 import AnalysisPage from "../pages/AnalysisPage";
 import LoginPage from "../pages/Auth/LoginPage";
 import RegisterPage from "../pages/Auth/RegisterPage";
+import AdminDashboard from "../components/AdminDashboard";
 
 import ProtectedRoute from "./ProtectedRoute";
+import AdminRoute from "./AdminRoute";
 import { ROUTE_PATHS } from "./routePaths";
 
 const AppRoutes = () => {
@@ -35,6 +37,13 @@ const AppRoutes = () => {
         <Route
           path={ROUTE_PATHS.ANALYSIS}
           element={<AnalysisPage />}
+        />
+      </Route>
+
+      <Route element={<AdminRoute />}>
+        <Route
+          path={ROUTE_PATHS.ADMIN}
+          element={<AdminDashboard />}
         />
       </Route>
 

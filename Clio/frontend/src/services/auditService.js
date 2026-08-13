@@ -1,8 +1,11 @@
 import { getAuthToken } from "./authStorage";
 
-const API_URL = "http://localhost:3000/api/admin/audit";
+const API_URL =
+  "http://localhost:3000/api/admin/audit";
 
-export const getAuditLog = async (analysisId = null) => {
+export const getAuditLog = async (
+  analysisId = null,
+) => {
   const token = getAuthToken();
 
   const url = analysisId
@@ -21,7 +24,8 @@ export const getAuditLog = async (analysisId = null) => {
 
   if (!response.ok) {
     throw new Error(
-      data?.error || "No fue posible obtener el registro de auditoría.",
+      data?.error ||
+        "No fue posible obtener el registro de auditoría.",
     );
   }
 

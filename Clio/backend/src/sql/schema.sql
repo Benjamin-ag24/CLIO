@@ -25,16 +25,19 @@ CREATE TABLE IF NOT EXISTS analysis (
         REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS audit_log (
+CREATE TABLE audit_log (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    user_id INTEGER,
     affected_table VARCHAR(50) NOT NULL,
-    operation VARCHAR(10) NOT NULL CHECK (operation IN ('INSERT', 'UPDATE', 'DELETE')),
+    operation VARCHAR(10) NOT NULL
+        CHECK (operation IN ('INSERT', 'UPDATE', 'DELETE')),
     previous_data JSONB,
     new_data JSONB,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_audit_log_user FOREIGN KEY (user_id) 
-        REFERENCES users(id) ON DELETE CASCADE
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_audit_log_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
 );
 ---Funcion trigger de audithlog para la tabla de analysis
 CREATE OR REPLACE FUNCTION fn_audit_analysis()

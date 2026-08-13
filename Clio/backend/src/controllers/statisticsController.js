@@ -18,10 +18,17 @@ export const getStatistics = async (req, res) => {
 
     byDateQuery += ` ORDER BY analysis_date ASC`;
 
-    const byDateResult = await AppDataSource.query(byDateQuery, queryParams);
+    const byDateResult = await AppDataSource.query(
+      byDateQuery,
+      queryParams
+    );
 
     const topKeywordsResult = await AppDataSource.query(
       `SELECT * FROM view_most_used_keywords LIMIT 15`
+    );
+
+    const topUsersResult = await AppDataSource.query(
+      `SELECT * FROM view_top_users`
     );
 
     const summary = summaryResult[0] || {};
@@ -30,26 +37,37 @@ export const getStatistics = async (req, res) => {
       summary: {
         totalAnalyses: Number(summary.total_analyses) || 0,
         totalActiveUsers: Number(summary.total_active_users) || 0,
+
         verdictBreakdown: {
-          veraz: Number(summary.veraz_total) || 0,
-          dudoso: Number(summary.dudoso_total) || 0,
-          falso: Number(summary.falso_total) || 0,
+          veraz: Number(summary.truthful_total) || 0,
+          dudoso: Number(summary.uncertain_total) || 0,
+          falso: Number(summary.false_total) || 0,
         },
       },
+
       byDate: byDateResult.map((row) => ({
         date: row.analysis_date,
-        total: Number(row.total),
-        veraz: Number(row.veraz_count),
-        dudoso: Number(row.dudoso_count),
-        falso: Number(row.falso_count),
+        total: Number(row.total) || 0,
+        veraz: Number(row.truthful_count) || 0,
+        dudoso: Number(row.uncertain_count) || 0,
+        falso: Number(row.false_count) || 0,
       })),
+
       topKeywords: topKeywordsResult.map((row) => ({
         keyword: row.keyword,
-        count: Number(row.usage_count),
+        count: Number(row.usage_count) || 0,
+      })),
+
+      topUsers: topUsersResult.map((row) => ({
+        userId: row.user_id,
+        firstName: row.first_name,
+        lastName: row.last_name,
+        analysisCount: Number(row.analysis_count) || 0,
       })),
     });
   } catch (error) {
     console.error("Error al obtener estadísticas:", error);
+
     return res.status(500).json({
       error: "Error al obtener las estadísticas",
     });

@@ -60,19 +60,37 @@ const LoginPage = () => {
 
       const data = await response.json();
 
+      console.log("LOGIN RESPONSE:", data);
+
       if (!response.ok) {
         throw new Error(
-          data.error || authValidationMessages.defaultLoginError,
+          data.error ||
+            authValidationMessages.defaultLoginError,
         );
       }
 
       saveAuthSession(data.token, data.user);
 
-      navigate(ROUTE_PATHS.DASHBOARD, {
-        replace: true,
-      });
+      console.log("USER:", data.user);
+      console.log("ROLE:", data.user?.role);
+
+      // Redirect according to the user's role
+      if (data.user?.role === "admin") {
+        navigate(ROUTE_PATHS.ADMIN, {
+          replace: true,
+        });
+      } else {
+        navigate(ROUTE_PATHS.DASHBOARD, {
+          replace: true,
+        });
+      }
     } catch (err) {
-      setError(err.message);
+      console.error("LOGIN ERROR:", err);
+
+      setError(
+        err.message ||
+          authValidationMessages.defaultLoginError,
+      );
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +110,10 @@ const LoginPage = () => {
             {authCopy.login.description}
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+          >
             <TextField
               label={authCopy.login.fields.email}
               type="email"
@@ -105,11 +126,19 @@ const LoginPage = () => {
               label={authCopy.login.fields.password}
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={authCopy.login.placeholders.password}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
+              placeholder={
+                authCopy.login.placeholders.password
+              }
             />
 
-            {error && <Alert variant="error">{error}</Alert>}
+            {error && (
+              <Alert variant="error">
+                {error}
+              </Alert>
+            )}
 
             <Button
               type="submit"
@@ -125,10 +154,13 @@ const LoginPage = () => {
 
           <p className="text-center text-sm text-[#93816F] mt-6">
             {authCopy.login.footer.noAccount}{" "}
+
             <Button
               variant="text"
               className="text-[#6FA8C9] font-semibold hover:underline hover:text-[#6FA8C9]"
-              onClick={() => navigate(ROUTE_PATHS.REGISTER)}
+              onClick={() =>
+                navigate(ROUTE_PATHS.REGISTER)
+              }
             >
               {authCopy.login.footer.action}
             </Button>
