@@ -34,15 +34,32 @@ export const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = userRepository.create({
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword,
-      role: "user",
-    });
+    const savedUser = await AppDataSource.transaction(
+      async (manager) => {
+        const currentUserId = Number(
+          req.user?.sub ?? req.user?.id
+        );
 
-    const savedUser = await userRepository.save(newUser);
+        if (Number.isInteger(currentUserId) && currentUserId > 0) {
+          await manager.query(
+            "SET LOCAL app.current_user_id = $1",
+            [currentUserId]
+          );
+        }
+
+        const userRepo = manager.getRepository("User");
+
+        const newUser = userRepo.create({
+          firstName,
+          lastName,
+          email,
+          password: hashedPassword,
+          role: "user",
+        });
+
+        return await userRepo.save(newUser);
+      }
+    );
 
     return res.status(201).json({
       user: {
