@@ -18,7 +18,7 @@ export const getAuditLog = async (req, res) => {
         al.created_at
       FROM audit_log al
       LEFT JOIN users u ON u.id = al.user_id
-      WHERE al.affected_table = 'analysis'
+      WHERE al.affected_table IN ('analysis', 'users', 'keywords')
     `;
 
     const params = [];
@@ -28,6 +28,7 @@ export const getAuditLog = async (req, res) => {
         (al.previous_data->>'id')::int = $1
         OR (al.new_data->>'id')::int = $1
       )`;
+
       params.push(Number(analysisId));
     }
 
@@ -39,6 +40,7 @@ export const getAuditLog = async (req, res) => {
       logs.map((log) => ({
         id: log.id,
         operation: log.operation,
+        affectedTable: log.affected_table,
         previousData: log.previous_data,
         newData: log.new_data,
         createdAt: log.created_at,
@@ -50,10 +52,14 @@ export const getAuditLog = async (req, res) => {
               email: log.email,
             }
           : null,
-      }))
+      })),
     );
   } catch (error) {
-    console.error("Error al obtener el registro de auditoría:", error);
+    console.error(
+      "Error al obtener el registro de auditoría:",
+      error,
+    );
+
     return res.status(500).json({
       error: "Error al obtener el registro de auditoría",
     });

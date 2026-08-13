@@ -6,8 +6,6 @@ import dotenv from "dotenv";
 import { AppDataSource } from "./config/database.js";
 import { verifyToken } from "./middleware/authMiddleware.js";
 
-
-
 import logger from "./middleware/logger.middleware.js";
 
 import authRoutes from "./routes/authRoutes.js";
@@ -15,6 +13,7 @@ import analysisRoutes from "./routes/analysisRoutes.js";
 import statisticsRoutes from "./routes/statisticsRoutes.js";
 import keywordRoutes from "./routes/keywordRoutes.js";
 import auditRoutes from "./routes/auditRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 import { createAnalysis } from "./controllers/analysisController.js";
 
@@ -36,6 +35,8 @@ app.use("/api/admin/keywords", keywordRoutes);
 app.use("/api/admin/statistics", statisticsRoutes);
 
 app.use("/api/admin/audit", auditRoutes);
+
+app.use("/api/admin/users", userRoutes);
 
 app.post(
   "/api/analyze",
