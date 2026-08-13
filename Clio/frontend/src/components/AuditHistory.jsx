@@ -1,6 +1,163 @@
 import { useEffect, useState } from "react";
+
 import { getAuditLog } from "../services/auditService";
 import Loading from "../common/Loading";
+import adminDashboardCopy from "../constants/adminDashboardConstants";
+
+const ECUADOR_TIME_ZONE = "America/Guayaquil";
+
+const formatDate = (dateValue) => {
+  if (!dateValue) {
+    return adminDashboardCopy.values.noValue;
+  }
+
+  let normalizedDate = String(dateValue).trim();
+
+  const hasTimezone =
+    normalizedDate.endsWith("Z") ||
+    /[+-]\d{2}:\d{2}$/.test(normalizedDate);
+
+  if (!hasTimezone) {
+    normalizedDate = `${normalizedDate}-05:00`;
+  }
+
+  const date = new Date(normalizedDate);
+
+  if (Number.isNaN(date.getTime())) {
+    return adminDashboardCopy.values.invalidDate;
+  }
+
+  return new Intl.DateTimeFormat("es-EC", {
+    timeZone: ECUADOR_TIME_ZONE,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(date);
+};
+
+const formatAuditData = (data) => {
+  if (!data) {
+    return null;
+  }
+
+  return {
+    id: data.id,
+    userId: data.user_id,
+    originalText: data.original_text,
+    analyzedText: data.analyzed_text,
+    verdict: data.verdict,
+    explanation: data.explanation,
+    keywords: data.keywords,
+
+    isDeleted:
+      data.is_deleted === true
+        ? adminDashboardCopy.values.yes
+        : adminDashboardCopy.values.no,
+
+    createdAt: formatDate(data.created_at),
+    updatedAt: formatDate(data.updated_at),
+  };
+};
+
+const AuditDataField = ({ label, value }) => {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return null;
+  }
+
+  return (
+    <div>
+      <p className="font-semibold text-[#7B5F49]">
+        {label}
+      </p>
+
+      <p className="whitespace-pre-wrap break-words text-[#5B3F2D]">
+        {String(value)}
+      </p>
+    </div>
+  );
+};
+
+const AuditDataCard = ({ title, data }) => {
+  if (!data) {
+    return null;
+  }
+
+  return (
+    <div className="mt-4">
+      <p className="mb-2 text-sm font-semibold text-[#5B3F2D]">
+        {title}
+      </p>
+
+      <div className="rounded-xl bg-[#F8F4F0] p-4">
+        <div className="space-y-3 text-sm">
+
+          <AuditDataField
+            label={adminDashboardCopy.fields.id}
+            value={data.id}
+          />
+
+          <AuditDataField
+            label={adminDashboardCopy.fields.user_id}
+            value={data.userId}
+          />
+
+          <AuditDataField
+            label={adminDashboardCopy.fields.verdict}
+            value={data.verdict}
+          />
+
+          <AuditDataField
+            label={adminDashboardCopy.fields.is_deleted}
+            value={data.isDeleted}
+          />
+
+          <AuditDataField
+            label={adminDashboardCopy.fields.created_at}
+            value={data.createdAt}
+          />
+
+          <AuditDataField
+            label={adminDashboardCopy.fields.updated_at}
+            value={data.updatedAt}
+          />
+
+          <AuditDataField
+            label={adminDashboardCopy.fields.original_text}
+            value={data.originalText}
+          />
+
+          <AuditDataField
+            label={adminDashboardCopy.fields.analyzed_text}
+            value={data.analyzedText}
+          />
+
+          <AuditDataField
+            label={adminDashboardCopy.fields.explanation}
+            value={data.explanation}
+          />
+
+          <AuditDataField
+            label={adminDashboardCopy.fields.keywords}
+            value={
+              Array.isArray(data.keywords)
+                ? data.keywords.join(" · ")
+                : data.keywords
+            }
+          />
+
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const AuditHistory = ({ analysisId = null }) => {
   const [auditLogs, setAuditLogs] = useState([]);
@@ -19,7 +176,7 @@ const AuditHistory = ({ analysisId = null }) => {
       } catch (err) {
         setError(
           err?.message ||
-            "No fue posible obtener el historial de auditoría.",
+            adminDashboardCopy.errors.audit,
         );
       } finally {
         setIsLoading(false);
@@ -39,8 +196,10 @@ const AuditHistory = ({ analysisId = null }) => {
 
   if (error) {
     return (
-      <div className="mt-8 rounded-xl bg-red-50 p-4 text-sm text-red-700">
-        {error}
+      <div className="mt-8 rounded-xl bg-[#FBEAE8] p-4">
+        <p className="text-sm text-[#C3564F]">
+          {error}
+        </p>
       </div>
     );
   }
@@ -48,8 +207,8 @@ const AuditHistory = ({ analysisId = null }) => {
   if (!auditLogs.length) {
     return (
       <div className="mt-8 rounded-2xl bg-white p-6 text-center shadow-sm">
-        <p className="text-[#7b5f49]">
-          No hay registros de auditoría disponibles.
+        <p className="text-[#7B5F49]">
+          {adminDashboardCopy.audit.noRecords}
         </p>
       </div>
     );
@@ -57,76 +216,102 @@ const AuditHistory = ({ analysisId = null }) => {
 
   return (
     <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
+
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-[#5b3f2d]">
-          Audit History
+        <h2 className="text-2xl font-bold text-[#5B3F2D]">
+          {adminDashboardCopy.audit.title}
         </h2>
 
-        <p className="mt-1 text-sm text-[#7b5f49]">
-          Registro de cambios realizados sobre los análisis.
+        <p className="mt-1 text-sm text-[#7B5F49]">
+          {adminDashboardCopy.audit.description}
         </p>
       </div>
 
       <div className="space-y-4">
-        {auditLogs.map((log) => (
-          <article
-            key={log.id}
-            className="rounded-xl border border-[#eadfd5] p-4"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="font-semibold text-[#5b3f2d]">
-                {log.operation}
-              </span>
 
-              <span className="text-sm text-[#a6886a]">
-                {new Date(log.createdAt).toLocaleString()}
-              </span>
-            </div>
+        {auditLogs.map((log) => {
+          const previousData = formatAuditData(
+            log.previousData,
+          );
 
-            <div className="mt-3 text-sm text-[#7b5f49]">
-              {log.user ? (
-                <>
-                  <p>
-                    <strong>User:</strong>{" "}
-                    {log.user.firstName} {log.user.lastName}
-                  </p>
+          const newData = formatAuditData(
+            log.newData,
+          );
 
-                  <p>
-                    <strong>Email:</strong> {log.user.email}
-                  </p>
-                </>
-              ) : (
-                <p>
-                  <strong>User:</strong> Unknown
-                </p>
-              )}
-            </div>
+          const operation =
+            adminDashboardCopy.operations[
+              log.operation
+            ] ||
+            adminDashboardCopy.operations.UNKNOWN;
 
-            {log.previousData && (
-              <div className="mt-4">
-                <p className="mb-1 text-sm font-semibold text-[#5b3f2d]">
-                  Previous Data
-                </p>
+          return (
+            <article
+              key={log.id}
+              className="rounded-xl border border-[#EADFD5] p-4"
+            >
 
-                <pre className="overflow-x-auto rounded-lg bg-[#f8f4f0] p-3 text-xs text-[#5b3f2d]">
-                  {JSON.stringify(log.previousData, null, 2)}
-                </pre>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+
+                <span className="font-semibold text-[#5B3F2D]">
+                  {operation}
+                </span>
+
+                <span className="text-sm text-[#A6886A]">
+                  {formatDate(log.createdAt)}
+                </span>
+
               </div>
-            )}
 
-            {log.newData && (
-              <div className="mt-4">
-                <p className="mb-1 text-sm font-semibold text-[#5b3f2d]">
-                  New Data
-                </p>
+              <div className="mt-3 text-sm text-[#7B5F49]">
 
-                <pre className="overflow-x-auto rounded-lg bg-[#f8f4f0] p-3 text-xs text-[#5b3f2d]">
-                  {JSON.stringify(log.newData, null, 2)}
-                </pre>
+                {log.user ? (
+                  <>
+                    <p>
+                      <strong>
+                        {adminDashboardCopy.audit.user}:
+                      </strong>{" "}
+                      {log.user.firstName}{" "}
+                      {log.user.lastName}
+                    </p>
+
+                    <p>
+                      <strong>
+                        {adminDashboardCopy.fields.email}:
+                      </strong>{" "}
+                      {log.user.email}
+                    </p>
+                  </>
+                ) : (
+                  <p>
+                    <strong>
+                      {adminDashboardCopy.audit.user}:
+                    </strong>{" "}
+                    {adminDashboardCopy.audit.unknownUser}
+                  </p>
+                )}
+
               </div>
-            )}
-          </article>
-        ))}
+
+              <AuditDataCard
+                title={
+                  adminDashboardCopy.audit
+                    .previousData
+                }
+                data={previousData}
+              />
+
+              <AuditDataCard
+                title={
+                  adminDashboardCopy.audit
+                    .newData
+                }
+                data={newData}
+              />
+
+            </article>
+          );
+        })}
+
       </div>
     </section>
   );

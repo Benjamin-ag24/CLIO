@@ -28,7 +28,8 @@ const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isAuditView = location.pathname === ROUTE_PATHS.AUDIT;
+  const isAuditView =
+    location.pathname === ROUTE_PATHS.AUDIT;
 
   const [content, setContent] = useState("");
   const [report, setReport] = useState(null);
@@ -61,8 +62,8 @@ const Home = () => {
 
       const analysisResult = await analyzeText(content);
 
-      const keyTerms = analysisCopy.keyTerms.filter((term) =>
-        normalized.includes(term),
+      const keyTerms = analysisCopy.keyTerms.filter(
+        (term) => normalized.includes(term),
       );
 
       const indicators =
@@ -104,15 +105,13 @@ const Home = () => {
   };
 
   const selectAnalysis = (item) => {
-    navigate(ROUTE_PATHS.ANALYSIS_BY_ID(item.id));
+    navigate(
+      ROUTE_PATHS.ANALYSIS_BY_ID(item.id),
+    );
   };
 
   const showAnalysis = () => {
     navigate(ROUTE_PATHS.DASHBOARD);
-  };
-
-  const showAudit = () => {
-    navigate(ROUTE_PATHS.AUDIT);
   };
 
   const handleLogout = () => {
@@ -130,11 +129,10 @@ const Home = () => {
         refreshTrigger={refreshTrigger}
         onNewAnalysis={resetAnalysis}
         onSelectAnalysis={selectAnalysis}
-        onViewAudit={showAudit}
       />
 
       <div className="mx-auto max-w-6xl px-6 py-8">
-        <div className="flex justify-end items-center gap-4 mb-4">
+        <div className="mb-4 flex items-center justify-end gap-4">
           {isAuditView && (
             <Button
               variant="text"
@@ -146,7 +144,9 @@ const Home = () => {
 
           <Button
             variant="text"
-            onClick={() => setIsSidebarOpen(true)}
+            onClick={() =>
+              setIsSidebarOpen(true)
+            }
           >
             {homePageCopy.actions.history}
           </Button>
@@ -163,16 +163,16 @@ const Home = () => {
 
         {!isAuditView ? (
           <>
-            <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold text-[#5b3f2d] tracking-tight">
+            <div className="mb-8 text-center">
+              <h1 className="text-3xl font-bold tracking-tight text-[#5b3f2d] md:text-4xl">
                 {homePageCopy.title}
               </h1>
 
-              <p className="mt-3 text-[#7b5f49] text-sm md:text-base max-w-2xl mx-auto">
+              <p className="mx-auto mt-3 max-w-2xl text-sm text-[#7b5f49] md:text-base">
                 {homePageCopy.description}
               </p>
 
-              <p className="mt-1 text-[#a6886a] text-sm italic">
+              <p className="mt-1 text-sm italic text-[#a6886a]">
                 {homePageCopy.example}
               </p>
             </div>
@@ -201,7 +201,7 @@ const Home = () => {
             )}
 
             {status === "result" && (
-              <div className="transition-all duration-500 ease-in opacity-100">
+              <div className="opacity-100 transition-all duration-500 ease-in">
                 <ReportPanel
                   report={report}
                   onReset={resetAnalysis}
@@ -209,11 +209,11 @@ const Home = () => {
               </div>
             )}
 
-            <div className="grid gap-6 md:grid-cols-3 mt-12">
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
               {featureList.map((feature) => (
                 <div
                   key={feature.title}
-                  className="rounded-2xl bg-white p-6 shadow-[0_8px_30px_-12px_rgba(91,55,35,0.2)] hover:shadow-[0_16px_40px_-16px_rgba(91,55,35,0.25)] transition-shadow duration-300"
+                  className="rounded-2xl bg-white p-6 shadow-[0_8px_30px_-12px_rgba(91,55,35,0.2)] transition-shadow duration-300 hover:shadow-[0_16px_40px_-16px_rgba(91,55,35,0.25)]"
                 >
                   <div
                     className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl text-xl ${feature.accent} text-white shadow-sm`}

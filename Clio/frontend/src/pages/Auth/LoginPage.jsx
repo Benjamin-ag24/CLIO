@@ -38,11 +38,13 @@ const LoginPage = () => {
     return true;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError("");
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
     setIsLoading(true);
 
@@ -51,11 +53,22 @@ const LoginPage = () => {
 
       saveAuthSession(data.token, data.user);
 
-      navigate(ROUTE_PATHS.DASHBOARD, {
-        replace: true,
-      });
+      if (data.user?.role === "admin") {
+        navigate(ROUTE_PATHS.ADMIN, {
+          replace: true,
+        });
+      } else {
+        navigate(ROUTE_PATHS.DASHBOARD, {
+          replace: true,
+        });
+      }
     } catch (err) {
-      setError(err.message || authValidationMessages.defaultLoginError);
+      console.error("LOGIN ERROR:", err);
+
+      setError(
+        err?.message ||
+          authValidationMessages.defaultLoginError,
+      );
     } finally {
       setIsLoading(false);
     }
@@ -75,12 +88,17 @@ const LoginPage = () => {
             {authCopy.login.description}
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+          >
             <TextField
               label={authCopy.login.fields.email}
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(event) =>
+                setEmail(event.target.value)
+              }
               placeholder={authCopy.login.placeholders.email}
             />
 
@@ -88,11 +106,19 @@ const LoginPage = () => {
               label={authCopy.login.fields.password}
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={authCopy.login.placeholders.password}
+              onChange={(event) =>
+                setPassword(event.target.value)
+              }
+              placeholder={
+                authCopy.login.placeholders.password
+              }
             />
 
-            {error && <Alert variant="error">{error}</Alert>}
+            {error && (
+              <Alert variant="error">
+                {error}
+              </Alert>
+            )}
 
             <Button
               type="submit"
@@ -108,10 +134,13 @@ const LoginPage = () => {
 
           <p className="text-center text-sm text-[#93816F] mt-6">
             {authCopy.login.footer.noAccount}{" "}
+
             <Button
               variant="text"
               className="text-[#6FA8C9] font-semibold hover:underline hover:text-[#6FA8C9]"
-              onClick={() => navigate(ROUTE_PATHS.REGISTER)}
+              onClick={() =>
+                navigate(ROUTE_PATHS.REGISTER)
+              }
             >
               {authCopy.login.footer.action}
             </Button>
