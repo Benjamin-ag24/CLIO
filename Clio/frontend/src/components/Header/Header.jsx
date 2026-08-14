@@ -1,3 +1,4 @@
+import logoImage from "../../assets/logo.png";
 import {
   headerContainerStyles,
   headerNavStyles,
@@ -13,7 +14,7 @@ const Header = () => {
       <nav className={headerNavStyles}>
         <div className={logoWrapperStyles}>
           <div className={logoBoxStyles}>
-            <img src="logo/logo.png" className={logoImageStyles} />
+            <img src={logoImage} alt="Clio" className={logoImageStyles} />
           </div>
           <span className={brandNameStyles}>Clio</span>
         </div>
