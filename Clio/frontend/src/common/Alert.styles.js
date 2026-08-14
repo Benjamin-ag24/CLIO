@@ -1,0 +1,2 @@
+export const errorAlertStyles = "rounded-xl bg-[#FBEAE8] border border-[#EFC9C5] text-[#C3564F] text-sm px-4 py-3";
+export const successAlertStyles = "rounded-xl bg-[#EAF5EC] border border-[#C9E4CE] text-[#3E7C50] text-sm px-4 py-3";

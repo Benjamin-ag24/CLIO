@@ -7,6 +7,44 @@ import {
 } from "../services/analysisService";
 import Button from "../common/Button";
 import { analysisCopy } from "../constants/analysisConstants";
+import {
+  overlayStyles,
+  asideBaseStyles,
+  asideOpenStyles,
+  asideClosedStyles,
+  sidebarWrapperStyles,
+  sidebarHeaderStyles,
+  sidebarTitleStyles,
+  closeButtonStyles,
+  newAnalysisWrapperStyles,
+  newAnalysisButtonStyles,
+  listWrapperStyles,
+  loadingTextStyles,
+  errorTextStyles,
+  emptyTextStyles,
+  analysisItemStyles,
+  itemHeaderStyles,
+  verdictBadgeStyles,
+  itemDateStyles,
+  itemTextStyles,
+  itemActionsStyles,
+  editButtonStyles,
+  deleteButtonStyles,
+  modalOverlayStyles,
+  editModalBoxStyles,
+  deleteModalBoxStyles,
+  modalTitleStyles,
+  modalSubtitleStyles,
+  editFieldWrapperStyles,
+  editLabelStyles,
+  editTextareaStyles,
+  modalActionsStyles,
+  deleteConfirmTextStyles,
+  deletePreviewBoxStyles,
+  deletePreviewTextStyles,
+  deleteWarningTextStyles,
+  deleteButtonDangerStyles,
+} from "./Sidebar.styles";
 
 const VERDICT_STYLES = {
   veraz: {
@@ -178,41 +216,36 @@ const Sidebar = ({
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/30 z-40"
+          className={overlayStyles}
           onClick={onClose}
         />
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-full w-[320px] bg-[#FBFAF6]
-                    border-r border-[#E9E1D3] z-50
-                    transform transition-transform duration-300 ease-in-out
-                    ${
-                      isOpen
-                        ? "translate-x-0"
-                        : "-translate-x-full"
-                    }`}
+        className={`${asideBaseStyles} ${
+          isOpen ? asideOpenStyles : asideClosedStyles
+        }`}
       >
-        <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between px-5 py-5 border-b border-[#E9E1D3]">
-            <h2 className="text-lg font-bold text-[#4A3226]">
+        <div className={sidebarWrapperStyles}>
+          <div className={sidebarHeaderStyles}>
+            <h2 className={sidebarTitleStyles}>
               {analysisCopy.sidebar.title}
             </h2>
 
             <Button
               variant="text"
               onClick={onClose}
-              className="text-xl leading-none"
+              className={closeButtonStyles}
               aria-label={analysisCopy.sidebar.closeLabel}
             >
               ✕
             </Button>
           </div>
 
-          <div className="px-5 pt-4">
+          <div className={newAnalysisWrapperStyles}>
             <Button
               variant="accent"
-              className="w-full"
+              className={newAnalysisButtonStyles}
               onClick={() => {
                 onNewAnalysis();
                 onClose();
@@ -222,15 +255,15 @@ const Sidebar = ({
             </Button>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2">
+          <div className={listWrapperStyles}>
             {isLoading && (
-              <p className="text-sm text-[#93816F] text-center py-6">
+              <p className={loadingTextStyles}>
                 {analysisCopy.sidebar.loading}
               </p>
             )}
 
             {!isLoading && error && (
-              <p className="text-sm text-[#C3564F] text-center py-6">
+              <p className={errorTextStyles}>
                 {error}
               </p>
             )}
@@ -238,7 +271,7 @@ const Sidebar = ({
             {!isLoading &&
               !error &&
               analyses.length === 0 && (
-                <p className="text-sm text-[#93816F] text-center py-6">
+                <p className={emptyTextStyles}>
                   {analysisCopy.sidebar.empty}
                 </p>
               )}
@@ -257,14 +290,11 @@ const Sidebar = ({
                       onSelectAnalysis(item);
                       onClose();
                     }}
-                    className="w-full text-left rounded-xl cursor-pointer
-                               border border-[#E9E1D3] bg-white
-                               px-4 py-3 hover:border-[#6FA8C9]
-                               hover:bg-[#FBFAF6] transition"
+                    className={analysisItemStyles}
                   >
-                    <div className="flex items-center justify-between mb-1.5">
+                    <div className={itemHeaderStyles}>
                       <span
-                        className="text-xs font-bold px-2 py-0.5 rounded-full"
+                        className={verdictBadgeStyles}
                         style={{
                           backgroundColor: style.bg,
                           color: style.text,
@@ -273,19 +303,19 @@ const Sidebar = ({
                         {style.label}
                       </span>
 
-                      <span className="text-xs text-[#B3A392]">
+                      <span className={itemDateStyles}>
                         {formatDate(item.createdAt)}
                       </span>
                     </div>
 
-                    <p className="text-sm text-[#4A3226] leading-snug">
+                    <p className={itemTextStyles}>
                       {truncateText(item.originalText)}
                     </p>
 
-                    <div className="flex gap-3 mt-2">
+                    <div className={itemActionsStyles}>
                       <Button
                         variant="text"
-                        className="text-[#6FA8C9] hover:text-[#4A3226]"
+                        className={editButtonStyles}
                         onClick={(event) =>
                           openEditModal(event, item)
                         }
@@ -295,7 +325,7 @@ const Sidebar = ({
 
                       <Button
                         variant="text"
-                        className="text-[#C3564F] hover:text-[#4A3226]"
+                        className={deleteButtonStyles}
                         onClick={(event) =>
                           openDeleteModal(event, item)
                         }
@@ -313,26 +343,26 @@ const Sidebar = ({
 
       {editingAnalysis && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4"
+          className={modalOverlayStyles}
           onClick={closeEditModal}
         >
           <div
-            className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"
+            className={editModalBoxStyles}
             onClick={(event) => event.stopPropagation()}
           >
-            <h2 className="text-2xl font-bold text-[#4A3226]">
+            <h2 className={modalTitleStyles}>
               Editar análisis
             </h2>
 
-            <p className="mt-2 text-sm text-[#93816F]">
+            <p className={modalSubtitleStyles}>
               Modifica el texto del análisis y vuelve a
               analizarlo para obtener un nuevo resultado.
             </p>
 
-            <div className="mt-5">
+            <div className={editFieldWrapperStyles}>
               <label
                 htmlFor="edit-analysis-text"
-                className="mb-2 block text-sm font-semibold text-[#4A3226]"
+                className={editLabelStyles}
               >
                 Texto del análisis
               </label>
@@ -345,17 +375,12 @@ const Sidebar = ({
                 }
                 rows={8}
                 disabled={isSavingEdit}
-                className="w-full resize-none rounded-xl border border-[#E9E1D3]
-                           bg-[#FBFAF6] p-4 text-sm text-[#4A3226]
-                           outline-none transition
-                           focus:border-[#6FA8C9]
-                           focus:ring-2 focus:ring-[#6FA8C9]/20
-                           disabled:opacity-60"
+                className={editTextareaStyles}
                 placeholder="Escribe el texto que deseas analizar..."
               />
             </div>
 
-            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <div className={modalActionsStyles}>
               <Button
                 variant="secondary"
                 type="button"
@@ -386,24 +411,24 @@ const Sidebar = ({
 
       {deletingAnalysis && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4"
+          className={modalOverlayStyles}
           onClick={closeDeleteModal}
         >
           <div
-            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+            className={deleteModalBoxStyles}
             onClick={(event) => event.stopPropagation()}
           >
-            <h2 className="text-2xl font-bold text-[#4A3226]">
+            <h2 className={modalTitleStyles}>
               Eliminar análisis
             </h2>
 
-            <p className="mt-3 text-sm leading-6 text-[#7B5F49]">
+            <p className={deleteConfirmTextStyles}>
               ¿Estás seguro de que deseas eliminar este
               análisis?
             </p>
 
-            <div className="mt-4 rounded-xl bg-[#FBFAF6] p-4">
-              <p className="text-sm leading-6 text-[#4A3226]">
+            <div className={deletePreviewBoxStyles}>
+              <p className={deletePreviewTextStyles}>
                 {truncateText(
                   deletingAnalysis.originalText,
                   180,
@@ -411,12 +436,12 @@ const Sidebar = ({
               </p>
             </div>
 
-            <p className="mt-4 text-xs leading-5 text-[#93816F]">
+            <p className={deleteWarningTextStyles}>
               El análisis dejará de aparecer en tu
               historial.
             </p>
 
-            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <div className={modalActionsStyles}>
               <Button
                 variant="secondary"
                 type="button"
@@ -431,7 +456,7 @@ const Sidebar = ({
                 type="button"
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="bg-[#C3564F] px-5 py-2.5 text-white rounded-lg hover:bg-[#A9433D]"
+                className={deleteButtonDangerStyles}
               >
                 {isDeleting
                   ? "Eliminando..."

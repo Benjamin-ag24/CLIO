@@ -1,8 +1,8 @@
+import { cardBaseStyles } from "./Card.styles";
+
 const Card = ({ children, className = "" }) => {
   return (
-    <div
-      className={`bg-white rounded-3xl border border-[#E9E1D3] shadow-sm p-8 ${className}`}
-    >
+    <div className={`${cardBaseStyles} ${className}`}>
       {children}
     </div>
   );

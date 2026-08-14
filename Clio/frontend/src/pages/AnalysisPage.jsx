@@ -13,6 +13,21 @@ import {
 import { analysisCopy } from "../constants/analysisConstants";
 import { ROUTE_PATHS } from "../routes/routePaths";
 
+import {
+  pageWrapperStyles,
+  pageWrapperNoPaddingStyles,
+  contentWrapperStyles,
+  contentWrapperWithPaddingStyles,
+  backButtonStyles,
+  backButtonTopStyles,
+  titleWrapperStyles,
+  titleStyles,
+  subtitleStyles,
+  originalTextBoxStyles,
+  originalTextTitleStyles,
+  originalTextContentStyles,
+} from "./AnalysisPage.styles";
+
 const AnalysisPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -59,8 +74,8 @@ const AnalysisPage = () => {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#F7F2EC] px-6 py-8">
-        <div className="mx-auto max-w-6xl">
+      <main className={pageWrapperStyles}>
+        <div className={contentWrapperStyles}>
           <Loading />
         </div>
       </main>
@@ -69,8 +84,8 @@ const AnalysisPage = () => {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-[#F7F2EC] px-6 py-8">
-        <div className="mx-auto max-w-6xl">
+      <main className={pageWrapperStyles}>
+        <div className={contentWrapperStyles}>
           <ErrorBanner
             message={error.message}
             code={error.code}
@@ -79,7 +94,7 @@ const AnalysisPage = () => {
 
           <Button
             variant="text"
-            className="mt-4"
+            className={backButtonStyles}
             onClick={() => navigate(ROUTE_PATHS.DASHBOARD)}
           >
             Back to Analysis
@@ -101,32 +116,32 @@ const AnalysisPage = () => {
   };
 
   return (
-    <main className="min-h-screen bg-[#F7F2EC]">
-      <div className="mx-auto max-w-6xl px-6 py-8">
+    <main className={pageWrapperNoPaddingStyles}>
+      <div className={contentWrapperWithPaddingStyles}>
         <Button
           variant="text"
           onClick={() => navigate(ROUTE_PATHS.DASHBOARD)}
-          className="mb-6"
+          className={backButtonTopStyles}
         >
           Back to Analysis
         </Button>
 
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#5b3f2d]">
+        <div className={titleWrapperStyles}>
+          <h1 className={titleStyles}>
             Analysis
           </h1>
 
-          <p className="mt-2 text-[#7b5f49]">
+          <p className={subtitleStyles}>
             Analysis #{analysis.id}
           </p>
         </div>
 
-        <div className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-[#5b3f2d] mb-3">
+        <div className={originalTextBoxStyles}>
+          <h2 className={originalTextTitleStyles}>
             Original Text
           </h2>
 
-          <p className="text-sm leading-relaxed text-[#7b5f49] whitespace-pre-wrap">
+          <p className={originalTextContentStyles}>
             {analysis.originalText}
           </p>
         </div>

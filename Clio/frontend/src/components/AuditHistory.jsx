@@ -3,6 +3,29 @@ import { useEffect, useState } from "react";
 import { getAuditLog } from "../services/auditService";
 import Loading from "../common/Loading";
 import adminDashboardCopy from "../constants/adminDashboardConstants";
+import {
+  fieldLabelStyles,
+  fieldValueStyles,
+  dataCardWrapperStyles,
+  dataCardTitleStyles,
+  dataCardBoxStyles,
+  dataCardListStyles,
+  loadingWrapperStyles,
+  errorWrapperStyles,
+  errorTextStyles,
+  emptyWrapperStyles,
+  emptyTextStyles,
+  sectionWrapperStyles,
+  sectionHeaderStyles,
+  sectionTitleStyles,
+  sectionDescriptionStyles,
+  logsListStyles,
+  logArticleStyles,
+  logHeaderStyles,
+  logOperationStyles,
+  logDateStyles,
+  logUserInfoStyles,
+} from "./AuditHistory.styles";
 
 const ECUADOR_TIME_ZONE = "America/Guayaquil";
 
@@ -74,11 +97,11 @@ const AuditDataField = ({ label, value }) => {
 
   return (
     <div>
-      <p className="font-semibold text-[#7B5F49]">
+      <p className={fieldLabelStyles}>
         {label}
       </p>
 
-      <p className="whitespace-pre-wrap break-words text-[#5B3F2D]">
+      <p className={fieldValueStyles}>
         {String(value)}
       </p>
     </div>
@@ -91,13 +114,13 @@ const AuditDataCard = ({ title, data }) => {
   }
 
   return (
-    <div className="mt-4">
-      <p className="mb-2 text-sm font-semibold text-[#5B3F2D]">
+    <div className={dataCardWrapperStyles}>
+      <p className={dataCardTitleStyles}>
         {title}
       </p>
 
-      <div className="rounded-xl bg-[#F8F4F0] p-4">
-        <div className="space-y-3 text-sm">
+      <div className={dataCardBoxStyles}>
+        <div className={dataCardListStyles}>
 
           <AuditDataField
             label={adminDashboardCopy.fields.id}
@@ -188,7 +211,7 @@ const AuditHistory = ({ analysisId = null }) => {
 
   if (isLoading) {
     return (
-      <div className="mt-8">
+      <div className={loadingWrapperStyles}>
         <Loading />
       </div>
     );
@@ -196,8 +219,8 @@ const AuditHistory = ({ analysisId = null }) => {
 
   if (error) {
     return (
-      <div className="mt-8 rounded-xl bg-[#FBEAE8] p-4">
-        <p className="text-sm text-[#C3564F]">
+      <div className={errorWrapperStyles}>
+        <p className={errorTextStyles}>
           {error}
         </p>
       </div>
@@ -206,8 +229,8 @@ const AuditHistory = ({ analysisId = null }) => {
 
   if (!auditLogs.length) {
     return (
-      <div className="mt-8 rounded-2xl bg-white p-6 text-center shadow-sm">
-        <p className="text-[#7B5F49]">
+      <div className={emptyWrapperStyles}>
+        <p className={emptyTextStyles}>
           {adminDashboardCopy.audit.noRecords}
         </p>
       </div>
@@ -215,19 +238,19 @@ const AuditHistory = ({ analysisId = null }) => {
   }
 
   return (
-    <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
+    <section className={sectionWrapperStyles}>
 
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-[#5B3F2D]">
+      <div className={sectionHeaderStyles}>
+        <h2 className={sectionTitleStyles}>
           {adminDashboardCopy.audit.title}
         </h2>
 
-        <p className="mt-1 text-sm text-[#7B5F49]">
+        <p className={sectionDescriptionStyles}>
           {adminDashboardCopy.audit.description}
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className={logsListStyles}>
 
         {auditLogs.map((log) => {
           const previousData = formatAuditData(
@@ -247,22 +270,22 @@ const AuditHistory = ({ analysisId = null }) => {
           return (
             <article
               key={log.id}
-              className="rounded-xl border border-[#EADFD5] p-4"
+              className={logArticleStyles}
             >
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className={logHeaderStyles}>
 
-                <span className="font-semibold text-[#5B3F2D]">
+                <span className={logOperationStyles}>
                   {operation}
                 </span>
 
-                <span className="text-sm text-[#A6886A]">
+                <span className={logDateStyles}>
                   {formatDate(log.createdAt)}
                 </span>
 
               </div>
 
-              <div className="mt-3 text-sm text-[#7B5F49]">
+              <div className={logUserInfoStyles}>
 
                 {log.user ? (
                   <>

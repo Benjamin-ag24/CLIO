@@ -16,6 +16,18 @@ import {
 
 import { ROUTE_PATHS } from "../../routes/routePaths";
 
+import {
+  pageWrapperStyles,
+  contentWrapperStyles,
+  titleStyles,
+  descriptionStyles,
+  formStyles,
+  submitButtonStyles,
+  footerTextStyles,
+  footerActionStyles,
+  brandTextStyles,
+} from "./LoginPage.styles";
+
 const LoginPage = () => {
   const navigate = useNavigate();
 
@@ -75,22 +87,22 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#F7F2EC] flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <div className={pageWrapperStyles}>
+      <div className={contentWrapperStyles}>
         <Logo />
 
         <Card>
-          <h2 className="text-2xl font-bold text-[#4A3226] mb-1">
+          <h2 className={titleStyles}>
             {authCopy.login.title}
           </h2>
 
-          <p className="text-sm text-[#93816F] mb-6">
+          <p className={descriptionStyles}>
             {authCopy.login.description}
           </p>
 
           <form
             onSubmit={handleSubmit}
-            className="space-y-4"
+            className={formStyles}
           >
             <TextField
               label={authCopy.login.fields.email}
@@ -123,7 +135,7 @@ const LoginPage = () => {
             <Button
               type="submit"
               variant="accent"
-              className="w-full py-3.5 mt-2"
+              className={submitButtonStyles}
               disabled={isLoading}
             >
               {isLoading
@@ -132,12 +144,12 @@ const LoginPage = () => {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-[#93816F] mt-6">
+          <p className={footerTextStyles}>
             {authCopy.login.footer.noAccount}{" "}
 
             <Button
               variant="text"
-              className="text-[#6FA8C9] font-semibold hover:underline hover:text-[#6FA8C9]"
+              className={footerActionStyles}
               onClick={() =>
                 navigate(ROUTE_PATHS.REGISTER)
               }
@@ -147,7 +159,7 @@ const LoginPage = () => {
           </p>
         </Card>
 
-        <p className="text-center text-xs text-[#B3A392] mt-6 tracking-wide">
+        <p className={brandTextStyles}>
           {authCopy.login.brand}
         </p>
       </div>

@@ -18,6 +18,96 @@ import { getAuthToken } from "../services/authStorage";
 import Button from "../common/Button";
 import Loading from "../common/Loading";
 import adminDashboardCopy from "../constants/adminDashboardConstants";
+import {
+  emptyValueStyles,
+  tagsWrapperStyles,
+  tagBadgeStyles,
+  booleanValueStyles,
+  jsonValueStyles,
+  textValueStyles,
+  fieldCardStyles,
+  fieldLabelStyles,
+  mutedTextStyles,
+  changesStackStyles,
+  creationBannerStyles,
+  creationTitleStyles,
+  creationDescriptionStyles,
+  fieldsGridStyles,
+  deletionBannerStyles,
+  deletionTitleStyles,
+  deletionDescriptionStyles,
+  noChangeBoxStyles,
+  noChangeTextStyles,
+  changesListStyles,
+  changeCountBannerStyles,
+  changeCountTextStyles,
+  changeFieldHeaderStyles,
+  changeFieldNameStyles,
+  changedBadgeStyles,
+  changeCompareGridStyles,
+  beforeBoxStyles,
+  beforeLabelStyles,
+  afterBoxStyles,
+  afterLabelStyles,
+  fullPageStateWrapperStyles,
+  stateContentStyles,
+  errorCardStyles,
+  errorTitleStyles,
+  errorMessageStyles,
+  retryButtonStyles,
+  pageWrapperStyles,
+  pageHeaderStyles,
+  pageTitleStyles,
+  summaryGridStyles,
+  summaryCardStyles,
+  summaryCardValueStyles,
+  summaryCardVerazStyles,
+  summaryLabelVerazStyles,
+  summaryValueVerazStyles,
+  summaryCardDudosoStyles,
+  summaryLabelDudosoStyles,
+  summaryValueDudosoStyles,
+  summaryCardFalsoStyles,
+  summaryLabelFalsoStyles,
+  summaryValueFalsoStyles,
+  chartsGridStyles,
+  chartSectionTitleStyles,
+  emptyChartTextStyles,
+  pieChartWrapperStyles,
+  sectionCardStyles,
+  tableWrapperStyles,
+  tableBaseStyles,
+  tableHeaderRowStyles,
+  tableHeaderCellStyles,
+  tableRowStyles,
+  tableCellMutedStyles,
+  tableCellNameStyles,
+  tableCellTextStyles,
+  sectionHeaderRowStyles,
+  sectionTitleStyles,
+  sectionDescriptionStyles,
+  loadingBoxStyles,
+  apiHintTextStyles,
+  usersTableStyles,
+  usersCellMutedStyles,
+  usersCellNameStyles,
+  usersCellStyles,
+  roleBadgeStyles,
+  usersCellDateStyles,
+  auditTableStyles,
+  auditRowStyles,
+  auditUserNameStyles,
+  auditUserEmailStyles,
+  auditUnknownUserStyles,
+  detailsGroupStyles,
+  detailsSummaryStyles,
+  detailsArrowStyles,
+  detailsPanelStyles,
+  statusBadgeBaseStyles,
+  statusBadgeActiveStyles,
+  statusBadgeInactiveStyles,
+  operationBadgeBaseStyles,
+} from "./AdminDashboard.styles";
 
 ChartJS.register(
   CategoryScale,
@@ -450,7 +540,7 @@ const AdminDashboard = () => {
       value === ""
     ) {
       return (
-        <span className="italic text-[#B3A392]">
+        <span className={emptyValueStyles}>
           {
             adminDashboardCopy
               .values.noValue
@@ -462,7 +552,7 @@ const AdminDashboard = () => {
     if (Array.isArray(value)) {
       if (value.length === 0) {
         return (
-          <span className="italic text-[#B3A392]">
+          <span className={emptyValueStyles}>
             {
               adminDashboardCopy
                 .values.noValues
@@ -472,12 +562,12 @@ const AdminDashboard = () => {
       }
 
       return (
-        <div className="flex flex-wrap gap-2">
+        <div className={tagsWrapperStyles}>
           {value.map(
             (item, index) => (
               <span
                 key={`${item}-${index}`}
-                className="rounded-full bg-[#F1E8DE] px-3 py-1 text-xs font-medium text-[#7B5F49]"
+                className={tagBadgeStyles}
               >
                 {item}
               </span>
@@ -492,7 +582,7 @@ const AdminDashboard = () => {
       "boolean"
     ) {
       return (
-        <span className="font-medium">
+        <span className={booleanValueStyles}>
           {value
             ? adminDashboardCopy
                 .values.yes
@@ -507,7 +597,7 @@ const AdminDashboard = () => {
       "object"
     ) {
       return (
-        <pre className="overflow-auto rounded-lg bg-[#F7F2EC] p-3 text-xs text-[#4A3226]">
+        <pre className={jsonValueStyles}>
           {JSON.stringify(
             value,
             null,
@@ -518,7 +608,7 @@ const AdminDashboard = () => {
     }
 
     return (
-      <p className="whitespace-pre-wrap break-words text-sm text-[#4A3226]">
+      <p className={textValueStyles}>
         {String(value)}
       </p>
     );
@@ -537,9 +627,9 @@ const AdminDashboard = () => {
     return (
       <div
         key={field}
-        className="rounded-xl border border-[#E9E1D3] bg-white p-4"
+        className={fieldCardStyles}
       >
-        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[#93816F]">
+        <p className={fieldLabelStyles}>
           {getFieldLabel(field)}
         </p>
 
@@ -572,7 +662,7 @@ const AdminDashboard = () => {
     ) {
       if (!newData) {
         return (
-          <p className="text-sm text-[#93816F]">
+          <p className={mutedTextStyles}>
             {
               adminDashboardCopy
                 .audit.creation
@@ -583,9 +673,9 @@ const AdminDashboard = () => {
       }
 
       return (
-        <div className="space-y-3">
-          <div className="rounded-xl bg-[#EAF5EC] p-4">
-            <p className="text-sm font-semibold text-[#3E7C50]">
+        <div className={changesStackStyles}>
+          <div className={creationBannerStyles}>
+            <p className={creationTitleStyles}>
               {
                 adminDashboardCopy
                   .audit.creation
@@ -593,7 +683,7 @@ const AdminDashboard = () => {
               }
             </p>
 
-            <p className="mt-1 text-xs text-[#3E7C50]">
+            <p className={creationDescriptionStyles}>
               {
                 adminDashboardCopy
                   .audit.creation
@@ -602,7 +692,7 @@ const AdminDashboard = () => {
             </p>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className={fieldsGridStyles}>
             {Object.entries(
               newData,
             ).map(
@@ -625,7 +715,7 @@ const AdminDashboard = () => {
     ) {
       if (!previousData) {
         return (
-          <p className="text-sm text-[#93816F]">
+          <p className={mutedTextStyles}>
             {
               adminDashboardCopy
                 .audit.deletion
@@ -636,9 +726,9 @@ const AdminDashboard = () => {
       }
 
       return (
-        <div className="space-y-3">
-          <div className="rounded-xl bg-[#FBEAE8] p-4">
-            <p className="text-sm font-semibold text-[#C3564F]">
+        <div className={changesStackStyles}>
+          <div className={deletionBannerStyles}>
+            <p className={deletionTitleStyles}>
               {
                 adminDashboardCopy
                   .audit.deletion
@@ -646,7 +736,7 @@ const AdminDashboard = () => {
               }
             </p>
 
-            <p className="mt-1 text-xs text-[#C3564F]">
+            <p className={deletionDescriptionStyles}>
               {
                 adminDashboardCopy
                   .audit.deletion
@@ -655,7 +745,7 @@ const AdminDashboard = () => {
             </p>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className={fieldsGridStyles}>
             {Object.entries(
               previousData,
             ).map(
@@ -686,8 +776,8 @@ const AdminDashboard = () => {
         !changedFields.length
       ) {
         return (
-          <div className="rounded-xl bg-[#F7F2EC] p-4">
-            <p className="text-sm text-[#7B5F49]">
+          <div className={noChangeBoxStyles}>
+            <p className={noChangeTextStyles}>
               {
                 adminDashboardCopy
                   .audit.update
@@ -699,9 +789,9 @@ const AdminDashboard = () => {
       }
 
       return (
-        <div className="space-y-4">
-          <div className="rounded-xl bg-[#F1DFC0] p-4">
-            <p className="text-sm font-semibold text-[#8C6239]">
+        <div className={changesListStyles}>
+          <div className={changeCountBannerStyles}>
+            <p className={changeCountTextStyles}>
               {
                 changedFields.length
               }{" "}
@@ -724,16 +814,16 @@ const AdminDashboard = () => {
             }) => (
               <div
                 key={field}
-                className="rounded-xl border border-[#E9E1D3] bg-white p-4"
+                className={fieldCardStyles}
               >
-                <div className="mb-4 flex items-center justify-between">
-                  <p className="font-semibold text-[#4A3226]">
+                <div className={changeFieldHeaderStyles}>
+                  <p className={changeFieldNameStyles}>
                     {getFieldLabel(
                       field,
                     )}
                   </p>
 
-                  <span className="rounded-full bg-[#F1DFC0] px-3 py-1 text-xs font-semibold text-[#8C6239]">
+                  <span className={changedBadgeStyles}>
                     {
                       adminDashboardCopy
                         .audit.update
@@ -742,9 +832,9 @@ const AdminDashboard = () => {
                   </span>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="rounded-lg bg-[#FBEAE8] p-4">
-                    <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[#C3564F]">
+                <div className={changeCompareGridStyles}>
+                  <div className={beforeBoxStyles}>
+                    <p className={beforeLabelStyles}>
                       {
                         adminDashboardCopy
                           .audit.update
@@ -764,8 +854,8 @@ const AdminDashboard = () => {
                     )}
                   </div>
 
-                  <div className="rounded-lg bg-[#EAF5EC] p-4">
-                    <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[#3E7C50]">
+                  <div className={afterBoxStyles}>
+                    <p className={afterLabelStyles}>
                       {
                         adminDashboardCopy
                           .audit.update
@@ -793,8 +883,8 @@ const AdminDashboard = () => {
     }
 
     return (
-      <div className="rounded-xl bg-[#F7F2EC] p-4">
-        <p className="text-sm text-[#7B5F49]">
+      <div className={noChangeBoxStyles}>
+        <p className={noChangeTextStyles}>
           {
             adminDashboardCopy
               .audit
@@ -810,8 +900,8 @@ const AdminDashboard = () => {
     !statistics
   ) {
     return (
-      <div className="min-h-screen bg-[#F7F2EC] p-8">
-        <div className="mx-auto max-w-7xl">
+      <div className={fullPageStateWrapperStyles}>
+        <div className={stateContentStyles}>
           <Loading />
         </div>
       </div>
@@ -823,10 +913,10 @@ const AdminDashboard = () => {
     !statistics
   ) {
     return (
-      <div className="min-h-screen bg-[#F7F2EC] p-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="rounded-2xl border border-[#E9E1D3] bg-white p-6">
-            <h2 className="text-xl font-bold text-[#C3564F]">
+      <div className={fullPageStateWrapperStyles}>
+        <div className={stateContentStyles}>
+          <div className={errorCardStyles}>
+            <h2 className={errorTitleStyles}>
               {
                 adminDashboardCopy
                   .errors
@@ -834,7 +924,7 @@ const AdminDashboard = () => {
               }
             </h2>
 
-            <p className="mt-2 text-[#7B5F49]">
+            <p className={errorMessageStyles}>
               {error}
             </p>
 
@@ -843,7 +933,7 @@ const AdminDashboard = () => {
               onClick={
                 refreshDashboard
               }
-              className="mt-4"
+              className={retryButtonStyles}
             >
               {
                 adminDashboardCopy
@@ -1136,19 +1226,19 @@ const AdminDashboard = () => {
   };
 
   return (
-    <main className="min-h-screen bg-[#F7F2EC] px-6 py-8">
-      <div className="mx-auto max-w-7xl">
+    <main className={pageWrapperStyles}>
+      <div className={stateContentStyles}>
 
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className={pageHeaderStyles}>
           <div>
-            <h1 className="text-3xl font-bold text-[#4A3226]">
+            <h1 className={pageTitleStyles}>
               {
                 adminDashboardCopy
                   .title
               }
             </h1>
 
-            <p className="mt-2 text-[#7B5F49]">
+            <p className={errorMessageStyles}>
               {
                 adminDashboardCopy
                   .description
@@ -1170,10 +1260,10 @@ const AdminDashboard = () => {
           </Button>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+        <div className={summaryGridStyles}>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-[#93816F]">
+          <div className={summaryCardStyles}>
+            <p className={mutedTextStyles}>
               {
                 adminDashboardCopy
                   .summary
@@ -1181,13 +1271,13 @@ const AdminDashboard = () => {
               }
             </p>
 
-            <p className="mt-2 text-3xl font-bold text-[#4A3226]">
+            <p className={summaryCardValueStyles}>
               {totalAnalyses}
             </p>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-[#93816F]">
+          <div className={summaryCardStyles}>
+            <p className={mutedTextStyles}>
               {
                 adminDashboardCopy
                   .summary
@@ -1195,7 +1285,7 @@ const AdminDashboard = () => {
               }
             </p>
 
-            <p className="mt-2 text-3xl font-bold text-[#4A3226]">
+            <p className={summaryCardValueStyles}>
               {
                 Number(
                   summary.totalActiveUsers,
@@ -1204,8 +1294,8 @@ const AdminDashboard = () => {
             </p>
           </div>
 
-          <div className="rounded-2xl bg-[#EAF5EC] p-6">
-            <p className="text-sm text-[#3E7C50]">
+          <div className={summaryCardVerazStyles}>
+            <p className={summaryLabelVerazStyles}>
               {
                 adminDashboardCopy
                   .summary
@@ -1213,13 +1303,13 @@ const AdminDashboard = () => {
               }
             </p>
 
-            <p className="mt-2 text-3xl font-bold text-[#3E7C50]">
+            <p className={summaryValueVerazStyles}>
               {truthfulTotal}
             </p>
           </div>
 
-          <div className="rounded-2xl bg-[#F1DFC0] p-6">
-            <p className="text-sm text-[#8C6239]">
+          <div className={summaryCardDudosoStyles}>
+            <p className={summaryLabelDudosoStyles}>
               {
                 adminDashboardCopy
                   .summary
@@ -1227,13 +1317,13 @@ const AdminDashboard = () => {
               }
             </p>
 
-            <p className="mt-2 text-3xl font-bold text-[#8C6239]">
+            <p className={summaryValueDudosoStyles}>
               {uncertainTotal}
             </p>
           </div>
 
-          <div className="rounded-2xl bg-[#FBEAE8] p-6">
-            <p className="text-sm text-[#C3564F]">
+          <div className={summaryCardFalsoStyles}>
+            <p className={summaryLabelFalsoStyles}>
               {
                 adminDashboardCopy
                   .summary
@@ -1241,18 +1331,18 @@ const AdminDashboard = () => {
               }
             </p>
 
-            <p className="mt-2 text-3xl font-bold text-[#C3564F]">
+            <p className={summaryValueFalsoStyles}>
               {falseTotal}
             </p>
           </div>
 
         </div>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <div className={chartsGridStyles}>
 
-          <section className="rounded-2xl bg-white p-6 shadow-sm">
+          <section className={summaryCardStyles}>
 
-            <h2 className="mb-5 text-lg font-bold text-[#4A3226]">
+            <h2 className={chartSectionTitleStyles}>
               {
                 adminDashboardCopy
                   .charts
@@ -1291,7 +1381,7 @@ const AdminDashboard = () => {
                 }}
               />
             ) : (
-              <p className="py-10 text-center text-[#93816F]">
+              <p className={emptyChartTextStyles}>
                 {
                   adminDashboardCopy
                     .charts
@@ -1302,9 +1392,9 @@ const AdminDashboard = () => {
 
           </section>
 
-          <section className="rounded-2xl bg-white p-6 shadow-sm">
+          <section className={summaryCardStyles}>
 
-            <h2 className="mb-5 text-lg font-bold text-[#4A3226]">
+            <h2 className={chartSectionTitleStyles}>
               {
                 adminDashboardCopy
                   .charts
@@ -1314,7 +1404,7 @@ const AdminDashboard = () => {
 
             {totalAnalyses >
             0 ? (
-              <div className="mx-auto max-w-sm">
+              <div className={pieChartWrapperStyles}>
                 <Pie
                   data={
                     verdictData
@@ -1337,7 +1427,7 @@ const AdminDashboard = () => {
                 />
               </div>
             ) : (
-              <p className="py-10 text-center text-[#93816F]">
+              <p className={emptyChartTextStyles}>
                 {
                   adminDashboardCopy
                     .charts
@@ -1350,9 +1440,9 @@ const AdminDashboard = () => {
 
         </div>
 
-        <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
+        <section className={sectionCardStyles}>
 
-          <h2 className="mb-5 text-lg font-bold text-[#4A3226]">
+          <h2 className={chartSectionTitleStyles}>
             {
               adminDashboardCopy
                 .charts
@@ -1393,7 +1483,7 @@ const AdminDashboard = () => {
               }}
             />
           ) : (
-            <p className="py-10 text-center text-[#93816F]">
+            <p className={emptyChartTextStyles}>
               {
                 adminDashboardCopy
                   .charts
@@ -1404,9 +1494,9 @@ const AdminDashboard = () => {
 
         </section>
 
-        <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
+        <section className={sectionCardStyles}>
 
-          <h2 className="mb-5 text-lg font-bold text-[#4A3226]">
+          <h2 className={chartSectionTitleStyles}>
             {
               adminDashboardCopy
                 .users
@@ -1416,14 +1506,14 @@ const AdminDashboard = () => {
 
           {topUsers.length >
           0 ? (
-            <div className="overflow-x-auto">
+            <div className={tableWrapperStyles}>
 
-              <table className="w-full text-left">
+              <table className={tableBaseStyles}>
 
                 <thead>
-                  <tr className="border-b border-[#E9E1D3]">
+                  <tr className={tableHeaderRowStyles}>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .users
@@ -1431,7 +1521,7 @@ const AdminDashboard = () => {
                       }
                     </th>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .users
@@ -1439,7 +1529,7 @@ const AdminDashboard = () => {
                       }
                     </th>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .users
@@ -1461,14 +1551,14 @@ const AdminDashboard = () => {
                           user.userId ||
                           index
                         }
-                        className="border-b border-[#F0EAE2]"
+                        className={tableRowStyles}
                       >
 
-                        <td className="px-4 py-3 text-[#93816F]">
+                        <td className={tableCellMutedStyles}>
                           {index + 1}
                         </td>
 
-                        <td className="px-4 py-3 font-medium text-[#4A3226]">
+                        <td className={tableCellNameStyles}>
                           {
                             user.firstName
                           }{" "}
@@ -1477,7 +1567,7 @@ const AdminDashboard = () => {
                           }
                         </td>
 
-                        <td className="px-4 py-3 text-[#7B5F49]">
+                        <td className={tableCellTextStyles}>
                           {
                             user.analysisCount
                           }
@@ -1492,7 +1582,7 @@ const AdminDashboard = () => {
 
             </div>
           ) : (
-            <p className="py-10 text-center text-[#93816F]">
+            <p className={emptyChartTextStyles}>
               {
                 adminDashboardCopy
                   .users
@@ -1503,12 +1593,12 @@ const AdminDashboard = () => {
 
         </section>
 
-        <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
+        <section className={sectionCardStyles}>
 
-          <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div className={sectionHeaderRowStyles}>
 
             <div>
-              <h2 className="text-lg font-bold text-[#4A3226]">
+              <h2 className={sectionTitleStyles}>
                 {
                   adminDashboardCopy
                     .users
@@ -1517,7 +1607,7 @@ const AdminDashboard = () => {
                 }
               </h2>
 
-              <p className="mt-1 text-sm text-[#93816F]">
+              <p className={sectionDescriptionStyles}>
                 {
                   adminDashboardCopy
                     .users
@@ -1543,17 +1633,17 @@ const AdminDashboard = () => {
           </div>
 
           {isUsersLoading ? (
-            <div className="py-10">
+            <div className={loadingBoxStyles}>
               <Loading />
             </div>
           ) : usersError ? (
-            <div className="rounded-xl bg-[#FBEAE8] p-4">
+            <div className={deletionBannerStyles}>
 
-              <p className="text-sm text-[#C3564F]">
+              <p className={summaryLabelFalsoStyles}>
                 {usersError}
               </p>
 
-              <p className="mt-2 text-xs text-[#93816F]">
+              <p className={apiHintTextStyles}>
                 Make sure that the backend exposes:
                 {" "}
                 GET /api/admin/users
@@ -1562,7 +1652,7 @@ const AdminDashboard = () => {
             </div>
           ) : users.length ===
             0 ? (
-            <p className="py-10 text-center text-[#93816F]">
+            <p className={emptyChartTextStyles}>
               {
                 adminDashboardCopy
                   .users
@@ -1571,14 +1661,14 @@ const AdminDashboard = () => {
               }
             </p>
           ) : (
-            <div className="overflow-x-auto">
+            <div className={tableWrapperStyles}>
 
-              <table className="w-full min-w-[800px] text-left">
+              <table className={usersTableStyles}>
 
                 <thead>
-                  <tr className="border-b border-[#E9E1D3]">
+                  <tr className={tableHeaderRowStyles}>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .users
@@ -1587,7 +1677,7 @@ const AdminDashboard = () => {
                       }
                     </th>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .users
@@ -1596,7 +1686,7 @@ const AdminDashboard = () => {
                       }
                     </th>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .users
@@ -1605,7 +1695,7 @@ const AdminDashboard = () => {
                       }
                     </th>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .users
@@ -1614,7 +1704,7 @@ const AdminDashboard = () => {
                       }
                     </th>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .users
@@ -1623,7 +1713,7 @@ const AdminDashboard = () => {
                       }
                     </th>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .users
@@ -1643,14 +1733,14 @@ const AdminDashboard = () => {
                         key={
                           user.id
                         }
-                        className="border-b border-[#F0EAE2]"
+                        className={tableRowStyles}
                       >
 
-                        <td className="px-4 py-4 text-sm text-[#7B5F49]">
+                        <td className={usersCellMutedStyles}>
                           #{user.id}
                         </td>
 
-                        <td className="px-4 py-4 font-medium text-[#4A3226]">
+                        <td className={usersCellNameStyles}>
                           {
                             user.firstName
                           }{" "}
@@ -1659,15 +1749,15 @@ const AdminDashboard = () => {
                           }
                         </td>
 
-                        <td className="px-4 py-4 text-sm text-[#7B5F49]">
+                        <td className={usersCellMutedStyles}>
                           {
                             user.email
                           }
                         </td>
 
-                        <td className="px-4 py-4">
+                        <td className={usersCellStyles}>
 
-                          <span className="rounded-full bg-[#F1E8DE] px-3 py-1 text-xs font-semibold text-[#7B5F49]">
+                          <span className={roleBadgeStyles}>
                             {
                               user.role
                             }
@@ -1675,13 +1765,13 @@ const AdminDashboard = () => {
 
                         </td>
 
-                        <td className="px-4 py-4">
+                        <td className={usersCellStyles}>
 
                           <span
-                            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                            className={`${statusBadgeBaseStyles} ${
                               user.isActive
-                                ? "bg-[#EAF5EC] text-[#3E7C50]"
-                                : "bg-[#FBEAE8] text-[#C3564F]"
+                                ? statusBadgeActiveStyles
+                                : statusBadgeInactiveStyles
                             }`}
                           >
                             {user.isActive
@@ -1697,7 +1787,7 @@ const AdminDashboard = () => {
 
                         </td>
 
-                        <td className="px-4 py-4 text-sm text-[#93816F]">
+                        <td className={usersCellDateStyles}>
                           {formatDate(
                             user.createdAt ||
                               user.created_at,
@@ -1717,13 +1807,13 @@ const AdminDashboard = () => {
 
         </section>
 
-        <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
+        <section className={sectionCardStyles}>
 
-          <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div className={sectionHeaderRowStyles}>
 
             <div>
 
-              <h2 className="text-lg font-bold text-[#4A3226]">
+              <h2 className={sectionTitleStyles}>
                 {
                   adminDashboardCopy
                     .audit
@@ -1731,7 +1821,7 @@ const AdminDashboard = () => {
                 }
               </h2>
 
-              <p className="mt-1 text-sm text-[#93816F]">
+              <p className={sectionDescriptionStyles}>
                 {
                   adminDashboardCopy
                     .audit
@@ -1757,18 +1847,18 @@ const AdminDashboard = () => {
           </div>
 
           {isAuditLoading ? (
-            <div className="py-10">
+            <div className={loadingBoxStyles}>
               <Loading />
             </div>
           ) : auditError ? (
-            <div className="rounded-xl bg-[#FBEAE8] p-4">
-              <p className="text-sm text-[#C3564F]">
+            <div className={deletionBannerStyles}>
+              <p className={summaryLabelFalsoStyles}>
                 {auditError}
               </p>
             </div>
           ) : auditLogs.length ===
             0 ? (
-            <p className="py-10 text-center text-[#93816F]">
+            <p className={emptyChartTextStyles}>
               {
                 adminDashboardCopy
                   .audit
@@ -1776,14 +1866,14 @@ const AdminDashboard = () => {
               }
             </p>
           ) : (
-            <div className="overflow-x-auto">
+            <div className={tableWrapperStyles}>
 
-              <table className="w-full min-w-[850px] text-left">
+              <table className={auditTableStyles}>
 
                 <thead>
-                  <tr className="border-b border-[#E9E1D3]">
+                  <tr className={tableHeaderRowStyles}>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .audit
@@ -1791,7 +1881,7 @@ const AdminDashboard = () => {
                       }
                     </th>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .audit
@@ -1799,7 +1889,7 @@ const AdminDashboard = () => {
                       }
                     </th>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .audit
@@ -1807,7 +1897,7 @@ const AdminDashboard = () => {
                       }
                     </th>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .audit
@@ -1815,7 +1905,7 @@ const AdminDashboard = () => {
                       }
                     </th>
 
-                    <th className="px-4 py-3 text-sm font-semibold text-[#7B5F49]">
+                    <th className={tableHeaderCellStyles}>
                       {
                         adminDashboardCopy
                           .audit
@@ -1849,15 +1939,15 @@ const AdminDashboard = () => {
                           key={
                             log.id
                           }
-                          className="border-b border-[#F0EAE2] align-top"
+                          className={auditRowStyles}
                         >
 
-                          <td className="px-4 py-4">
+                          <td className={usersCellStyles}>
 
                             {log.user ? (
                               <div>
 
-                                <p className="font-medium text-[#4A3226]">
+                                <p className={auditUserNameStyles}>
                                   {
                                     log.user
                                       .firstName
@@ -1868,7 +1958,7 @@ const AdminDashboard = () => {
                                   }
                                 </p>
 
-                                <p className="text-xs text-[#93816F]">
+                                <p className={auditUserEmailStyles}>
                                   {
                                     log.user
                                       .email
@@ -1877,7 +1967,7 @@ const AdminDashboard = () => {
 
                               </div>
                             ) : (
-                              <span className="text-[#93816F]">
+                              <span className={auditUnknownUserStyles}>
                                 {
                                   adminDashboardCopy
                                     .audit
@@ -1888,10 +1978,10 @@ const AdminDashboard = () => {
 
                           </td>
 
-                          <td className="px-4 py-4">
+                          <td className={usersCellStyles}>
 
                             <span
-                              className={`rounded-full px-3 py-1 text-xs font-bold ${getOperationStyle(
+                              className={`${operationBadgeBaseStyles} ${getOperationStyle(
                                 log.operation,
                               )}`}
                             >
@@ -1904,24 +1994,24 @@ const AdminDashboard = () => {
 
                           </td>
 
-                          <td className="px-4 py-4 text-sm text-[#7B5F49]">
+                          <td className={usersCellMutedStyles}>
                             #{entityId}
                           </td>
 
-                          <td className="px-4 py-4 text-sm text-[#93816F]">
+                          <td className={usersCellDateStyles}>
                             {formatDate(
                               log.createdAt ||
                                 log.created_at,
                             )}
                           </td>
 
-                          <td className="px-4 py-4">
+                          <td className={usersCellStyles}>
 
-                            <details className="group">
+                            <details className={detailsGroupStyles}>
 
-                              <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-[#6FA8C9]">
+                              <summary className={detailsSummaryStyles}>
 
-                                <span className="transition-transform group-open:rotate-90">
+                                <span className={detailsArrowStyles}>
                                   ▶
                                 </span>
 
@@ -1933,7 +2023,7 @@ const AdminDashboard = () => {
 
                               </summary>
 
-                              <div className="mt-4 rounded-2xl border border-[#E9E1D3] bg-[#FBFAF6] p-5">
+                              <div className={detailsPanelStyles}>
 
                                 {
                                   renderAuditChanges(
