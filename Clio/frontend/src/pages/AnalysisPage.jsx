@@ -11,6 +11,8 @@ import {
 } from "../services/analysisService";
 
 import { analysisCopy } from "../constants/analysisConstants";
+import { analysisPageCopy } from "../constants/analysisPageConstants";
+import { BACK_TO_ANALYSIS } from "../constants/uiConstants";
 import { ROUTE_PATHS } from "../routes/routePaths";
 
 import {
@@ -97,7 +99,7 @@ const AnalysisPage = () => {
             className={backButtonStyles}
             onClick={() => navigate(ROUTE_PATHS.DASHBOARD)}
           >
-            Back to Analysis
+            {BACK_TO_ANALYSIS}
           </Button>
         </div>
       </main>
@@ -123,22 +125,22 @@ const AnalysisPage = () => {
           onClick={() => navigate(ROUTE_PATHS.DASHBOARD)}
           className={backButtonTopStyles}
         >
-          Back to Analysis
+          {BACK_TO_ANALYSIS}
         </Button>
 
         <div className={titleWrapperStyles}>
           <h1 className={titleStyles}>
-            Analysis
+            {analysisPageCopy.title}
           </h1>
 
           <p className={subtitleStyles}>
-            Analysis #{analysis.id}
+            {analysisPageCopy.subtitlePrefix}{analysis.id}
           </p>
         </div>
 
         <div className={originalTextBoxStyles}>
           <h2 className={originalTextTitleStyles}>
-            Original Text
+            {analysisPageCopy.originalTextTitle}
           </h2>
 
           <p className={originalTextContentStyles}>

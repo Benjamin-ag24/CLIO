@@ -1,5 +1,6 @@
 import logoImage from "../../assets/logo.png";
 import Button from "../../common/Button";
+import { ALT_LOGO, LOGOUT_LABEL } from "../../constants/uiConstants";
 import {
   headerContainerStyles,
   headerNavStyles,
@@ -16,7 +17,7 @@ const Header = ({ userName, onLogout }) => {
       <nav className={headerNavStyles}>
         <div className={logoWrapperStyles}>
           <div className={logoBoxStyles}>
-            <img src={logoImage} alt="Clio" className={logoImageStyles} />
+            <img src={logoImage} alt={ALT_LOGO} className={logoImageStyles} />
           </div>
           <span className={brandNameStyles}>Clio</span>
         </div>
@@ -27,7 +28,7 @@ const Header = ({ userName, onLogout }) => {
             className={logoutButtonStyles}
             onClick={onLogout}
           >
-            Cerrar sesión {userName ? `(${userName})` : ""}
+            {LOGOUT_LABEL} {userName ? `(${userName})` : ""}
           </Button>
         )}
       </nav>

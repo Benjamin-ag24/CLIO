@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { BACK_TO_ANALYSIS } from "../constants/uiConstants";
 
 import Header from "../components/Header/Header";
 import AIInteractivePanel from "../components/AIInteractivePanel/AIInteractivePanel";
@@ -155,7 +156,7 @@ const Home = () => {
               variant="text"
               onClick={showAnalysis}
             >
-              Back to Analysis
+              {BACK_TO_ANALYSIS}
             </Button>
           )}
 
