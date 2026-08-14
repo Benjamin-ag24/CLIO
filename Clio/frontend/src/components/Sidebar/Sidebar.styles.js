@@ -1,7 +1,7 @@
 export const overlayStyles = "fixed inset-0 bg-black/30 z-40";
 
-export const asideBaseStyles = `fixed top-0 left-0 h-full w-[320px] bg-[#FBFAF6]
-                    border-r border-[#E9E1D3] z-50
+export const asideBaseStyles = `fixed top-0 left-0 h-full w-[320px] bg-cafe-100
+                    border-r border-cafe-300 z-50
                     transform transition-transform duration-300 ease-in-out`;
 
 export const asideOpenStyles = "translate-x-0";
