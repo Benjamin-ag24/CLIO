@@ -71,17 +71,6 @@ Contiene la interfaz gráfica de Clio desarrollada con React, Vite y Tailwind CS
 * Panel de análisis
 * Estadísticas
 * Consumo de la API REST
-
-### 📄 README.md
-
-Contiene la documentación principal del proyecto, incluyendo:
-
-* Tecnologías utilizadas
-* Requisitos previos
-* Instalación
-* Configuración
-* Ejecución del proyecto
-
 ---
 
 ## ⚙️ Requisitos previos
