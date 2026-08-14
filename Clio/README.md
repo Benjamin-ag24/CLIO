@@ -1,158 +1,313 @@
 # Clio - Validador de Hechos Históricos con IA
 
-Aplicación web que utiliza inteligencia artificial (Gemini) para verificar la veracidad de información histórica.
+Clio es una aplicación web **full-stack** que utiliza **Google Gemini** para analizar afirmaciones históricas y clasificarlas como **Veraz, Dudoso o Falso**, proporcionando una explicación y términos clave relacionados con el análisis.
 
 ---
 
-## 🎯 ¿Qué hace Clio?
+## 📌 Tecnologías y versiones
 
-Clio te permite pegar un texto o afirmación histórica y recibir un análisis con:
+### Backend
 
-- _Semáforo de veracidad:_ Verde (veraz), Amarillo (dudoso), Rojo (falso).
-- _Explicación detallada:_ Entiende por qué se llegó a esa conclusión.
-- _Términos clave:_ Palabras importantes detectadas en el análisis.
+| Tecnología    | Versión / Uso              |
+| ------------- | -------------------------- |
+| Node.js       | 18 o superior              |
+| Express.js    | 5.x                        |
+| TypeORM       | 0.3.x                      |
+| PostgreSQL    | 12 o superior              |
+| pg            | Driver de PostgreSQL       |
+| bcryptjs      | Hash de contraseñas        |
+| jsonwebtoken  | Autenticación mediante JWT |
+| dotenv        | Variables de entorno       |
+| cors          | Configuración CORS         |
+| Google Gemini | Análisis mediante IA       |
 
----
+### Frontend
 
-## 🚀 ¿Cómo usar Clio?
-
-1. Escribe o pega un texto histórico en el área de entrada.
-2. Haz clic en _"Validar hecho"_.
-3. Espera unos segundos mientras la IA analiza el contenido.
-4. Revisa el reporte con el semáforo y la explicación.
-
-_Ejemplo:_
-
-> "Antes de la década de 1440, la inmensa mayoría de los textos se copiaban a mano, un proceso sumamente lento y costoso realizado principalmente por monjes en monasterios. Esta barrera significaba que el saber estaba restringido a las élites y que los índices de alfabetización eran extremadamente bajos. En Europa, el monopolio de la información residía casi en su totalidad en la Iglesia"
-
-Puedes utilizar _"Limpiar"_ para borrar el texto y comenzar de nuevo. Después de un análisis, _"Nuevo análisis"_ devuelve la aplicación al estado inicial. Si ocurre un error de comunicación, utiliza _"Intentar de nuevo"_ para repetir el análisis sin volver a escribir el contenido.
-
----
-
-## ⚙️ Requisitos técnicos
-
-- Node.js (v18 o superior).
-- npm.
-- API Key de Google Gemini (gratuita).
+| Tecnología   | Versión / Uso           |
+| ------------ | ----------------------- |
+| React        | 18+                     |
+| Vite         | 6+                      |
+| Tailwind CSS | 3+                      |
+| React Router | 7+                      |
+| Axios        | Consumo de API REST     |
+| Chart.js     | Estadísticas y gráficos |
 
 ---
 
-## 📦 Instalación y ejecución
+## 📁 Estructura del proyecto
+
+La estructura principal del proyecto es:
+
+```text
+Clio/
+├── backend/
+├── frontend/
+└── README.md
+```
+
+### 📂 backend/
+
+Contiene la lógica del servidor y los servicios necesarios para el funcionamiento de Clio, incluyendo:
+
+* API REST
+* Autenticación
+* Controladores
+* Rutas
+* TypeORM
+* Conexión con PostgreSQL
+* Integración con Google Gemini
+* Gestión de análisis
+* Sistema de auditoría
+
+### 📂 frontend/
+
+Contiene la interfaz gráfica de Clio desarrollada con React, Vite y Tailwind CSS, incluyendo:
+
+* Páginas
+* Componentes
+* Servicios
+* Autenticación
+* Historial de análisis
+* Panel de análisis
+* Estadísticas
+* Consumo de la API REST
+---
+
+## ⚙️ Requisitos previos
+
+Antes de ejecutar Clio es necesario tener instalados:
+
+* Node.js 18 o superior
+* npm 9 o superior
+* PostgreSQL 12 o superior
+* Git
+
+### Verificar las versiones
+
+```bash
+node --version
+npm --version
+psql --version
+git --version
+```
+
+---
+
+## 🚀 Instalación
 
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <url-del-repositorio>
+git clone <URL_DEL_REPOSITORIO>
 cd Clio
 ```
 
-### 2. Instalar dependencias del backend
+---
+
+### 2. Configurar la base de datos
+
+Crear la base de datos en PostgreSQL:
+
+```sql
+CREATE DATABASE ClioUser;
+```
+
+Después, ejecutar el esquema de la base de datos:
+
+```bash
+psql -U postgres -d ClioUser -f backend/src/sql/schema.sql
+```
+
+---
+
+### 3. Configurar el Backend
+
+Entrar a la carpeta del backend:
 
 ```bash
 cd backend
+```
+
+Instalar las dependencias:
+
+```bash
 npm install
 ```
 
-### 3. Configurar la API Key de Gemini
+Crear el archivo:
 
-Crea o edita el archivo `backend/.env` con la siguiente configuración:
+```text
+backend/.env
+```
+
+Agregar las siguientes variables de entorno:
 
 ```env
 PORT=3000
-GEMINI_API_KEY=tu_api_key_de_gemini
+NODE_ENV=development
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=ClioUser
+DB_USER=postgres
+DB_PASSWORD=TU_CONTRASEÑA
+
+GEMINI_API_KEY=TU_API_KEY
 GEMINI_MODEL=gemini-3.5-flash
+
+JWT_SECRET=TU_SECRETO
 ```
 
-Reemplaza `tu_api_key_de_gemini` por tu clave real. No compartas este archivo ni subas la clave a un repositorio público.
-
-### 4. Iniciar el backend
-
-Desde la carpeta `backend`, ejecuta:
+Iniciar el servidor:
 
 ```bash
 npm run dev
 ```
 
-El servidor quedará disponible en:
+El backend estará disponible en:
 
 ```text
 http://localhost:3000
 ```
 
-### 5. Instalar dependencias del frontend
+---
 
-Abre otra terminal en la raíz del proyecto y ejecuta:
+### 4. Configurar el Frontend
+
+Abrir una **segunda terminal**.
+
+Desde la carpeta principal del proyecto, entrar a `frontend`:
 
 ```bash
 cd frontend
+```
+
+Instalar las dependencias:
+
+```bash
 npm install
 ```
 
-### 6. Iniciar el frontend
-
-Desde la carpeta `frontend`, ejecuta:
+Iniciar el servidor de desarrollo:
 
 ```bash
 npm run dev
 ```
 
-Vite mostrará en la terminal la URL local de la aplicación, normalmente:
+El frontend estará disponible en:
 
 ```text
 http://localhost:5173
 ```
 
-Abre esa dirección en el navegador con el backend ejecutándose en paralelo.
+Abrir esta dirección en el navegador para acceder a Clio.
 
 ---
 
-El endpoint utilizado por el frontend es:
+## ▶️ Ejecución del proyecto
+
+Para ejecutar Clio se necesitan **dos terminales abiertas simultáneamente**.
+
+### Terminal 1 — Backend
+
+```bash
+cd backend
+npm run dev
+```
+
+Servidor:
 
 ```text
-POST http://localhost:3000/api/analisar
+http://localhost:3000
 ```
 
-Recibe un cuerpo JSON con este formato:
+### Terminal 2 — Frontend
 
-```json
-{
-  "texto": "Antes de la década de 1440, la inmensa mayoría de los textos se copiaban a mano, un proceso sumamente lento y costoso realizado principalmente por monjes en monasterios. Esta barrera significaba que el saber estaba restringido a las élites y que los índices de alfabetización eran extremadamente bajos. En Europa, el monopolio de la información residía casi en su totalidad en la Iglesia"
-}
+```bash
+cd frontend
+npm run dev
 ```
 
----
-
-## 🗂️ Estructura principal
+Aplicación:
 
 ```text
-Clio/
-├── backend/
-│   ├── .env
-│   ├── package.json
-│   └── src/
-│       └── server.js
-├── frontend/
-│   ├── package.json
-│   └── src/
-│       ├── components/
-│       ├── pages/
-│       ├── services/
-│       ├── App.jsx
-│       └── main.jsx
-└── README.md
+http://localhost:5173
+```
+
+Finalmente, abrir en el navegador:
+
+```text
+http://localhost:5173
 ```
 
 ---
 
-## 🔒 Seguridad
+## 🔐 Variables de entorno
 
-- Mantén `GEMINI_API_KEY` únicamente en el archivo `.env` del backend.
-- No incluyas claves, tokens ni credenciales en el código fuente.
-- No compartas capturas de pantalla o registros que contengan la API Key.
-- Si una clave se expone accidentalmente, revócala y genera una nueva desde Google AI Studio.
+Las variables de entorno contienen información necesaria para conectar Clio con PostgreSQL, autenticar usuarios y utilizar Google Gemini.
+
+El archivo `.env` **no debe subirse al repositorio**, ya que contiene información sensible como:
+
+* Contraseña de PostgreSQL
+* API Key de Google Gemini
+* Secret utilizado para JWT
+
+Cada desarrollador debe utilizar su propio archivo `.env` de forma local.
+
+---
+---
+
+## 🧠 Análisis mediante IA
+
+Clio utiliza **Google Gemini** para procesar las afirmaciones históricas introducidas por los usuarios.
+
+El sistema genera:
+
+* **Veredicto:** Veraz, Dudoso o Falso.
+* **Explicación:** Justificación del resultado obtenido.
+* **Términos clave:** Palabras o conceptos importantes relacionados con la afirmación.
 
 ---
 
-## ℹ️ Notas
+## 🔒 Autenticación y seguridad
 
-Clio ofrece una clasificación asistida por IA y debe utilizarse como apoyo para la investigación. Para decisiones académicas o profesionales, comprueba las afirmaciones consultando fuentes históricas confiables.
+Clio utiliza diferentes mecanismos para proteger la aplicación:
+
+* Autenticación mediante **JWT**.
+* Contraseñas protegidas mediante **bcryptjs**.
+* Variables sensibles almacenadas mediante `.env`.
+* Control de acceso mediante roles.
+* Protección de rutas privadas.
+* Registro de operaciones mediante auditoría.
+
+---
+
+## 📊 Auditoría y trazabilidad
+
+El sistema cuenta con un mecanismo de auditoría que permite registrar operaciones realizadas sobre los análisis.
+
+La información registrada puede incluir:
+
+* Usuario que realizó la operación.
+* Fecha y hora.
+* Tipo de operación.
+* Datos anteriores.
+* Datos nuevos.
+
+El acceso al historial de auditoría está restringido a usuarios con permisos administrativos.
+
+---
+
+## 👥 Equipo
+
+**Clio — Validador de Hechos Históricos con Inteligencia Artificial**
+
+Proyecto desarrollado como una aplicación **full-stack**, integrando:
+
+* Frontend
+* Backend
+* Base de datos
+* Autenticación
+* Inteligencia artificial
+* Auditoría
+* Estadísticas
