@@ -3,8 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import Button from "../common/Button";
 import Loading from "../common/Loading";
-import ErrorBanner from "../components/ErrorBanner";
-import ReportPanel from "../components/ReportPanel";
+import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
+import ReportPanel from "../components/AnalysisResults/ReportPanel/ReportPanel";
 
 import {
   getAnalysisById,

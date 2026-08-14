@@ -1,13 +1,13 @@
 // frontend/src/components/Sidebar.jsx
-import { BACKEND_URL } from "../constants/configConstants";
+import { BACKEND_URL } from "../../constants/configConstants";
 import { useEffect, useState } from "react";
-import { getAuthToken } from "../services/authStorage";
+import { getAuthToken } from "../../services/authStorage";
 import {
   updateAnalysis,
   deleteAnalysis,
-} from "../services/analysisService";
-import Button from "../common/Button";
-import { analysisCopy } from "../constants/analysisConstants";
+} from "../../services/analysisService";
+import Button from "../../common/Button";
+import { analysisCopy } from "../../constants/analysisConstants";
 import {
   overlayStyles,
   asideBaseStyles,

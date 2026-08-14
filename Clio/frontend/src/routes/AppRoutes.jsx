@@ -4,7 +4,7 @@ import Home from "../pages/Home";
 import AnalysisPage from "../pages/AnalysisPage";
 import LoginPage from "../pages/Auth/LoginPage";
 import RegisterPage from "../pages/Auth/RegisterPage";
-import AdminDashboard from "../components/AdminDashboard";
+import AdminDashboard from "../components/AdminDashboard/AdminDashboard";
 
 import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";

@@ -1,4 +1,4 @@
-import { analysisCopy } from "../../constants/analysisConstants";
+import { analysisCopy } from "../../../constants/analysisConstants";
 
 export const verdictMap = {
   veraz: {
