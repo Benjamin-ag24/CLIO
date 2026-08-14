@@ -1,717 +1,876 @@
-# Clio - Validador de Hechos Históricos con IA
+Clio - Validador de Hechos Históricos con IA
 
-<div align="center">
+Aplicación web full-stack que utiliza inteligencia artificial (Google Gemini) para analizar afirmaciones históricas y clasificarlas como veraces, dudosas o falsas, proporcionando una explicación y términos clave relacionados con el contenido analizado.
 
-[![Node.js](https://img.shields.io/badge/Node.js-v18+-green)](https://nodejs.org)
-[![Express](https://img.shields.io/badge/Express-5.2+-blue)](https://expressjs.com)
-[![React](https://img.shields.io/badge/React-19.2+-blue)](https://react.dev)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-blue)](https://www.postgresql.org)
-[![License](https://img.shields.io/badge/License-ISC-green)]()
+📋 Tabla de Contenidos
+Descripción General
+Objetivo
+Características
+Manual de Usuario
+Instalación
+Configuración de la Base de Datos
+Configuración del Backend
+Configuración del Frontend
+Stack Tecnológico
+Arquitectura del Sistema
+Estructura del Proyecto
+API REST
+Seguridad
+Base de Datos
+Auditoría y Trazabilidad
+Roles y Permisos
+Equipo
+Limitaciones
+Licencia
+🎯 Descripción General
 
-Aplicación web full-stack que utiliza inteligencia artificial (Google Gemini) para verificar la veracidad de información histórica de manera rápida y precisa.
+Clio es una aplicación web educativa orientada a la verificación de información histórica mediante inteligencia artificial.
 
-[Características](#-características) • [Instalación](#-instalación-completa) • [Uso](#-manual-de-usuario) • [Tecnologías](#-stack-tecnológico) • [API](#-documentación-de-api)
+El sistema permite que los usuarios ingresen afirmaciones o textos históricos para obtener un análisis automatizado mediante Google Gemini.
 
-</div>
+El resultado se presenta mediante un sistema de semáforo:
 
----
+🟢 Veraz: la afirmación presenta información históricamente correcta.
+🟡 Dudoso: la afirmación contiene información parcialmente correcta, ambigua o que requiere verificación.
+🔴 Falso: la afirmación presenta información que contradice hechos históricos conocidos.
 
-## 📋 Tabla de Contenidos
+Además del análisis mediante IA, Clio permite almacenar y consultar el historial de análisis, editar y eliminar registros, administrar usuarios y consultar información estadística y de auditoría según el rol del usuario.
 
-- [Descripción General](#-descripción-general)
-- [Características](#-características)
-- [Manual de Usuario](#-manual-de-usuario)
-- [Instalación Completa](#-instalación-completa)
-- [Stack Tecnológico](#-stack-tecnológico)
-- [Estructura del Proyecto](#-estructura-del-proyecto)
-- [Documentación de API](#-documentación-de-api)
-- [Seguridad](#-seguridad)
-- [Equipo](#-equipo)
-- [Licencia](#-licencia)
+🎯 Objetivo
 
----
+El objetivo de Clio es proporcionar una herramienta educativa que facilite la identificación y análisis de posibles afirmaciones históricas falsas mediante inteligencia artificial.
 
-## 🎯 Descripción General
+La aplicación busca servir como herramienta de apoyo para la investigación, sin reemplazar la consulta de fuentes históricas confiables.
 
-**Clio** es una herramienta educativa diseñada para ayudarte a verificar la veracidad de afirmaciones históricas. Utilizando la potencia de Google Gemini AI, analiza textos históricos y proporciona:
+✨ Características
+Usuario estándar
+Registro de usuarios.
+Inicio de sesión mediante credenciales.
+Autenticación mediante JWT.
+Análisis de textos históricos mediante Google Gemini.
+Clasificación mediante semáforo de veracidad.
+Explicación del resultado.
+Extracción de términos clave.
+Historial de análisis.
+Edición de análisis.
+Eliminación lógica de análisis.
+Visualización de resultados anteriores.
+Administrador
+Acceso al panel administrativo.
+Visualización de estadísticas generales.
+Consulta de información de auditoría.
+Gestión de usuarios.
+Control de acceso basado en roles.
+Consulta de reportes del sistema.
+📘 Manual de Usuario
+1. Registro de usuario
 
-- ✅ **Clasificación de veracidad** con semáforo visual (Verde/Amarillo/Rojo)
-- 📖 **Explicaciones detalladas** sobre el análisis realizado
-- 🔑 **Extracción de términos clave** relacionados con el texto
-- 📊 **Historial de análisis** para usuarios registrados
-- 🛡️ **Auditoría completa** de operaciones en el sistema
-- 👨‍💼 **Dashboard administrativo** para gestión del sistema
+Para utilizar Clio por primera vez:
 
----
+Abrir la aplicación.
+Seleccionar la opción Registrarse.
+Ingresar:
+Nombre.
+Apellido.
+Correo electrónico.
+Contraseña.
+Presionar el botón Registrarse.
+El sistema valida la información.
+Si los datos son correctos, se crea la cuenta.
 
-## ✨ Características
+La contraseña se almacena utilizando un mecanismo de hash mediante bcryptjs.
 
-### Para Usuarios Estándar
-- 🔐 Autenticación segura con JWT
-- 📝 Análisis ilimitado de hechos históricos
-- 💾 Historial persistente de análisis realizados
-- 🔍 Búsqueda y filtrado de análisis anteriores
-- 📊 Visualización de gráficos de análisis
-- 🗑️ Gestión de análisis (crear, ver, eliminar)
+2. Inicio de sesión
+Abrir Clio.
+Ingresar el correo electrónico.
+Ingresar la contraseña.
+Presionar Iniciar sesión.
+El backend valida las credenciales.
+Si son correctas, se genera un token JWT.
+El usuario accede a la aplicación.
 
-### Para Administradores
-- 👥 Gestión de usuarios (crear, editar, eliminar, cambiar roles)
-- 📊 Estadísticas globales del sistema
-- 🔍 Auditoría de operaciones y cambios
-- ⚙️ Monitoreo de la aplicación
-- 📈 Reportes de uso del sistema
+Si las credenciales son incorrectas, el sistema muestra un mensaje de error.
 
----
+3. Analizar un texto histórico
 
-## 📘 Manual de Usuario
+Una vez iniciada la sesión:
 
-### Inicio de Sesión
+Acceder al panel de análisis.
+Escribir o pegar una afirmación histórica.
+Presionar el botón Analizar.
+El sistema valida que el contenido no esté vacío.
+El backend envía la información a Google Gemini.
+La IA procesa el contenido.
+Se obtiene:
+Veredicto.
+Explicación.
+Términos clave.
+El sistema almacena el análisis.
+El resultado se muestra en pantalla.
+Ejemplo
+La Revolución Francesa comenzó en 1789 con la toma de la Bastilla.
 
-1. **Accede a la aplicación** en `http://localhost:5173`
-2. **Regístrate** si es la primera vez:
-   - Completa el formulario con nombre, apellido, email y contraseña
-   - Haz clic en "Registrarse"
-3. **Inicia sesión** con tus credenciales
+El sistema devolverá un resultado similar a:
 
-### Validar un Hecho Histórico
+Veredicto: Veraz
 
-#### Paso 1: Acceder a la herramienta
-- Una vez autenticado, verás la página principal con un área de entrada de texto
 
-#### Paso 2: Ingresar el texto
-- Escribe o pega el hecho histórico que deseas validar
-- La aplicación acepta textos de cualquier longitud
-- Ejemplo de entrada:
-  ```
-  "La Revolución Francesa comenzó en 1789 con la toma de la Bastilla."
-  ```
+Explicación:
+La Revolución Francesa comenzó en 1789 y la toma de la Bastilla
+ocurrió el 14 de julio del mismo año.
 
-#### Paso 3: Iniciar el análisis
-- Haz clic en el botón **"Validar hecho"**
-- Espera a que la IA procese el contenido (generalmente 2-5 segundos)
 
-#### Paso 4: Revisar los resultados
+Términos clave:
+- Revolución Francesa
+- 1789
+- Bastilla
+4. Interpretación del semáforo
+🟢 Veraz
 
-El análisis mostrará:
+Indica que la información analizada coincide con hechos históricos conocidos.
 
-**Semáforo de Veracidad:**
-- 🟢 **Verde (Veraz)**: La afirmación es históricamente correcta
-- 🟡 **Amarillo (Dudoso)**: La afirmación tiene elementos cuestionables o es incompleta
-- 🔴 **Rojo (Falso)**: La afirmación contradice hechos históricos comprobados
+🟡 Dudoso
 
-**Explicación Detallada:**
-- Análisis profundo sobre por qué se llegó a esa conclusión
-- Referencias a contexto histórico
-- Aclaraciones sobre puntos débiles o errores
+Indica que la información contiene elementos que requieren contexto, precisión o una verificación adicional.
 
-**Términos Clave:**
-- Palabras y conceptos importantes identificados en el análisis
-- Útiles para investigación adicional
+🔴 Falso
 
-#### Paso 5: Acciones después del análisis
+Indica que la información analizada contradice hechos históricos conocidos.
 
-- **Limpiar**: Borra el texto para validar uno nuevo
-- **Nuevo análisis**: Devuelve la aplicación al estado inicial
-- **Intentar de nuevo**: Repite el análisis si hubo error de comunicación
+Importante: El resultado generado por inteligencia artificial no debe considerarse una fuente histórica absoluta. Se recomienda contrastar la información con fuentes académicas y bibliográficas confiables.
 
-### Gestionar tu Historial
+5. Consultar el historial
 
-1. **Ver análisis anteriores**:
-   - Accede a la sección "Historial de análisis"
-   - Ver lista de todos tus análisis con fecha y veredicto
+El usuario puede consultar los análisis realizados anteriormente.
 
-2. **Buscar análisis**:
-   - Utiliza el filtro por palabras clave o rango de fechas
-   - Filtra por tipo de veredicto (Veraz, Dudoso, Falso)
+El historial permite visualizar:
 
-3. **Eliminar análisis**:
-   - Selecciona un análisis de tu historial
-   - Haz clic en eliminar
-   - Confirma la acción
+Texto analizado.
+Veredicto.
+Explicación.
+Términos clave.
+Fecha del análisis.
 
-### Características de Administrador
+Los análisis eliminados mediante eliminación lógica no aparecen en el historial visible.
 
-Si tienes rol de administrador, accede a:
+6. Editar un análisis
 
-- **Dashboard**: Resumen de estadísticas del sistema
-- **Gestión de usuarios**: Ver, editar o eliminar usuarios
-- **Auditoría**: Registro de todas las operaciones realizadas
-- **Reportes**: Gráficos y análisis de uso del sistema
+Para modificar un análisis:
 
-### Tips y Mejores Prácticas
+Seleccionar un análisis del historial.
+Presionar la opción Editar.
+Modificar el texto.
+Guardar los cambios.
+El sistema vuelve a enviar el contenido a la IA.
+Se genera un nuevo veredicto.
+Se actualiza el análisis existente.
 
-✅ **Hazlo bien:**
-- Utiliza Clio para complementar tu investigación histórica
-- Consulta varias fuentes confiables para verificar conclusiones
-- Lee la explicación completa del análisis
-- Guarda análisis importante para futuras referencias
+El identificador original del análisis se conserva.
 
-❌ **Evita:**
-- Usar Clio como única fuente de verdad histórica
-- Validar información muy reciente sin contrastar con académicos
-- Confiar ciegamente en la IA sin investigación adicional
+7. Eliminar un análisis
 
----
+Para eliminar un análisis:
 
-## 🔧 Instalación Completa
+Seleccionar el análisis.
+Presionar Eliminar.
+Confirmar la operación.
+El sistema marca el registro como eliminado.
+El análisis deja de mostrarse en el historial.
 
-### Requisitos Previos
+La información no se elimina físicamente de la base de datos cuando se utiliza eliminación lógica, permitiendo conservar la trazabilidad del registro.
 
-Asegúrate de tener instalado:
+👨‍💼 Funciones del Administrador
 
-| Herramienta | Versión | Descargar |
-|-------------|---------|-----------|
-| Node.js | v18+ | [nodejs.org](https://nodejs.org) |
-| npm | v9+ | Incluido con Node.js |
-| PostgreSQL | 12+ | [postgresql.org](https://www.postgresql.org/download) |
-| Git | Último | [git-scm.com](https://git-scm.com) |
+Los usuarios con rol admin tienen acceso a funcionalidades adicionales.
 
-Verificar instalación:
-```bash
-node --version    # v18.x.x o superior
-npm --version     # v9.x.x o superior
-psql --version    # psql (PostgreSQL) 12+ o superior
-```
+Panel administrativo
 
-### Paso 1: Clonar el Repositorio
+El administrador puede consultar información general del sistema, incluyendo estadísticas relacionadas con los análisis realizados.
 
-```bash
-git clone <url-del-repositorio>
+Auditoría
+
+El administrador puede consultar los registros de auditoría generados por las operaciones realizadas sobre los datos.
+
+La auditoría permite conocer:
+
+Usuario que realizó la operación.
+Fecha y hora.
+Tipo de operación.
+Datos anteriores.
+Datos nuevos.
+Registro afectado.
+Gestión de usuarios
+
+El administrador puede gestionar los usuarios registrados y sus roles de acuerdo con los permisos implementados en el sistema.
+
+🚀 Instalación
+Requisitos previos
+
+Antes de instalar Clio se necesita:
+
+Herramienta	Versión recomendada
+Node.js	18 o superior
+npm	9 o superior
+PostgreSQL	12 o superior
+Git	Versión actual
+Navegador web	Chrome, Edge, Firefox u otro navegador moderno
+
+Verificar las versiones:
+
+node --version
+npm --version
+psql --version
+git --version
+📥 Clonar el repositorio
+
+Clonar el proyecto:
+
+git clone <URL_DEL_REPOSITORIO>
+
+Ingresar a la carpeta:
+
 cd Clio
-```
+🗄️ Configuración de la Base de Datos
 
-### Paso 2: Configurar PostgreSQL
+Clio utiliza PostgreSQL como sistema gestor de base de datos.
 
-#### 2.1 Crear la base de datos
+1. Crear la base de datos
 
-```bash
-# Abre psql (línea de comandos de PostgreSQL)
+Ingresar a PostgreSQL:
+
 psql -U postgres
 
-# En la línea de comandos de psql:
-CREATE DATABASE "ClioUser" ENCODING 'UTF8' LC_COLLATE 'es_ES.UTF-8' LC_CTYPE 'es_ES.UTF-8';
-CREATE USER clio WITH PASSWORD 'clio2026admin';
-ALTER ROLE clio SET client_encoding TO 'utf8';
-ALTER ROLE clio SET default_transaction_isolation TO 'read committed';
-ALTER ROLE clio SET default_transaction_deferrable TO on;
-ALTER ROLE clio SET timezone TO 'America/Bogota';
-GRANT ALL PRIVILEGES ON DATABASE "ClioUser" TO clio;
+Crear la base:
+
+CREATE DATABASE ClioUser;
+
+Crear el usuario de la aplicación:
+
+CREATE USER clio WITH PASSWORD 'CAMBIAR_ESTA_CONTRASEÑA';
+
+Asignar permisos:
+
+GRANT ALL PRIVILEGES ON DATABASE ClioUser TO clio;
+
+Ingresar a la base:
+
 \c ClioUser
+
+Asignar permisos sobre el esquema:
+
 GRANT ALL ON SCHEMA public TO clio;
-```
+2. Ejecutar el esquema
 
-#### 2.2 Cargar el esquema de la base de datos
+Desde la raíz del proyecto:
 
-```bash
-# Desde la raíz del proyecto
 psql -U clio -d ClioUser -f backend/src/sql/schema.sql
-```
 
-Verifica que las tablas se crearon correctamente:
-```bash
+Para verificar las tablas:
+
 psql -U clio -d ClioUser -c "\dt"
-```
 
-Deberías ver:
-- `users` - Información de usuarios
-- `analysis` - Análisis realizados
-- `audit_log` - Registro de auditoría
-- `keywords` - Palabras clave extraídas
+Entre las tablas principales se encuentran:
 
-### Paso 3: Configurar el Backend
+users
+analysis
+audit_log
+keywords
+⚙️ Configuración del Backend
 
-#### 3.1 Instalar dependencias
+Ingresar a la carpeta:
 
-```bash
 cd backend
+
+Instalar las dependencias:
+
 npm install
-```
 
-#### 3.2 Crear archivo `.env`
+Crear un archivo:
 
-Crea o edita `backend/.env`:
+backend/.env
 
-```env
-# Servidor
+Agregar las variables de entorno:
+
 PORT=3000
 NODE_ENV=development
 
-# Base de datos PostgreSQL
+
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=ClioUser
 DB_USER=clio
-DB_PASSWORD=clio2026admin
+DB_PASSWORD=CAMBIAR_ESTA_CONTRASEÑA
 
-# Google Gemini API
-GEMINI_API_KEY=tu_api_key_de_gemini
+
+GEMINI_API_KEY=TU_API_KEY_DE_GEMINI
 GEMINI_MODEL=gemini-3.5-flash
 
-# JWT Secret (cambiar en producción)
-JWT_SECRET=clio_super_secreto_2026_cambiar_en_produccion
-```
 
-**Obtener API Key de Gemini:**
-1. Ve a [Google AI Studio](https://aistudio.google.com)
-2. Haz clic en "Get API Key"
-3. Crea una nueva clave o usa una existente
-4. Cópiala en el archivo `.env`
+JWT_SECRET=CAMBIAR_POR_UN_SECRETO_SEGURO
 
-#### 3.3 Iniciar el backend
+No subir el archivo .env al repositorio.
 
-```bash
+Obtener la API Key de Gemini
+Acceder a Google AI Studio.
+Crear o seleccionar un proyecto.
+Generar una API Key.
+Copiar la clave.
+Colocarla en:
+GEMINI_API_KEY=TU_API_KEY
+Ejecutar el Backend
+
+Desde backend:
+
 npm run dev
-```
 
-Verifica que se inicia correctamente:
-```text
-✓ Servidor ejecutándose en puerto 3000
-✓ Conectado a PostgreSQL
-```
+El backend estará disponible normalmente en:
 
-El backend estará disponible en: `http://localhost:3000`
+http://localhost:3000
+🎨 Configuración del Frontend
 
-**Comandos disponibles:**
-```bash
-npm run dev      # Desarrollo con auto-reload
-npm start        # Producción
-npm test         # Tests (no configurados aún)
-```
+Abrir una nueva terminal.
 
-### Paso 4: Configurar el Frontend
+Desde la raíz del proyecto:
 
-#### 4.1 Instalar dependencias
-
-Abre una nueva terminal en la raíz del proyecto:
-
-```bash
 cd frontend
+
+Instalar dependencias:
+
 npm install
-```
 
-#### 4.2 Iniciar el frontend
+Ejecutar el proyecto:
 
-```bash
 npm run dev
-```
 
-Vite mostrará en la terminal la URL local:
+Vite mostrará una dirección similar a:
 
-```text
-Local:   http://localhost:5173
-```
+http://localhost:5173
 
-Abre esa dirección en tu navegador preferido.
+Abrir esa dirección en el navegador.
 
-**Comandos disponibles:**
-```bash
-npm run dev      # Desarrollo con hot reload
-npm run build    # Compilar para producción
-npm run preview  # Vista previa de build
-npm run lint     # Verificar código con oxlint
-```
+Comandos principales
+Backend
+npm run dev
 
-### Paso 5: Verificación Final
+Ejecuta el servidor en modo desarrollo.
 
-✅ **Backend ejecutándose:**
-- Accede a `http://localhost:3000`
-- Verifica conexión a base de datos
+npm start
 
-✅ **Frontend ejecutándose:**
-- Accede a `http://localhost:5173`
-- Deberías ver la página de login
+Ejecuta el servidor.
 
-✅ **Aplicación lista:**
-- Regístrate con un usuario de prueba
-- Prueba validando un hecho histórico
+Frontend
+npm run dev
 
----
+Ejecuta Vite en modo desarrollo.
 
-## 🛠️ Stack Tecnológico
+npm run build
 
-### Frontend
+Genera la versión de producción.
 
-| Tecnología | Versión | Propósito |
-|------------|---------|-----------|
-| **React** | 19.2.7 | Librería UI principal |
-| **Vite** | 8.1.1 | Build tool y dev server |
-| **Tailwind CSS** | 3.4.19 | Estilos y componentes |
-| **React Router** | 7.18.2 | Enrutamiento de páginas |
-| **Axios** | 1.18.1 | Cliente HTTP |
-| **Chart.js** | 4.5.1 | Gráficos y visualizaciones |
-| **Oxlint** | 1.71.0 | Linter de código |
+npm run preview
 
-### Backend
+Permite visualizar el build de producción.
 
-| Tecnología | Versión | Propósito |
-|------------|---------|-----------|
-| **Node.js** | 18+ | Runtime de JavaScript |
-| **Express** | 5.2.1 | Framework web |
-| **PostgreSQL** | 12+ | Base de datos relacional |
-| **TypeORM** | 1.1.0 | ORM para Node.js |
-| **pg** | 8.22.0 | Driver PostgreSQL nativo |
-| **Google Gemini API** | @google/genai 2.13.0 | IA para análisis |
-| **JWT** | jsonwebtoken 9.0.3 | Autenticación |
-| **bcryptjs** | 3.0.3 | Hash de contraseñas |
-| **CORS** | 2.8.6 | Manejo de CORS |
-| **dotenv** | 17.4.2 | Gestión de variables de entorno |
+npm run lint
 
-### Stack Completo
+Ejecuta el análisis estático del código.
 
-```
-┌─────────────────────────────────────┐
-│         Frontend (React + Vite)      │
-│        http://localhost:5173        │
-└────────────────┬────────────────────┘
-                 │ Axios HTTP
-                 ▼
-┌─────────────────────────────────────┐
-│     Backend (Express.js + Node.js)   │
-│        http://localhost:3000        │
-└────────────────┬────────────────────┘
-                 │
-        ┌────────┴────────┬──────────┐
-        ▼                 ▼          ▼
-   PostgreSQL      Google Gemini   JWT
-   Database           API        Auth
-```
+🛠️ Stack Tecnológico
+Frontend
+Tecnología	Propósito
+React	Construcción de la interfaz
+Vite	Herramienta de desarrollo y build
+Tailwind CSS	Estilos de la aplicación
+React Router	Manejo de rutas
+Axios	Consumo de la API REST
+Chart.js	Visualización de estadísticas
+JavaScript	Lenguaje principal del frontend
+Backend
+Tecnología	Propósito
+Node.js	Entorno de ejecución
+Express.js	Framework para API REST
+TypeORM	Acceso y persistencia de datos
+PostgreSQL	Base de datos relacional
+pg	Driver de PostgreSQL
+bcryptjs	Hash de contraseñas
+JSON Web Token	Autenticación
+Google Gemini	Inteligencia artificial
+dotenv	Gestión de variables de entorno
+CORS	Control de solicitudes entre dominios
+🏗️ Arquitectura del Sistema
 
----
+Clio utiliza una arquitectura de aplicación web cliente-servidor.
 
-## 📁 Estructura del Proyecto
-
-```
+┌──────────────────────────────┐
+│       FRONTEND               │
+│       React + Vite           │
+│                              │
+│       Puerto 5173            │
+└──────────────┬───────────────┘
+               │
+               │ HTTP / REST
+               │ Axios
+               ▼
+┌──────────────────────────────┐
+│        BACKEND               │
+│      Node.js + Express       │
+│                              │
+│       Puerto 3000            │
+└──────────────┬───────────────┘
+               │
+        ┌──────┴──────────┐
+        │                 │
+        ▼                 ▼
+┌───────────────┐   ┌───────────────┐
+│  PostgreSQL   │   │ Google Gemini │
+│   Database    │   │      API      │
+└───────────────┘   └───────────────┘
+📁 Estructura del Proyecto
 Clio/
-│
-├── 📄 README.md                          # Este archivo
-├── .gitignore                            # Configuración git
-│
-├── backend/                              # ⚙️ API REST y lógica
-│   ├── .env                              # Variables de entorno (no versionado)
-│   ├── .gitignore                        # Ignora node_modules y .env
-│   ├── package.json                      # Dependencias del backend
-│   ├── package-lock.json                 # Lock file
-│   │
-│   └── src/
-│       ├── server.js                     # Punto de entrada principal
-│       │
-│       ├── config/
-│       │   ├── database.js               # Configuración de conexión DB
-│       │   └── aiPrompt.js               # Prompts para Gemini AI
-│       │
-│       ├── controllers/
-│       │   ├── authController.js         # Autenticación y registro
-│       │   ├── analysisController.js     # Gestión de análisis
-│       │   ├── keywordController.js      # Gestión de palabras clave
-│       │   ├── statisticsController.js   # Estadísticas del sistema
-│       │   ├── auditController.js        # Registro de auditoría
-│       │   └── userController.js         # Gestión de usuarios
+│       │   ├── analysisController.js
+│       │   ├── auditController.js
+│       │   ├── keywordController.js
+│       │   ├── statisticsController.js
+│       │   └── userController.js
 │       │
 │       ├── middleware/
-│       │   ├── authMiddleware.js         # Validación de JWT
-│       │   └── logger.middleware.js      # Registro de peticiones
+│       │   ├── authMiddleware.js
+│       │   └── logger.middleware.js
 │       │
 │       ├── models/
-│       │   ├── User.js                   # Modelo de usuario
-│       │   ├── Analysis.js               # Modelo de análisis
-│       │   ├── AuditLog.js               # Modelo de auditoría
-│       │   └── Keyword.js                # Modelo de palabras clave
+│       │   ├── User.js
+│       │   ├── Analysis.js
+│       │   ├── AuditLog.js
+│       │   └── Keyword.js
 │       │
 │       ├── routes/
-│       │   ├── authRoutes.js             # /api/auth (login, registro)
-│       │   ├── analysisRoutes.js         # /api/analysis
-│       │   ├── keywordRoutes.js          # /api/keywords
-│       │   ├── statisticsRoutes.js       # /api/statistics
-│       │   ├── auditRoutes.js            # /api/audit
-│       │   └── userRoutes.js             # /api/users
+│       │   ├── authRoutes.js
+│       │   ├── analysisRoutes.js
+│       │   ├── auditRoutes.js
+│       │   ├── keywordRoutes.js
+│       │   ├── statisticsRoutes.js
+│       │   └── userRoutes.js
 │       │
 │       ├── services/
-│       │   └── geminiService.js          # Integración con Gemini API
+│       │   └── geminiService.js
 │       │
 │       └── sql/
-│           └── schema.sql                # Definición de base de datos
+│           └── schema.sql
 │
-├── frontend/                             # 🎨 Interfaz de usuario
-│   ├── .gitignore                        # Ignora node_modules y build
-│   ├── .oxlintrc.json                    # Configuración de oxlint
-│   ├── package.json                      # Dependencias del frontend
-│   ├── package-lock.json                 # Lock file
-│   ├── vite.config.js                    # Configuración de Vite
-│   ├── tailwind.config.js                # Configuración de Tailwind
-│   ├── postcss.config.js                 # Configuración de PostCSS
-│   ├── index.html                        # Punto de entrada HTML
+├── frontend/
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── tailwind.config.js
 │   │
 │   └── src/
-│       ├── main.jsx                      # Punto de entrada React
-│       ├── App.jsx                       # Componente raíz
-│       ├── index.css                     # Estilos globales
+│       ├── main.jsx
+│       ├── App.jsx
+│       ├── index.css
 │       │
-│       ├── common/                       # 🧩 Componentes reutilizables
-│       │   ├── Alert.jsx & .styles.js
-│       │   ├── Button.jsx & .styles.js
-│       │   ├── Card.jsx & .styles.js
-│       │   ├── Loading.jsx & .styles.js
-│       │   ├── Logo.jsx & .styles.js
-│       │   └── TextField.jsx & .styles.js
+│       ├── common/
+│       │   ├── Alert.jsx
+│       │   ├── Button.jsx
+│       │   ├── Card.jsx
+│       │   ├── Loading.jsx
+│       │   ├── Logo.jsx
+│       │   └── TextField.jsx
 │       │
-│       ├── components/                   # 🎯 Componentes específicos
-│       │   ├── Header/                   # Barra de navegación
-│       │   ├── Sidebar/                  # Panel lateral
-│       │   ├── Footer/                   # Pie de página
-│       │   ├── AdminDashboard/           # Dashboard de admin
-│       │   │   └── AdminDashboard.jsx
-│       │   ├── AIInteractivePanel/       # Panel de análisis
-│       │   │   └── AIInteractivePanel.jsx
-│       │   ├── AnalysisResults/          # Resultados del análisis
-│       │   │   ├── ReportPanel/
-│       │   │   └── Semaphore/
-│       │   ├── AuditHistory/             # Historial de auditoría
-│       │   ├── ErrorBanner/              # Banner de errores
-│       │   └── ...más componentes
+│       ├── components/
+│       │   ├── Header/
+│       │   ├── Sidebar/
+│       │   ├── Footer/
+│       │   ├── AdminDashboard/
+│       │   ├── AIInteractivePanel/
+│       │   ├── AnalysisResults/
+│       │   ├── AuditHistory/
+│       │   └── ErrorBanner/
 │       │
-│       ├── pages/                        # 📄 Páginas principales
-│       │   ├── Home.jsx & .styles.js
-│       │   ├── AnalysisPage.jsx & .styles.js
-│       │   └── Auth/                     # Autenticación
+│       ├── pages/
+│       │   ├── Home.jsx
+│       │   ├── AnalysisPage.jsx
+│       │   └── Auth/
 │       │       ├── Login.jsx
 │       │       └── Register.jsx
 │       │
-│       ├── routes/                       # 🛣️ Configuración de rutas
-│       │   ├── AppRoutes.jsx             # Rutas principales
-│       │   ├── ProtectedRoute.jsx        # Rutas protegidas
-│       │   ├── AdminRoute.jsx            # Rutas de admin
-│       │   └── routePaths.js             # Constantes de rutas
+│       ├── routes/
+│       │   ├── AppRoutes.jsx
+│       │   ├── ProtectedRoute.jsx
+│       │   ├── AdminRoute.jsx
+│       │   └── routePaths.js
 │       │
-│       ├── services/                     # 🔌 Servicios API
-│       │   ├── authService.js            # Autenticación
-│       │   ├── analysisService.js        # Análisis
-│       │   ├── auditService.js           # Auditoría
-│       │   ├── statisticsService.js      # Estadísticas
-│       │   ├── userService.js            # Usuarios
-│       │   └── authStorage.js            # Almacenamiento local
+│       ├── services/
+│       │   ├── authService.js
+│       │   ├── analysisService.js
+│       │   ├── auditService.js
+│       │   ├── statisticsService.js
+│       │   ├── userService.js
+│       │   └── authStorage.js
 │       │
-│       ├── constants/                    # ⚙️ Constantes
+│       ├── constants/
 │       │   ├── authConstants.js
 │       │   ├── analysisConstants.js
 │       │   ├── analysisPageConstants.js
 │       │   ├── adminDashboardConstants.js
 │       │   ├── homePageConstants.js
-│       │   ├── configConstants.js
 │       │   └── uiConstants.js
 │       │
-│       ├── utils/                        # 🛠️ Funciones auxiliares
-│       │   └── auditUtils.js
-│       │
-│       ├── assets/                       # 📷 Imágenes y recursos
-│       └── public/                       # 📁 Archivos públicos
+│       └── utils/
+│           └── auditUtils.js
 │
-└── ADRs/                                 # 📋 Decisiones arquitectónicas
+└── ADRs/
     ├── 1.Componentes-React.md
     ├── 2.Estilo-Codigo-JS.md
     ├── 3.Estructura-Carpetas.md
     ├── 4.Framework-Estilos.md
     ├── 5.Commits-Git.md
     └── 6.Idioma-Documentacion.md
-```
+🔌 API REST
 
----
+La API utiliza como dirección base:
 
-## 🔌 Documentación de API
-
-### Base URL
-```
 http://localhost:3000/api
-```
 
-### Autenticación
-La mayoría de endpoints requieren un token JWT en el header:
-```
+Los endpoints protegidos requieren un token JWT:
+
 Authorization: Bearer <token>
-```
-
-### Endpoints Principales
-
-#### Análisis
-```
-POST /api/analisar
-Content-Type: application/json
-Body: {
-  "texto": "string - Texto a analizar"
-}
-
-Response (200):
-{
-  "veredicto": "veraz|dudoso|falso",
-  "explicacion": "string - Análisis detallado",
-  "palabrasClave": ["string"],
-  "timestamp": "ISO-8601"
-}
-```
-
-#### Autenticación
-```
-POST /api/auth/login
-{
-  "email": "user@example.com",
-  "password": "password"
-}
-
+Autenticación
+Registrar usuario
 POST /api/auth/register
+
+Ejemplo:
+
 {
   "firstName": "Juan",
   "lastName": "Pérez",
   "email": "juan@example.com",
-  "password": "password"
+  "password": "password123"
 }
-```
+Iniciar sesión
+POST /api/auth/login
 
-#### Usuarios (Admin)
-```
-GET /api/users           # Listar usuarios
-POST /api/users          # Crear usuario
-PUT /api/users/:id       # Actualizar usuario
-DELETE /api/users/:id    # Eliminar usuario
-```
+Ejemplo:
 
-#### Estadísticas
-```
-GET /api/statistics     # Obtener estadísticas globales
-```
+{
+  "email": "juan@example.com",
+  "password": "password123"
+}
+Análisis
+Crear análisis
+POST /api/analysis
 
-#### Auditoría
-```
-GET /api/audit          # Obtener registro de auditoría
-```
+Ejemplo:
 
----
+{
+  "originalText": "La Revolución Francesa comenzó en 1789."
+}
+Obtener análisis
+GET /api/analysis
+Actualizar análisis
+PUT /api/analysis/:id
+Eliminar análisis
+DELETE /api/analysis/:id
+Estadísticas
+GET /api/statistics
 
-## 🔒 Seguridad
+Este endpoint permite obtener información estadística del sistema de acuerdo con los permisos del usuario.
 
-### Mejores Prácticas Implementadas
+Auditoría
+GET /api/admin/audit
 
-✅ **Autenticación y Autorización**
-- Contraseñas hasheadas con bcryptjs
-- JWT para sesiones seguras
-- Roles de usuario (user, admin)
-- Refresh tokens para seguridad extendida
+Este endpoint está destinado a usuarios autorizados y permite consultar el historial de operaciones registradas.
 
-✅ **Protección de Datos**
-- CORS configurado correctamente
-- Variables sensibles en `.env` (no versionado)
-- SQL injection prevention con ORM TypeORM
-- Input validation en todos los endpoints
+Usuarios
+GET /api/users
+POST /api/users
+PUT /api/users/:id
+DELETE /api/users/:id
 
-✅ **Auditoría y Monitoreo**
-- Registro completo de operaciones en `audit_log`
-- Timestamps en todas las operaciones
-- Tracking de cambios en datos
+Los endpoints administrativos requieren autorización según el rol del usuario.
 
-### Checklist de Seguridad
+🗄️ Base de Datos
 
-**Antes de Producción:**
+Clio utiliza PostgreSQL, una base de datos relacional.
 
-```bash
-# 1. Cambiar JWT_SECRET
-JWT_SECRET=<genera-una-clave-segura>
+La elección de PostgreSQL se debe a que el proyecto requiere:
 
-# 2. Cambiar DB_PASSWORD
-DB_PASSWORD=<contraseña-fuerte>
+Integridad referencial.
+Claves primarias y foráneas.
+Restricciones de integridad.
+Relaciones entre usuarios y análisis.
+Persistencia de información.
+Auditoría.
+Consultas y agregaciones.
+Reportería.
+Control de acceso.
+Entidades principales
+Users
 
-# 3. Usar HTTPS
-NODE_ENV=production
+Almacena la información de los usuarios:
 
-# 4. Verificar CORS origins
-CORS_ORIGINS=https://tu-dominio.com
+Identificador.
+Nombre.
+Apellido.
+Correo electrónico.
+Contraseña.
+Rol.
+Analysis
 
-# 5. Cambiar GEMINI_API_KEY
-# Usa una clave dedicada para producción
+Almacena los análisis realizados:
 
-# 6. Hacer backup de la base de datos
-pg_dump -U clio -d ClioUser > backup.sql
+Identificador.
+Usuario propietario.
+Texto original.
+Texto analizado.
+Veredicto.
+Explicación.
+Términos clave.
+Estado de eliminación.
+Fecha de creación.
+Audit Log
 
-# 7. Configurar logs
-NODE_ENV=production
+Almacena información relacionada con las operaciones realizadas sobre los datos.
 
-# 8. Monitorear auditoría
-# Revisa regularmente audit_log
-```
+Keywords
 
-### Protecciones Implementadas
+Almacena información relacionada con los términos clave utilizados en los análisis.
 
-- ❌ No exponer API keys en client
-- ❌ No guardar contraseñas en texto plano
-- ❌ No hacer commits de `.env`
-- ✅ Validar entrada de usuario
-- ✅ Sanitizar output
-- ✅ Usar HTTPS en producción
-- ✅ Rate limiting en producción
-- ✅ CORS restrictivo
+🔍 Auditoría y Trazabilidad
 
----
+Clio implementa mecanismos de auditoría para mantener la trazabilidad de las operaciones importantes.
 
-## 👥 Equipo
+El sistema registra información como:
 
-Clio fue desarrollado como parte del **Dev Challenge** de [Nombre de la Organización].
+Usuario
+Fecha
+Operación
+Registro afectado
+Datos anteriores
+Datos nuevos
 
-### Colaboradores
+Las operaciones auditadas incluyen:
 
-- **Tu Nombre** - Full Stack Development
-- **Otro Nombre** - Frontend/UI
-- **Otro Nombre** - Backend/Database
+INSERT
+UPDATE
+DELETE
 
-### Créditos
+La auditoría permite conocer qué usuario realizó una operación y qué cambios fueron efectuados.
 
-- **Gemini API** by Google - IA para análisis
-- **React** - Librería de UI
-- **Express.js** - Framework web
-- **PostgreSQL** - Base de datos
-- **Tailwind CSS** - Estilos
+🔐 Seguridad
 
----
+Clio incorpora diferentes mecanismos de seguridad.
 
-## 📝 Licencia
+Autenticación
 
-Este proyecto está bajo la licencia **ISC**. Ver archivo LICENSE para más detalles.
+La autenticación utiliza:
 
----
+JWT
 
-## ❓ Preguntas Frecuentes
+Los usuarios deben autenticarse para acceder a funcionalidades protegidas.
 
-### ¿Necesito internet para usar Clio?
-Sí, se requiere conexión a internet para acceder a Google Gemini API.
+Contraseñas
 
-### ¿Puedo usar esto comercialmente?
-Sí, bajo la licencia ISC, pero verifica los términos de Google Gemini API.
+Las contraseñas no se almacenan directamente.
 
-### ¿Dónde reporto bugs?
-Abre un issue en el repositorio con descripción detallada y pasos para reproducir.
+Se utiliza:
 
-### ¿Cómo contribuir?
-1. Fork el repositorio
-2. Crea una rama para tu feature
-3. Commit tus cambios
-4. Push y abre un Pull Request
+bcryptjs
 
----
+para generar un hash seguro de las contraseñas.
 
-## 📞 Soporte y Contacto
+Control de acceso
 
-- 📧 Email: [tu-email@example.com](mailto:tu-email@example.com)
-- 🐛 Issues: [GitHub Issues](https://github.com/tu-usuario/Clio/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/tu-usuario/Clio/discussions)
+El sistema utiliza roles:
 
----
+user
+admin
 
-## ℹ️ Notas Importantes
+Los usuarios administradores pueden acceder a funcionalidades restringidas como:
 
-Clio ofrece una clasificación asistida por IA y debe utilizarse como **apoyo para la investigación histórica**. Para decisiones académicas o profesionales, siempre comprueba las afirmaciones consultando múltiples fuentes históricas confiables. No consideres el análisis de Clio como la verdad absoluta, sino como un punto de partida para investigación más profunda.
+Estadísticas.
+Auditoría.
+Gestión administrativa.
+Variables de entorno
 
----
+Las credenciales y claves sensibles se almacenan mediante variables de entorno:
 
-<div align="center">
+.env
 
-**Hecho con ❤️ para la comunidad educativa**
+El archivo .env no debe ser incluido en el repositorio.
 
-[⬆ Volver al inicio](#clio---validador-de-hechos-históricos-con-ia)
+CORS
 
-</div>
+El backend incorpora configuración de CORS para controlar las solicitudes provenientes del frontend.
+
+👥 Roles y Permisos
+Funcionalidad	Usuario	Administrador
+Registrarse	✅	✅
+Iniciar sesión	✅	✅
+Analizar textos	✅	✅
+Ver historial	✅	✅
+Editar análisis	✅	✅
+Eliminar análisis	✅	✅
+Ver estadísticas globales	❌	✅
+Consultar auditoría	❌	✅
+Gestión administrativa	❌	✅
+📊 Reportería y Estadísticas
+
+El sistema contempla funcionalidades de reportería para proporcionar información útil sobre el uso de Clio.
+
+Entre los indicadores considerados se encuentran:
+
+Cantidad total de análisis.
+Distribución de veredictos.
+Análisis realizados por usuarios.
+Información agregada del sistema.
+
+Los datos estadísticos son procesados en el backend y presentados mediante componentes visuales en el frontend.
+
+🔄 Flujo General del Sistema
+Usuario
+   │
+   ▼
+Inicio de sesión
+   │
+   ▼
+Validación JWT
+   │
+   ▼
+Panel principal
+   │
+   ▼
+Ingresar texto histórico
+   │
+   ▼
+Frontend
+   │
+   ▼
+API REST
+   │
+   ▼
+Backend Express
+   │
+   ├──────────────► Google Gemini
+   │                     │
+   │                     ▼
+   │                Veredicto
+   │                Explicación
+   │                Keywords
+   │
+   ▼
+PostgreSQL
+   │
+   ▼
+Guardar análisis
+   │
+   ▼
+Mostrar resultado
+🧪 Pruebas Manuales Recomendadas
+
+Después de instalar el proyecto se recomienda comprobar:
+
+Autenticación
+Registrar un usuario.
+Intentar registrar un correo existente.
+Iniciar sesión con credenciales correctas.
+Intentar iniciar sesión con credenciales incorrectas.
+Análisis
+Analizar un texto válido.
+Intentar analizar un texto vacío.
+Comprobar el resultado de la IA.
+Comprobar que el análisis se almacena.
+Historial
+Consultar análisis anteriores.
+Editar un análisis.
+Comprobar la actualización.
+Eliminar un análisis.
+Confirmar que deja de aparecer en el historial.
+Administración
+Ingresar con un usuario administrador.
+Consultar estadísticas.
+Consultar auditoría.
+Intentar acceder a funcionalidades administrativas con un usuario estándar.
+🌱 Flujo de Trabajo con Git
+
+Para contribuir al proyecto se recomienda trabajar mediante ramas:
+
+git checkout -b nombre-de-la-tarea
+
+Realizar cambios:
+
+git add .
+
+Crear el commit:
+
+git commit -m "feat: description of changes"
+
+Subir la rama:
+
+git push -u origin nombre-de-la-tarea
+
+Posteriormente se crea un Pull Request para revisión del equipo.
+
+📋 Buenas Prácticas
+
+El proyecto sigue prácticas de desarrollo colaborativo:
+
+Uso de ramas independientes.
+Pull Requests.
+Revisión de código.
+Commits descriptivos.
+Componentes reutilizables.
+Separación de responsabilidades.
+Variables y funciones con nombres claros.
+Constantes centralizadas.
+Validación de datos.
+Manejo de errores.
+Variables sensibles mediante .env.
+Documentación técnica mediante README y ADRs.
+📚 Documentación del Proyecto
+
+La documentación complementaria se encuentra organizada en:
+
+Confluence: documentación funcional y técnica.
+Jira: gestión de historias, tareas y Sprint.
+ADRs: decisiones arquitectónicas.
+README: instalación, funcionamiento y tecnologías.
+Documentación de base de datos: estructura, relaciones y reglas.
+👨‍💻 Equipo
+Equipo Clio
+Doménica Faz Mayorga — Product Owner / Desarrollo
+Benjamín Paredes — Desarrollo
+Vinicio David Naranjo Cruz — Desarrollo
+
+El equipo trabaja de manera colaborativa mediante Git, GitHub, Jira y ceremonias Scrum.
+
+⚠️ Limitaciones
+
+Clio utiliza inteligencia artificial para realizar la clasificación de los textos.
+
+Por esta razón:
+
+Los resultados pueden contener errores.
+La IA puede interpretar incorrectamente determinados contextos históricos.
+Una clasificación no garantiza que una afirmación sea verdadera o falsa de forma absoluta.
+Se recomienda contrastar los resultados con fuentes históricas confiables.
+
+Clio debe utilizarse como una herramienta de apoyo para la investigación y no como sustituto de fuentes académicas.
+
+📄 Licencia
+
+Este proyecto utiliza la licencia ISC.
+
+📞 Soporte
+
+Para reportar errores o solicitar mejoras:
+
+Crear un Issue en el repositorio.
+Describir el problema.
+Indicar los pasos necesarios para reproducirlo.
+Adjuntar capturas o mensajes de error cuando sea necesario.
+🚀 Estado del Proyecto
+
+Clio se encuentra en desarrollo como proyecto integrador de:
+
+Bases de Datos II.
+Desarrollo Web.
+Proyectos de Software.
