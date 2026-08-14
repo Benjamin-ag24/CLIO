@@ -266,41 +266,6 @@ El archivo `.env` **no debe subirse al repositorio**, ya que contiene informaci�
 Cada desarrollador debe utilizar su propio archivo `.env` de forma local.
 
 ---
-
-## 🔄 Funcionamiento general
-
-El funcionamiento principal de Clio sigue el siguiente flujo:
-
-```text
-Usuario
-   │
-   ▼
-Frontend (React)
-   │
-   ▼
-API REST
-   │
-   ▼
-Backend (Express + TypeORM)
-   │
-   ├──────────────► PostgreSQL
-   │
-   ▼
-Google Gemini
-   │
-   ▼
-Análisis de la afirmación
-   │
-   ▼
-Veraz / Dudoso / Falso
-   │
-   ▼
-Explicación + términos clave
-   │
-   ▼
-Frontend
-```
-
 ---
 
 ## 🧠 Análisis mediante IA
