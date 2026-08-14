@@ -19,7 +19,6 @@ export const authCopy = {
       noAccount: "¿No tienes cuenta?",
       action: "Regístrate",
     },
-    brand: "PUCE TEC · DEVCHALLENGE 2026",
   },
   register: {
     title: "Crear cuenta",
@@ -43,7 +42,6 @@ export const authCopy = {
       action: "Inicia sesión",
     },
     success: "¡Cuenta creada! Redirigiendo al inicio de sesión...",
-    brand: "PUCE TEC · DEVCHALLENGE 2026",
   },
 };
 
