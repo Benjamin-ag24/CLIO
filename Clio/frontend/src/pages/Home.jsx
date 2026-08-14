@@ -24,6 +24,22 @@ import {
 import { analysisCopy } from "../constants/analysisConstants";
 import { ROUTE_PATHS } from "../routes/routePaths";
 
+import {
+  contentWrapperStyles,
+  actionsRowStyles,
+  heroWrapperStyles,
+  heroTitleStyles,
+  heroDescriptionStyles,
+  heroExampleStyles,
+  loadingWrapperStyles,
+  resultWrapperStyles,
+  featuresGridStyles,
+  featureCardStyles,
+  featureIconBaseStyles,
+  featureTitleStyles,
+  featureDescriptionStyles,
+} from "./Home.styles";
+
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -131,8 +147,8 @@ const Home = () => {
         onSelectAnalysis={selectAnalysis}
       />
 
-      <div className="mx-auto max-w-6xl px-6 py-8">
-        <div className="mb-4 flex items-center justify-end gap-4">
+      <div className={contentWrapperStyles}>
+        <div className={actionsRowStyles}>
           {isAuditView && (
             <Button
               variant="text"
@@ -163,16 +179,16 @@ const Home = () => {
 
         {!isAuditView ? (
           <>
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl font-bold tracking-tight text-[#5b3f2d] md:text-4xl">
+            <div className={heroWrapperStyles}>
+              <h1 className={heroTitleStyles}>
                 {homePageCopy.title}
               </h1>
 
-              <p className="mx-auto mt-3 max-w-2xl text-sm text-[#7b5f49] md:text-base">
+              <p className={heroDescriptionStyles}>
                 {homePageCopy.description}
               </p>
 
-              <p className="mt-1 text-sm italic text-[#a6886a]">
+              <p className={heroExampleStyles}>
                 {homePageCopy.example}
               </p>
             </div>
@@ -187,7 +203,7 @@ const Home = () => {
             />
 
             {status === "loading" && (
-              <div className="mt-8">
+              <div className={loadingWrapperStyles}>
                 <Loading />
               </div>
             )}
@@ -201,7 +217,7 @@ const Home = () => {
             )}
 
             {status === "result" && (
-              <div className="opacity-100 transition-all duration-500 ease-in">
+              <div className={resultWrapperStyles}>
                 <ReportPanel
                   report={report}
                   onReset={resetAnalysis}
@@ -209,23 +225,23 @@ const Home = () => {
               </div>
             )}
 
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <div className={featuresGridStyles}>
               {featureList.map((feature) => (
                 <div
                   key={feature.title}
-                  className="rounded-2xl bg-white p-6 shadow-[0_8px_30px_-12px_rgba(91,55,35,0.2)] transition-shadow duration-300 hover:shadow-[0_16px_40px_-16px_rgba(91,55,35,0.25)]"
+                  className={featureCardStyles}
                 >
                   <div
-                    className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl text-xl ${feature.accent} text-white shadow-sm`}
+                    className={`${featureIconBaseStyles} ${feature.accent}`}
                   >
                     {feature.icon}
                   </div>
 
-                  <h3 className="text-base font-semibold text-[#5b3f2d]">
+                  <h3 className={featureTitleStyles}>
                     {feature.title}
                   </h3>
 
-                  <p className="mt-2 text-sm leading-relaxed text-[#7b5f49]">
+                  <p className={featureDescriptionStyles}>
                     {feature.description}
                   </p>
                 </div>

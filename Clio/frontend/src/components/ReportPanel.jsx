@@ -2,6 +2,24 @@
 import Semaphore, { renderHighlightedText } from "./Semaphore/Semaphore";
 import Button from "../common/Button";
 import { analysisCopy } from "../constants/analysisConstants";
+import {
+  panelContainerStyles,
+  gridStyles,
+  sectionCardStyles,
+  sectionHeaderStyles,
+  sectionLabelStyles,
+  sectionTitleStyles,
+  explanationWrapperStyles,
+  indicatorsTitleStyles,
+  indicatorsListStyles,
+  indicatorItemStyles,
+  indicatorIconStyles,
+  keyTermsTitleStyles,
+  keyTermsListStyles,
+  keyTermBadgeStyles,
+  actionsRowStyles,
+  copyIconStyles,
+} from "./ReportPanel.styles";
 
 const buildReportText = ({ verdict, explanation, keyTerms, indicators }) => {
   const text = [
@@ -67,44 +85,44 @@ const ReportPanel = ({ report, onReset }) => {
   };
 
   return (
-    <div className="mt-8 rounded-3xl bg-white p-6 shadow-[0_8px_30px_-12px_rgba(91,55,35,0.15)]">
-      <div className="grid gap-6 xl:grid-cols-[1.1fr_1fr]">
-        <section className="rounded-3xl border border-[#e8ddd0] bg-[#fcfaf7] p-5">
-          <div className="mb-4">
-            <span className="text-xs font-semibold uppercase tracking-[0.24em] text-[#a78a6f]">
+    <div className={panelContainerStyles}>
+      <div className={gridStyles}>
+        <section className={sectionCardStyles}>
+          <div className={sectionHeaderStyles}>
+            <span className={sectionLabelStyles}>
               {analysisCopy.reportPanel.sections.semaphore.label}
             </span>
-            <h2 className="mt-2 text-lg font-semibold text-[#5b3f2d]">
+            <h2 className={sectionTitleStyles}>
               {analysisCopy.reportPanel.sections.semaphore.title}
             </h2>
           </div>
           <Semaphore verdict={verdict} />
         </section>
 
-        <section className="rounded-3xl border border-[#e8ddd0] bg-[#fcfaf7] p-5">
-          <div className="mb-4">
-            <span className="text-xs font-semibold uppercase tracking-[0.24em] text-[#a78a6f]">
+        <section className={sectionCardStyles}>
+          <div className={sectionHeaderStyles}>
+            <span className={sectionLabelStyles}>
               {analysisCopy.reportPanel.sections.explanation.label}
             </span>
-            <h2 className="mt-2 text-lg font-semibold text-[#5b3f2d]">
+            <h2 className={sectionTitleStyles}>
               {analysisCopy.reportPanel.sections.explanation.title}
             </h2>
           </div>
-          <div className="space-y-4 text-sm leading-7 text-[#6e5544]">
+          <div className={explanationWrapperStyles}>
             <p>{renderHighlightedText(explanation, keyTerms)}</p>
 
             {indicators?.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-[#a78a6f]">
+                <h3 className={indicatorsTitleStyles}>
                   {analysisCopy.reportPanel.sections.indicators}
                 </h3>
-                <ul className="mt-3 space-y-2">
+                <ul className={indicatorsListStyles}>
                   {indicators.map((indicator) => (
                     <li
                       key={indicator}
-                      className="flex items-start gap-3 rounded-2xl bg-[#fff8f3] p-3 text-sm text-[#705944]"
+                      className={indicatorItemStyles}
                     >
-                      <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#e8d7c1] text-xs font-semibold text-[#7b5d42]">
+                      <span className={indicatorIconStyles}>
                         ✓
                       </span>
                       <span>{indicator}</span>
@@ -116,14 +134,14 @@ const ReportPanel = ({ report, onReset }) => {
 
             {keyTerms?.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-[#a78a6f]">
+                <h3 className={keyTermsTitleStyles}>
                   {analysisCopy.reportPanel.sections.keyTerms}
                 </h3>
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className={keyTermsListStyles}>
                   {keyTerms.map((term) => (
                     <span
                       key={term}
-                      className="rounded-full bg-[#f2ede6] px-3 py-1 text-sm font-medium text-[#5b3f2d]"
+                      className={keyTermBadgeStyles}
                     >
                       {term}
                     </span>
@@ -135,9 +153,9 @@ const ReportPanel = ({ report, onReset }) => {
         </section>
       </div>
 
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+      <div className={actionsRowStyles}>
         <Button variant="secondary" onClick={handleCopy} type="button">
-          <span className="mr-2 text-base">
+          <span className={copyIconStyles}>
             {copyState === "copied" ? "✅" : "📋"}
           </span>
           {copyState === "copied"
