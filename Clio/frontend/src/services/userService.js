@@ -1,6 +1,7 @@
 import { getAuthToken } from "./authStorage";
+import { BACKEND_URL } from "../constants/configConstants";
 
-const USERS_URL = "http://localhost:3000/api/admin/users";
+const USERS_URL = `${BACKEND_URL}/admin/users`;
 
 export const updateUser = async (userId, userData) => {
   const token = getAuthToken();

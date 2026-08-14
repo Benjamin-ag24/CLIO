@@ -1,6 +1,7 @@
 import { getAuthToken } from "./authStorage";
+import { BACKEND_URL } from "../constants/configConstants";
 
-const API_URL = "http://localhost:3000/api/statistics";
+const API_URL = `${BACKEND_URL}/statistics`;
 
 export const getStatistics = async (from, to) => {
   const params = new URLSearchParams();

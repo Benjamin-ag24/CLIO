@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "./configConstants";
 export const analysisCopy = {
   inputPanel: {
     title: "Texto a analizar",
@@ -98,5 +99,5 @@ export const analysisCopy = {
 };
 
 export const analysisApiEndpoints = {
-  base: "http://localhost:3000/api/analysis",
+  base: `${BACKEND_URL}/analysis`,
 };

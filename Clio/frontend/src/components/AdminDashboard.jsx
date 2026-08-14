@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "../constants/configConstants";
 import { useEffect, useState } from "react";
 
 import {
@@ -120,14 +121,11 @@ ChartJS.register(
   Legend,
 );
 
-const STATISTICS_URL =
-  "http://localhost:3000/api/admin/statistics";
+const STATISTICS_URL = `${BACKEND_URL}/admin/statistics`;
 
-const AUDIT_URL =
-  "http://localhost:3000/api/admin/audit";
+const AUDIT_URL = `${BACKEND_URL}/admin/audit`;
 
-const USERS_URL =
-  "http://localhost:3000/api/admin/users";
+const USERS_URL = `${BACKEND_URL}/admin/users`;
 
 const ECUADOR_TIME_ZONE =
   "America/Guayaquil";

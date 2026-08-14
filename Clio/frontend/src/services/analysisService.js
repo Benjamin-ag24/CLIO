@@ -1,6 +1,7 @@
 import { getAuthToken } from "./authStorage";
+import { BACKEND_URL } from "../constants/configConstants";
 
-const API_URL = "http://localhost:3000/api/analysis";
+const API_URL = `${BACKEND_URL}/analysis`;
 
 export const analyzeText = async (text) => {
   try {
