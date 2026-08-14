@@ -1,63 +1,96 @@
-# Clio - Validador de Hechos Históricos con IA
+Clio - Validador de Hechos Históricos con IA
 
-Clio es una aplicación web full-stack que utiliza Google Gemini para analizar afirmaciones históricas y clasificarlas como Veraz, Dudoso o Falso, proporcionando una explicación y términos clave.
+Clio es una aplicación web full-stack que utiliza Google Gemini para analizar afirmaciones históricas y clasificarlas como Veraz, Dudoso o Falso, proporcionando una explicación y términos clave relacionados con el análisis.
 
-## 1.Tecnologías y versiones
+📌 Tecnologías y versiones
+
 Backend
-•	Node.js: 18 o superior
-•	Express.js: 5.x
-•	TypeORM: 0.3.x
-•	PostgreSQL: 12 o superior
-•	pg: driver de PostgreSQL
-•	bcryptjs: hash de contraseñas
-•	jsonwebtoken: autenticación JWT
-•	dotenv: variables de entorno
-•	cors: configuración CORS
-•	Google Gemini: análisis mediante IA
+Tecnología	Versión / Uso
+Node.js	18 o superior
+Express.js	5.x
+TypeORM	0.3.x
+PostgreSQL	12 o superior
+pg	Driver de PostgreSQL
+bcryptjs	Hash de contraseñas
+jsonwebtoken	Autenticación mediante JWT
+dotenv	Variables de entorno
+cors	Configuración CORS
+Google Gemini	Análisis mediante IA
 Frontend
-•	React: 18+
-•	Vite: 6+
-•	Tailwind CSS: 3+
-•	React Router: 7+
-•	Axios: consumo de API REST
-•	Chart.js: estadísticas
+Tecnología	Versión / Uso
+React	18+
+Vite	6+
+Tailwind CSS	3+
+React Router	7+
+Axios	Consumo de API REST
+Chart.js	Estadísticas y gráficos
 
-## 2.Requisitos previos
+📁 Estructura del proyecto
 
-Antes de ejecutar Clio se necesita instalar:
-•	Node.js 18 o superior
-•	npm 9 o superior
-•	PostgreSQL 12 o superior
-•	Git
-Verificar las versiones:
+La estructura principal del proyecto está organizada de la siguiente manera:
+
+Clio/
+├── backend/
+├── frontend/
+└── README.md
+backend/
+
+Contiene toda la lógica del servidor, API REST, autenticación, conexión con PostgreSQL, integración con Google Gemini y gestión de datos mediante TypeORM.
+
+frontend/
+
+Contiene la interfaz gráfica de Clio desarrollada con React, Vite y Tailwind CSS. Aquí se encuentran las páginas, componentes, servicios para consumir la API y elementos visuales de la aplicación.
+
+README.md
+
+Documento principal con la información del proyecto, tecnologías utilizadas, requisitos e instrucciones necesarias para instalar y ejecutar Clio.
+
+⚙️ Requisitos previos
+
+Antes de ejecutar Clio es necesario tener instalados:
+
+Node.js 18 o superior
+npm 9 o superior
+PostgreSQL 12 o superior
+Git
+
+Para verificar las versiones instaladas:
+
 node --version
 npm --version
 psql --version
 git --version
 
-## 3.Instalación
+🚀 Instalación
 
 1. Clonar el repositorio
 git clone <URL_DEL_REPOSITORIO>
-
 cd Clio
-
-
 2. Configurar la base de datos
-Crear la base de datos en PostgreSQL:
-CREATE DATABASE ClioUser;
-Ejecutar el esquema:
-psql -U postgres -d ClioUser -f backend/src/sql/schema.sql
 
+Crear la base de datos en PostgreSQL:
+
+CREATE DATABASE ClioUser;
+
+Después, ejecutar el esquema de la base de datos:
+
+psql -U postgres -d ClioUser -f backend/src/sql/schema.sql
 3. Configurar el Backend
-Entrar a la carpeta:
+
+Entrar a la carpeta del backend:
 
 cd backend
-Instalar dependencias:
+
+Instalar las dependencias:
+
 npm install
-Crear el archivo:
+
+Crear el archivo .env dentro de la carpeta backend:
+
 backend/.env
-Agregar:
+
+Agregar las siguientes variables:
+
 PORT=3000
 NODE_ENV=development
 
@@ -72,34 +105,76 @@ GEMINI_MODEL=gemini-3.5-flash
 
 JWT_SECRET=TU_SECRETO
 
-Ejecutar:
+Iniciar el servidor:
+
 npm run dev
-Backend:
+
+El backend estará disponible en:
+
 http://localhost:3000
 
 4. Configurar el Frontend
-Abrir otra terminal y ejecutar:
+
+Abrir una segunda terminal y regresar a la carpeta principal del proyecto:
+
 cd frontend
+
+Instalar las dependencias:
+
 npm install
+
+Iniciar el servidor de desarrollo:
+
 npm run dev
-Frontend:
+
+El frontend estará disponible en:
+
 http://localhost:5173
 
-Abrir esa dirección en el navegador.
+Abrir esta dirección en el navegador para acceder a Clio.
 
-## 4.Ejecutar el proyecto
+▶️ Ejecución del proyecto
 
-Se necesitan dos terminales.
+Para ejecutar Clio se necesitan dos terminales abiertas simultáneamente.
 
-Terminal 1 - Backend
-cd backend
+Terminal 1 — Backend
+
+Desde la carpeta backend:
+
 npm run dev
 
-Terminal 2 - Frontend
-cd frontend
+Servidor:
+
+http://localhost:3000
+
+Terminal 2 — Frontend
+
+Desde la carpeta frontend:
+
 npm run dev
 
-Finalmente abrir:
+Aplicación:
+
 http://localhost:5173
 
-Abrir esa dirección en el navegador.
+Finalmente, abrir en el navegador:
+
+http://localhost:5173
+
+🔐 Variables de entorno
+
+Las variables de entorno contienen información necesaria para conectar Clio con PostgreSQL, autenticar usuarios y utilizar Google Gemini.
+
+El archivo .env no debe subirse al repositorio, ya que contiene información sensible como:
+
+Contraseña de PostgreSQL
+API Key de Google Gemini
+Secret utilizado para JWT
+
+Se debe utilizar un archivo .env local para cada entorno de desarrollo.
+
+👥 Proyecto
+
+Clio — Validador de Hechos Históricos con Inteligencia Artificial.
+
+Aplicación desarrollada como proyecto full-stack, integrando frontend, backend, base de datos y servicios de inteligencia artificial.
