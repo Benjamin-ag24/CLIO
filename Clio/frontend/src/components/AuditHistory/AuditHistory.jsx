@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { getAuditLog } from "../services/auditService";
-import Loading from "../common/Loading";
-import adminDashboardCopy from "../constants/adminDashboardConstants";
+import { getAuditLog } from "../../services/auditService";
+import Loading from "../../common/Loading";
+import adminDashboardCopy from "../../constants/adminDashboardConstants";
 import {
   fieldLabelStyles,
   fieldValueStyles,

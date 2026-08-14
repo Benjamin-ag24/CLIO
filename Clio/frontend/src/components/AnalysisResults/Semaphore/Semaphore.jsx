@@ -1,4 +1,4 @@
-import { analysisCopy } from "../../constants/analysisConstants";
+import { analysisCopy } from "../../../constants/analysisConstants";
 import { levels, verdictMap } from "./constantsForSemaphore";
 import {
   highlightedTermStyles,

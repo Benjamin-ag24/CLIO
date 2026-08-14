@@ -1,13 +1,13 @@
 import { useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import Header from "../components/Header";
-import AIInteractivePanel from "../components/AIInteractivePanel";
-import ReportPanel from "../components/ReportPanel";
-import AuditHistory from "../components/AuditHistory";
-import ErrorBanner from "../components/ErrorBanner";
+import Header from "../components/Header/Header";
+import AIInteractivePanel from "../components/AIInteractivePanel/AIInteractivePanel";
+import ReportPanel from "../components/AnalysisResults/ReportPanel/ReportPanel";
+import AuditHistory from "../components/AuditHistory/AuditHistory";
+import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
 import Loading from "../common/Loading";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../components/Sidebar/Sidebar";
 import Button from "../common/Button";
 
 import { analyzeText } from "../services/analysisService";

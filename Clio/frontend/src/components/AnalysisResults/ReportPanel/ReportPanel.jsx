@@ -1,7 +1,7 @@
 ﻿import { useState } from "react";
-import Semaphore, { renderHighlightedText } from "./Semaphore/Semaphore";
-import Button from "../common/Button";
-import { analysisCopy } from "../constants/analysisConstants";
+import Semaphore, { renderHighlightedText } from "../Semaphore/Semaphore";
+import Button from "../../../common/Button";
+import { analysisCopy } from "../../../constants/analysisConstants";
 import {
   panelContainerStyles,
   gridStyles,

@@ -1,4 +1,4 @@
-import { BACKEND_URL } from "../constants/configConstants";
+import { BACKEND_URL } from "../../constants/configConstants";
 import { useEffect, useState } from "react";
 
 import {
@@ -15,10 +15,10 @@ import {
 
 import { Line, Bar, Pie } from "react-chartjs-2";
 
-import { getAuthToken } from "../services/authStorage";
-import Button from "../common/Button";
-import Loading from "../common/Loading";
-import adminDashboardCopy from "../constants/adminDashboardConstants";
+import { getAuthToken } from "../../services/authStorage";
+import Button from "../../common/Button";
+import Loading from "../../common/Loading";
+import adminDashboardCopy from "../../constants/adminDashboardConstants";
 import {
   emptyValueStyles,
   tagsWrapperStyles,

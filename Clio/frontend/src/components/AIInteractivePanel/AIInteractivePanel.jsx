@@ -1,6 +1,6 @@
 import { forwardRef, useState } from "react";
-import Button from "../common/Button";
-import { analysisCopy } from "../constants/analysisConstants";
+import Button from "../../common/Button";
+import { analysisCopy } from "../../constants/analysisConstants";
 import {
   panelContainerStyles,
   contentWrapperStyles,
