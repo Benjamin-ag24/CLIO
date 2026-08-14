@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "./configConstants";
 export const authCopy = {
   login: {
     title: "Iniciar sesión",
@@ -55,6 +56,6 @@ export const authValidationMessages = {
 };
 
 export const authApiEndpoints = {
-  login: "http://localhost:3000/api/auth/login",
-  register: "http://localhost:3000/api/auth/register",
+  login: `${BACKEND_URL}/auth/login`,
+  register: `${BACKEND_URL}/auth/register`,
 };

@@ -1,4 +1,5 @@
 // frontend/src/components/Sidebar.jsx
+import { BACKEND_URL } from "../constants/configConstants";
 import { useEffect, useState } from "react";
 import { getAuthToken } from "../services/authStorage";
 import {
@@ -64,7 +65,7 @@ const VERDICT_STYLES = {
   },
 };
 
-const API_URL = "http://localhost:3000/api/analysis";
+const API_URL = `${BACKEND_URL}/analysis`;
 
 const formatDate = (isoString) => {
   if (!isoString) return "";

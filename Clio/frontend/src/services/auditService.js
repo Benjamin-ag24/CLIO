@@ -1,7 +1,7 @@
 import { getAuthToken } from "./authStorage";
+import { BACKEND_URL } from "../constants/configConstants";
 
-const API_URL =
-  "http://localhost:3000/api/admin/audit";
+const API_URL = `${BACKEND_URL}/admin/audit`;
 
 export const getAuditLog = async (
   analysisId = null,
