@@ -1,4 +1,5 @@
 import logoImage from "../../assets/logo.png";
+import Button from "../../common/Button";
 import {
   headerContainerStyles,
   headerNavStyles,
@@ -6,9 +7,10 @@ import {
   logoBoxStyles,
   logoImageStyles,
   brandNameStyles,
+  logoutButtonStyles,
 } from "./Header.styles";
 
-const Header = () => {
+const Header = ({ userName, onLogout }) => {
   return (
     <header className={headerContainerStyles}>
       <nav className={headerNavStyles}>
@@ -18,6 +20,16 @@ const Header = () => {
           </div>
           <span className={brandNameStyles}>Clio</span>
         </div>
+
+        {onLogout && (
+          <Button
+            variant="text"
+            className={logoutButtonStyles}
+            onClick={onLogout}
+          >
+            Cerrar sesión {userName ? `(${userName})` : ""}
+          </Button>
+        )}
       </nav>
     </header>
   );

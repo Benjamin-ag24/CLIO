@@ -9,6 +9,7 @@ import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
 import Loading from "../common/Loading";
 import Sidebar from "../components/Sidebar/Sidebar";
 import Button from "../common/Button";
+import Footer from "../components/Footer/Footer";
 
 import { analyzeText } from "../services/analysisService";
 import {
@@ -137,7 +138,7 @@ const Home = () => {
 
   return (
     <main>
-      <Header />
+      <Header userName={getAuthUser()?.nombre} onLogout={handleLogout} />
 
       <Sidebar
         isOpen={isSidebarOpen}
@@ -167,14 +168,6 @@ const Home = () => {
             {homePageCopy.actions.history}
           </Button>
 
-          <Button
-            variant="text"
-            onClick={handleLogout}
-          >
-            {homePageCopy.actions.logoutPrefix} (
-            {getAuthUser()?.nombre}
-            )
-          </Button>
         </div>
 
         {!isAuditView ? (
@@ -252,6 +245,8 @@ const Home = () => {
           <AuditHistory />
         )}
       </div>
+
+      <Footer />
     </main>
   );
 };
